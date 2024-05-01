@@ -13,21 +13,26 @@ using System.IO;
 using UnityEngine.Rendering;
 using System.Linq;
 using Newtonsoft.Json;
+using Unity.VisualScripting;
 
 
 public class DirectInputAirTapDisplayer : MonoBehaviour
 {
 
-    [SerializeField]
-    private GameObject leftHand;
-    [SerializeField]
-    private GameObject rightHand;
+    
+    // [SerializeField]
+    // private GameObject leftHand;
+    // [SerializeField]
+    // private GameObject rightHand;
 
     [SerializeField]
     private InputActionReference leftHandReference;
     [SerializeField]
     private InputActionReference rightHandReference;
     private Boolean trackingState;
+
+    private Boolean recordState = false;
+
     [SerializeField]
     private InputActionReference rightHandActive;
 
@@ -37,49 +42,72 @@ public class DirectInputAirTapDisplayer : MonoBehaviour
 
     public List<float[]> jointPosesArrList;
 
+    // Dictionary to store hand joint pose data
     public Dictionary<string, List<float[]>> JointPoseDict;
     
     private int counter=0;
-    public struct JointPoseData
-    {
-        public Vector3 position;
-        public Quaternion rotation;
-    }
 
-    JointPoseData poseData;
-
-    // List to store hand joint pose data
+    Instantiator instantiator;
+    public GameObject InstantiatorGameObject;
 
     private void Start()
     {
+        instantiator =  InstantiatorGameObject.GetComponent<Instantiator>();
         JointPoseDict = new Dictionary<string, List<float[]>>();
         jointPosesList =  new List<Vector3>();
-        jointPosesArrList = new List<float[]>();
-        leftHand.SetActive(false);
-        rightHand.SetActive(false);
-        leftHandReference.action.performed += ProcessLeftHand;
-        rightHandReference.action.performed += ProcessRightHand;
-        rightHandReference.action.started += StartTracking;
-        rightHandReference.action.canceled += StopTracking;
+        
+        // leftHand.SetActive(false);
+        // rightHand.SetActive(false);
+        leftHandReference.action.started += ProcessLeftHand;
+        rightHandReference.action.started += ProcessRightHand;
+        // rightHandReference.action.started += StartTracking;
+        // rightHandReference.action.canceled += StopRecording;
         rightHandActive.action.performed += GetRightHandJoint;
     }
 
 
     private void ProcessRightHand(InputAction.CallbackContext ctx)
     {
-        ProcessHand(ctx, rightHand);
-        //Debug.Log(ctx);
+        ProcessHand(ctx);
+        Debug.Log("Right hand action started = " + ctx.started);
+        if (recordState == false)
+        {   
+            recordState = true;
+            Debug.Log("Record state = " + recordState);
+            jointPosesArrList = new List<float[]>();
+        }
+        else if (recordState == true)
+        {
+            recordState = false;
+            StopRecording();
+            Debug.Log("Record state = " + recordState);
+        }
     }
 
     private void ProcessLeftHand(InputAction.CallbackContext ctx)
     {
-        ProcessHand(ctx, leftHand);
-        //Debug.Log(ctx);
+
+        ProcessHand(ctx);
+        Debug.Log("Left hand action started = " + ctx.started);
+        if (recordState == false)
+        {   
+            recordState = true;
+            Debug.Log("Record state = " + recordState);
+        }
+        else if (recordState == true)
+        {
+            recordState = false;
+            StopRecording();
+            Debug.Log("Record state = " + recordState);
+        }
     }
 
-    private void ProcessHand(InputAction.CallbackContext ctx, GameObject g)
+    private void ProcessHand(InputAction.CallbackContext ctx)
     {
-        g.SetActive(ctx.ReadValue<float>() > 0.95f);     
+        // recordState = ctx.ReadValue<float>() > 0.95f;
+        
+        Debug.Log(ctx.ReadValue<float>() > 0.95f ? "Air tap was registered" : "Air tap was not registered");
+   
     }
 
     private void OnDestroy()
@@ -88,37 +116,35 @@ public class DirectInputAirTapDisplayer : MonoBehaviour
         rightHandReference.action.performed -= ProcessRightHand;   
     }
 
-    void StartTracking(InputAction.CallbackContext ctx)
-    {
-    trackingState = true;
-    Debug.Log("Tracking started!");
-    }
-
-    void StopTracking(InputAction.CallbackContext ctx)
-    {
-    trackingState = false;
-    Debug.Log("Tracking stopped!");
-
-    counter += 1;
-
-    //Debug.Log("bool is false" + trackingState);
-    //     for(int i=0; i < jointPoses.Count; i++)
-    // {   
-    //     Debug.Log(string.Format("{0} {1}", i, jointPoses[i].position));
+    // void StartTracking(InputAction.CallbackContext ctx)
+    // {
+    //     trackingState = true;
+    //     Debug.Log("Tracking started!");
     // }
 
-    // string listAsString = string.Join(", ", jointPoses.ToArray());
+    void StopRecording()
+    {
+        Debug.Log("Recording stopped! Poses recorded = " + jointPosesList.Count);
 
-    // string dummy1 = "hello";
-    // string dummy2 = "1";
-    // JointPoseDict.Add(dummy1, dummy2);
+        //Debug.Log("bool is false" + trackingState);
+        //     for(int i=0; i < jointPoses.Count; i++)
+        // {   
+        //     Debug.Log(string.Format("{0} {1}", i, jointPoses[i].position));
+        // }
 
-    //Debug.Log(jointPosesArrList.GetType());
-    JointPoseDict.Add(counter.ToString(), jointPosesArrList);
-    Debug.Log("jointPosesArrList length " + jointPosesArrList.Count);
-    string json = JsonConvert.SerializeObject(JointPoseDict);
-    //Debug.Log(json.ToString());
-    WriteToFile(json);
+        // string listAsString = string.Join(", ", jointPoses.ToArray());
+
+        // string dummy1 = "hello";
+        // string dummy2 = "1";
+        // JointPoseDict.Add(dummy1, dummy2);
+
+        //Debug.Log(jointPosesArrList.GetType());
+        JointPoseDict.Add(counter.ToString(), jointPosesArrList);
+        Debug.Log("Recorded joint poses " + jointPosesArrList.Count);
+        string json = JsonConvert.SerializeObject(JointPoseDict);
+        WriteToFile(json);
+
+        counter ++;
     }
 
     void WriteToFile(string json)
@@ -132,31 +158,39 @@ public class DirectInputAirTapDisplayer : MonoBehaviour
         {
             streamwriter.Write(json);
         }
-
         Debug.Log("We exported the file to " + filepath);
     }
     void GetRightHandJoint(InputAction.CallbackContext ctx)
     {
-        Debug.Log("I am in void GetRightHandJoint!");
-        //Debug.Log("InputAction = " + ctx);
-        if (trackingState == false)
+        // Debug.Log("I am in void GetRightHandJoint!");
+        // Debug.Log("InputAction = " + ctx);
+        // if (trackingState == false && recordState == true)
+        if (recordState == false)
         {
-            Debug.Log("Tracking ON!");
+            Debug.Log("Recording OFF!");
         }
         else
         {   
-            Debug.Log("Tracking OFF!");          
-            Debug.Log("Sequence number " + counter);
+            Debug.Log("Recording ON!");          
+            Debug.Log("Recording sequence number " + counter);
 
             var handsSubsystem_mrtk = XRSubsystemHelpers.GetFirstRunningSubsystem<HandsSubsystem>();
+            Debug.Log("current subsystem = " + handsSubsystem_mrtk);
+            // var handsSubsystem_mrtk = XRSubsystemHelpers.GetFirstRunningSubsystem<IHandsAggregatorSubsystem>();
+            // handsSubsystem_mrtk.TryGetEntireHand(XRNode.RightHand, out IReadOnlyList<HandJointPose> jointPoses);
             handsSubsystem_mrtk.TryGetJoint(TrackedHandJoint.IndexTip, XRNode.RightHand, out HandJointPose pose);
+            // handsAggregatorSubsystem.TryGetPinchingPoint
+            
             Debug.Log("Tracked hand joint pose = " + pose);
+
+            // foreach(Pose jointPose in jointPoses)
+            // {
+            //     Debug.Log("Tracked hand joint poses = " + jointPose);
+            // }
       
 
             if (pose != null)
             {
-                poseData.position = pose.Pose.position;
-                poseData.rotation = pose.Pose.rotation;
                 var vecArr = new float[3]
                 {
                     pose.Pose.position.x,
@@ -166,6 +200,7 @@ public class DirectInputAirTapDisplayer : MonoBehaviour
                 jointPosesList.Add(pose.Pose.position);
                 jointPosesArrList.Add(vecArr);
                 
+                instantiator.InstantiateSpheresRT(pose.Pose, counter.ToString());
 
             }
         }
