@@ -162,9 +162,7 @@ public class DirectInputAirTapDisplayer : MonoBehaviour
     }
     void GetRightHandJoint(InputAction.CallbackContext ctx)
     {
-        // Debug.Log("I am in void GetRightHandJoint!");
-        // Debug.Log("InputAction = " + ctx);
-        // if (trackingState == false && recordState == true)
+
         if (recordState == false)
         {
             Debug.Log("Recording OFF!");
@@ -176,18 +174,10 @@ public class DirectInputAirTapDisplayer : MonoBehaviour
 
             var handsSubsystem_mrtk = XRSubsystemHelpers.GetFirstRunningSubsystem<HandsSubsystem>();
             Debug.Log("current subsystem = " + handsSubsystem_mrtk);
-            // var handsSubsystem_mrtk = XRSubsystemHelpers.GetFirstRunningSubsystem<IHandsAggregatorSubsystem>();
-            // handsSubsystem_mrtk.TryGetEntireHand(XRNode.RightHand, out IReadOnlyList<HandJointPose> jointPoses);
             handsSubsystem_mrtk.TryGetJoint(TrackedHandJoint.IndexTip, XRNode.RightHand, out HandJointPose pose);
-            // handsAggregatorSubsystem.TryGetPinchingPoint
             
             Debug.Log("Tracked hand joint pose = " + pose);
-
-            // foreach(Pose jointPose in jointPoses)
-            // {
-            //     Debug.Log("Tracked hand joint poses = " + jointPose);
-            // }
-      
+     
 
             if (pose != null)
             {

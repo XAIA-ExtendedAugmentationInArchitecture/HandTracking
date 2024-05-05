@@ -9,6 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/hand_tracking_test.unity
     guid: 9ae4a22a3cfe87441aa6b4cd5997d726
   m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: 9ad56510223fe8e4e821d2c7120c5b13, type: 2}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: ecbcbc914f115f048a9d566c45ed92f8, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 61cd86af18842ff4ebf7c93c24ae4875, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 49be1f13cfd842c4e922659324b3ac41, type: 2}

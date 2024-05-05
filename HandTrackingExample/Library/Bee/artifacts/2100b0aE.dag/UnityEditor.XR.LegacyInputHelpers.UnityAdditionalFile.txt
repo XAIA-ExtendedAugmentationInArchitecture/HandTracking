@@ -1,1 +1,1 @@
-C:\Users\lidet\workspace\projects\hand_tracking\HandTrackingExample
+C:\Users\dm3424\Documents\GitHub\HandTracking\HandTrackingExample
