@@ -463,6 +463,7 @@
 -analyzer:"C:/Program Files/Unity/Hub/Editor/2023.2.18f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.UIToolkit.SourceGenerator.dll"
 "Assets/Scripts/datamanagment.cs"
 "Assets/Scripts/DataManagmentDM.cs"
+"Assets/Scripts/debuglog.cs"
 "Assets/Scripts/DirectInputAirTapDisplayer.cs"
 "Assets/Scripts/hands.cs"
 "Assets/Scripts/handscript_dm.cs"

@@ -116,29 +116,11 @@ public class DirectInputAirTapDisplayer : MonoBehaviour
         rightHandReference.action.performed -= ProcessRightHand;   
     }
 
-    // void StartTracking(InputAction.CallbackContext ctx)
-    // {
-    //     trackingState = true;
-    //     Debug.Log("Tracking started!");
-    // }
 
     void StopRecording()
     {
         Debug.Log("Recording stopped! Poses recorded = " + jointPosesList.Count);
 
-        //Debug.Log("bool is false" + trackingState);
-        //     for(int i=0; i < jointPoses.Count; i++)
-        // {   
-        //     Debug.Log(string.Format("{0} {1}", i, jointPoses[i].position));
-        // }
-
-        // string listAsString = string.Join(", ", jointPoses.ToArray());
-
-        // string dummy1 = "hello";
-        // string dummy2 = "1";
-        // JointPoseDict.Add(dummy1, dummy2);
-
-        //Debug.Log(jointPosesArrList.GetType());
         JointPoseDict.Add(counter.ToString(), jointPosesArrList);
         Debug.Log("Recorded joint poses " + jointPosesArrList.Count);
         string json = JsonConvert.SerializeObject(JointPoseDict);

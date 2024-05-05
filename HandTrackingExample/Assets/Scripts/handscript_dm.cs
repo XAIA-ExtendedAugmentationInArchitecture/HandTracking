@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 using System.Linq;
+using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
+using UnityEngine.XR.OpenXR.Input;
 
 
 
@@ -14,9 +16,21 @@ public class handscript_dm : MonoBehaviour
      // Gets the first valid implementation of T that is started and running.
      // Reference to the hands aggregator
     HandsAggregatorSubsystem aggregator;
+    public List<Vector3> jointPosesList;
+    public List<float[]> jointPosesArrList;
+    private int counter = 0;
+    Instantiator instantiator;
+    public GameObject InstantiatorGameObject;
+    // Dictionary to store hand joint pose data
+    public Dictionary<string, List<float[]>> JointPoseDict;
 
     void Start()
     {
+        instantiator = InstantiatorGameObject.GetComponent<Instantiator>();
+        JointPoseDict = new Dictionary<string, List<float[]>>();
+        jointPosesList = new List<Vector3>();
+        jointPosesArrList = new List<float[]>();
+
         // Gets the first valid implementation of T that is started and running.
         aggregator = XRSubsystemHelpers.GetFirstRunningSubsystem<HandsAggregatorSubsystem>();
 
@@ -40,9 +54,17 @@ public class handscript_dm : MonoBehaviour
             bool handIsValid = aggregator.TryGetPalmFacingAway(XRNode.LeftHand, out bool isLeftPalmFacingAway);
             Debug.Log("The pose of the joint is" + jointIsValid + jointPose);
 
+
+
             // Query pinch characteristics from the left hand.
-            bool handIsValidPinch = aggregator.TryGetPinchProgress(XRNode.LeftHand, out bool isReadyToPinch, out bool isPinching, out float pinchAmount);
-            Debug.Log("The pinch is" + jointIsValid + jointPose);
+            bool handIsValidPinch = aggregator.TryGetPinchProgress(XRNode.RightHand, out bool isReadyToPinch, out bool isPinching, out float pinchAmount);
+            Debug.Log("The pinch is" + isPinching);
+
+            if (isPinching)
+            {
+                PlaceSpheres(jointPose);
+                Debug.Log("yeeahh");
+            }
         }
     }
 
@@ -53,5 +75,23 @@ public class handscript_dm : MonoBehaviour
 
         // Once available, you can access its properties
         string isPhysicalData = aggregator.subsystemDescriptor.id;
+    }
+
+    void PlaceSpheres(HandJointPose pose)
+    {
+        if (pose != null)
+        {
+            var vecArr = new float[3]
+            {
+                    pose.Pose.position.x,
+                    pose.Pose.position.y,
+                    pose.Pose.position.z
+            };
+            jointPosesList.Add(pose.Pose.position);
+            jointPosesArrList.Add(vecArr);
+
+            instantiator.InstantiateSpheresRT(pose.Pose, counter.ToString());
+
+        }
     }
 }
