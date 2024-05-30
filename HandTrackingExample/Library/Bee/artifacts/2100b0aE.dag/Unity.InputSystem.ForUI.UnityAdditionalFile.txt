@@ -1,1 +1,1 @@
-C:\Users\lidet\workspace\projects\HandTracking\HandTrackingExample
+C:\Users\eleni\Documents\GitHub\IntuitiveRobotics-AugmentedTechnologies\HandTracking\HandTrackingExample

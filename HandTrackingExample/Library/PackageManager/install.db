@@ -4,129 +4,129 @@
     "com.microsoft.mixedreality.openxr": {
       "tarball": {
         "hash": "6b31efb96f12",
-        "mtime": 1711578584454,
+        "mtime": 1717109402933,
         "size": 10561549,
-        "localPath": "C:\\Users\\lidet\\workspace\\projects\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\com.microsoft.mixedreality.openxr-1.10.0.tgz"
+        "localPath": "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\com.microsoft.mixedreality.openxr-1.10.0.tgz"
       }
     },
     "com.microsoft.mrtk.graphicstools.unity": {
       "tarball": {
         "hash": "2da042f5f1dc",
-        "mtime": 1711578585033,
+        "mtime": 1717109403017,
         "size": 16808633,
-        "localPath": "C:\\Users\\lidet\\workspace\\projects\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\com.microsoft.mrtk.graphicstools.unity-0.6.7.tgz"
+        "localPath": "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\com.microsoft.mrtk.graphicstools.unity-0.6.7.tgz"
       }
     },
     "com.microsoft.mrtk.tts.windows": {
       "tarball": {
         "hash": "97f8b869fdb4",
-        "mtime": 1711578581320,
+        "mtime": 1709290232070,
         "size": 50944,
-        "localPath": "C:\\Users\\lidet\\workspace\\projects\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\com.microsoft.mrtk.tts.windows-1.0.4.tgz"
+        "localPath": "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\com.microsoft.mrtk.tts.windows-1.0.4.tgz"
       }
     },
     "org.mixedrealitytoolkit.accessibility": {
       "tarball": {
         "hash": "c40bda383de6",
-        "mtime": 1711578581286,
+        "mtime": 1716826101134,
         "size": 25527,
-        "localPath": "C:\\Users\\lidet\\workspace\\projects\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.accessibility-1.0.2-pre.20.tgz"
+        "localPath": "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.accessibility-1.0.2-pre.20.tgz"
       }
     },
     "org.mixedrealitytoolkit.audio": {
       "tarball": {
         "hash": "efdd27e942cb",
-        "mtime": 1711578581237,
+        "mtime": 1716826101294,
         "size": 9118,
-        "localPath": "C:\\Users\\lidet\\workspace\\projects\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.audio-3.0.2.tgz"
+        "localPath": "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.audio-3.0.2.tgz"
       }
     },
     "org.mixedrealitytoolkit.core": {
       "tarball": {
         "hash": "f006db6463bb",
-        "mtime": 1711578581484,
+        "mtime": 1716826101578,
         "size": 134812,
-        "localPath": "C:\\Users\\lidet\\workspace\\projects\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.core-3.2.0.tgz"
+        "localPath": "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.core-3.2.0.tgz"
       }
     },
     "org.mixedrealitytoolkit.diagnostics": {
       "tarball": {
         "hash": "449033b42c12",
-        "mtime": 1711578581227,
+        "mtime": 1716826101320,
         "size": 13379,
-        "localPath": "C:\\Users\\lidet\\workspace\\projects\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.diagnostics-3.0.2.tgz"
+        "localPath": "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.diagnostics-3.0.2.tgz"
       }
     },
     "org.mixedrealitytoolkit.extendedassets": {
       "tarball": {
         "hash": "1ab56f7177f1",
-        "mtime": 1711578591128,
+        "mtime": 1716826110168,
         "size": 47311797,
-        "localPath": "C:\\Users\\lidet\\workspace\\projects\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.extendedassets-3.0.2.tgz"
+        "localPath": "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.extendedassets-3.0.2.tgz"
       }
     },
     "org.mixedrealitytoolkit.input": {
       "tarball": {
         "hash": "6785b215823f",
-        "mtime": 1711578582248,
+        "mtime": 1716826102476,
         "size": 2817475,
-        "localPath": "C:\\Users\\lidet\\workspace\\projects\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.input-3.2.0.tgz"
+        "localPath": "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.input-3.2.0.tgz"
       }
     },
     "org.mixedrealitytoolkit.spatialmanipulation": {
       "tarball": {
         "hash": "e9a3afeaede7",
-        "mtime": 1711578581484,
+        "mtime": 1716826101563,
         "size": 163937,
-        "localPath": "C:\\Users\\lidet\\workspace\\projects\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.spatialmanipulation-3.2.0.tgz"
+        "localPath": "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.spatialmanipulation-3.2.0.tgz"
       }
     },
     "org.mixedrealitytoolkit.standardassets": {
       "tarball": {
         "hash": "30664ff4df7a",
-        "mtime": 1711578582627,
+        "mtime": 1716826102869,
         "size": 4261759,
-        "localPath": "C:\\Users\\lidet\\workspace\\projects\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.standardassets-3.1.0.tgz"
+        "localPath": "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.standardassets-3.1.0.tgz"
       }
     },
     "org.mixedrealitytoolkit.tools": {
       "tarball": {
         "hash": "3e7494cf0c44",
-        "mtime": 1711578581224,
+        "mtime": 1716826101405,
         "size": 12122,
-        "localPath": "C:\\Users\\lidet\\workspace\\projects\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.tools-3.0.2.tgz"
+        "localPath": "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.tools-3.0.2.tgz"
       }
     },
     "org.mixedrealitytoolkit.uxcomponents": {
       "tarball": {
         "hash": "f707933cdf29",
-        "mtime": 1711578581492,
+        "mtime": 1716826101168,
         "size": 159394,
-        "localPath": "C:\\Users\\lidet\\workspace\\projects\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.uxcomponents-3.2.0.tgz"
+        "localPath": "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.uxcomponents-3.2.0.tgz"
       }
     },
     "org.mixedrealitytoolkit.uxcomponents.noncanvas": {
       "tarball": {
         "hash": "168fff74c24e",
-        "mtime": 1711578581426,
+        "mtime": 1716826101310,
         "size": 102281,
-        "localPath": "C:\\Users\\lidet\\workspace\\projects\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.uxcomponents.noncanvas-3.1.2.tgz"
+        "localPath": "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.uxcomponents.noncanvas-3.1.2.tgz"
       }
     },
     "org.mixedrealitytoolkit.uxcore": {
       "tarball": {
         "hash": "fc881d722d9c",
-        "mtime": 1711578581474,
+        "mtime": 1716826101168,
         "size": 108957,
-        "localPath": "C:\\Users\\lidet\\workspace\\projects\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.uxcore-3.2.0.tgz"
+        "localPath": "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.uxcore-3.2.0.tgz"
       }
     },
     "org.mixedrealitytoolkit.windowsspeech": {
       "tarball": {
         "hash": "a5fe89e85018",
-        "mtime": 1711578581237,
+        "mtime": 1716826101405,
         "size": 15233,
-        "localPath": "C:\\Users\\lidet\\workspace\\projects\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.windowsspeech-3.0.2.tgz"
+        "localPath": "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\HandTrackingExample\\Packages\\MixedReality\\org.mixedrealitytoolkit.windowsspeech-3.0.2.tgz"
       }
     }
   }
