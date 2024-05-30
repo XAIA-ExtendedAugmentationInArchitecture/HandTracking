@@ -4,6 +4,7 @@
     "com.microsoft.mrtk.graphicstools.unity": "file:MixedReality/com.microsoft.mrtk.graphicstools.unity-0.6.7.tgz",
     "com.microsoft.mrtk.tts.windows": "file:MixedReality/com.microsoft.mrtk.tts.windows-1.0.4.tgz",
     "com.realitycollective.service-framework": "https://github.com/realitycollective/com.realitycollective.service-framework.git",
+    "com.unity.2d.sprite": "1.0.0",
     "com.unity.collab-proxy": "2.3.1",
     "com.unity.feature.development": "1.0.2",
     "com.unity.nuget.newtonsoft-json": "3.2.1",

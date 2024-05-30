@@ -105,30 +105,35 @@ public class Instantiator : MonoBehaviour
         
     }
 
-    public void InstantiateSpheresRT(Pose pose, string index)
+    public void InstantiateSpheresRT(Pose pose, GameObject parent)
     {
-        Debug.Log("Instantiating spheres..."+ spherePrefab);
-        Debug.Log("Index: " + index);
-        Debug.Log("child: " + RTparent.transform.Find(index));
-        int childcount = 0;
-        
-        if (RTparent.transform.Find(index))
-        {
-            Debug.Log("Parent with name " + index + " already exists.");
-            parenttransform = RTparent.transform.Find(index).transform;
-            // count the amount of children in gameobject
-            childcount = parenttransform.childCount;
-        }
-        else
-        {
-            GameObject parent = new GameObject(index);
-            parent.transform.parent = RTparent.transform;
-            parenttransform = parent.transform;
-        }
-                
         Vector3 vec = new Vector3(pose.position.x, pose.position.y, pose.position.z);
         GameObject sphere = Instantiate(spherePrefab, vec, Quaternion.identity);
-        sphere.transform.parent = parenttransform;
-        sphere.name = index + "_" + childcount;
+        sphere.transform.parent = parent.transform;
+        sphere.name = parent.name + "_Sphere";
+
+        //Debug.Log("Instantiating spheres..." + spherePrefab);
+        //Debug.Log("Index: " + index);
+        //Debug.Log("child: " + RTparent.transform.Find(index));
+        //int childcount = 0;
+
+        //if (RTparent.transform.Find(index))
+        //{
+        //    Debug.Log("Parent with name " + index + " already exists.");
+        //    parenttransform = RTparent.transform.Find(index).transform;
+        //    // count the amount of children in gameobject
+        //    childcount = parenttransform.childCount;
+        //}
+        //else
+        //{
+        //    GameObject parent = new GameObject(index);
+        //    parent.transform.parent = RTparent.transform;
+        //    parenttransform = parent.transform;
+        //}
+
+        //Vector3 vec = new Vector3(pose.position.x, pose.position.y, pose.position.z);
+        //GameObject sphere = Instantiate(spherePrefab, vec, Quaternion.identity);
+        //sphere.transform.parent = parenttransform;
+        //sphere.name = index + "_" + childcount;
     }
 }
