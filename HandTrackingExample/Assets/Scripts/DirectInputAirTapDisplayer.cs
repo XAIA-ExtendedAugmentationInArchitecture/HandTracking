@@ -172,7 +172,7 @@ public class DirectInputAirTapDisplayer : MonoBehaviour
                 jointPosesList.Add(pose.Pose.position);
                 jointPosesArrList.Add(vecArr);
                 
-                instantiator.InstantiateSpheresRT(pose.Pose, counter.ToString());
+                //instantiator.InstantiateSpheresRT(pose.Pose, counter.ToString());
 
             }
         }

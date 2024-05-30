@@ -6,8 +6,10 @@ using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 using System.Linq;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 using UnityEngine.XR.OpenXR.Input;
+using System;
+using TMPro;
+using Microsoft.MixedReality.GraphicsTools;
 
 
 
@@ -19,14 +21,27 @@ public class handscript_dm : MonoBehaviour
     public List<Vector3> jointPosesList;
     public List<float[]> jointPosesArrList;
     private int counter = 0;
+    public Boolean previewState;
+    public Boolean recordState;
     Instantiator instantiator;
+    public GameObject recordStateIndicator;
+    public GameObject InfoButton;
     public GameObject InstantiatorGameObject;
     // Dictionary to store hand joint pose data
     public Dictionary<string, List<float[]>> JointPoseDict;
 
+    private GameObject currentDrawingParent;
+    public TextMeshProUGUI buttonText;
+
     void Start()
     {
-        instantiator = InstantiatorGameObject.GetComponent<Instantiator>();
+
+        // Set priview state to false
+        previewState = false;
+
+        recordStateIndicator.SetActive(false);
+
+        instantiator = FindFirstObjectByType<Instantiator>();
         JointPoseDict = new Dictionary<string, List<float[]>>();
         jointPosesList = new List<Vector3>();
         jointPosesArrList = new List<float[]>();
@@ -40,6 +55,10 @@ public class handscript_dm : MonoBehaviour
             StartCoroutine(EnableWhenSubsystemAvailable());
         }
 
+        if (instantiator.RTparent == null)
+        {
+            instantiator.RTparent = new GameObject("RTSpheres");
+        }
     }
 
     // Update is called once per frame
@@ -60,10 +79,17 @@ public class handscript_dm : MonoBehaviour
             bool handIsValidPinch = aggregator.TryGetPinchProgress(XRNode.RightHand, out bool isReadyToPinch, out bool isPinching, out float pinchAmount);
             Debug.Log("The pinch is" + isPinching);
 
-            if (isPinching)
+            if (isPinching && recordState)
             {
+                recordStateIndicator.SetActive(true);
                 PlaceSpheres(jointPose);
-                Debug.Log("yeeahh");
+                Debug.Log("Pinching: Action executed");
+
+            }
+            else
+            {
+                recordStateIndicator.SetActive(false);
+                Debug.Log("Not pinching: Indicator deactivated");
             }
         }
     }
@@ -90,8 +116,47 @@ public class handscript_dm : MonoBehaviour
             jointPosesList.Add(pose.Pose.position);
             jointPosesArrList.Add(vecArr);
 
-            instantiator.InstantiateSpheresRT(pose.Pose, counter.ToString());
+            instantiator.InstantiateSpheresRT(pose.Pose, currentDrawingParent);
 
         }
     }
+
+    public void StartNewDrawing()
+    {
+        HideSpheres();
+        recordState = true;
+        counter++;
+        //Debug.Log("record state:" + recordState);
+        Debug.Log("Start drawing No:" + counter);
+        CreateDrawingParent();
+        Debug.Log("info button text" + buttonText.text);
+
+
+    }
+
+    void CreateDrawingParent()
+    {
+        currentDrawingParent = new GameObject("Drawing_" + counter);
+        currentDrawingParent.transform.parent = instantiator.RTparent.transform;
+    }
+
+    public void HideSpheres()
+    {
+        // Find the RTSpheres GameObject
+        GameObject rTSpheres = GameObject.Find("RTSpheres");
+        if (rTSpheres == null)
+        {
+            Debug.LogError("RTSpheres GameObject not found!");
+            return;
+        }
+
+        // Iterate through the children of RTSpheres
+        foreach (Transform child in rTSpheres.transform)
+        {
+            // Deactivate the child GameObject
+            child.gameObject.SetActive(false);
+        }
+    }
+
+
 }

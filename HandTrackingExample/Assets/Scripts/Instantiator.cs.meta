@@ -1,2 +1,14 @@
 fileFormatVersion: 2
 guid: e4822c2602cd07249b65744e30e1f29d
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - spherePrefab: {instanceID: 0}
+  - parentgameobject: {instanceID: 0}
+  - RTparent: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

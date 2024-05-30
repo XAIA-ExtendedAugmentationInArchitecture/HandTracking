@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c48033da7dd12f04fa687369c416ba8a, type: 3}
   m_Name: MRTKHandsAggregatorConfig
   m_EditorClassIdentifier: 
-  pinchOpenThreshold: 0.75
-  pinchClosedThreshold: 0.25
+  pinchOpenThreshold: 0.2
+  pinchClosedThreshold: 0.1
   handRaiseCameraFov: 45
   handFacingAwayToleranceInDegrees: 75
