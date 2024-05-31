@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.OpenXR.Input;
+using TMPro;
 
 public class DrawingController : MonoBehaviour
 {
@@ -14,8 +15,10 @@ public class DrawingController : MonoBehaviour
     public StatefulInteractable MeshInteractable;
     public Material lineMaterial;
     public GameObject linesParent;
+    public GameObject recordStateIndicator;
     private LineRenderer lineRenderer;
     private float lineWidth = 0.002f;
+    private int DrawingIndex = -1;
     private int lineIndex = -1;
     private int linePointIndex = 0;
     private int print=0;
@@ -23,11 +26,16 @@ public class DrawingController : MonoBehaviour
     private GameObject line;
     private float minDistance = 0.01f;
     private Vector3 previousPosition = Vector3.zero;
+
+    private GameObject currentDrawingParent;
+    public TextMeshProUGUI buttonText;
     
 
     void Start()
     {
         reticleVisual = reticleTransform.gameObject.transform.Find("RingVisual").gameObject;
+        recordStateIndicator.SetActive(false);
+        CreateDrawingParent();
     }
 
     void Update()
@@ -51,17 +59,54 @@ public class DrawingController : MonoBehaviour
                 AddPointsToLine(reticleTransform);
                 previousPosition = reticleTransform.position;
             }
+
+            recordStateIndicator.SetActive(true);
             
         }
         else
         {
-            if (linePointIndex != -1)
-            {
-                GenerateMeshCollider();
-            }
+            // if (linePointIndex != -1)
+            // {
+            //     GenerateMeshCollider();
+            // }
+            recordStateIndicator.SetActive(false);
+
             linePointIndex = -1;
+
         }
         
+    }
+
+    public void StartNewDrawing()
+    {
+        HideChildren(linesParent.transform);
+        Debug.Log("Start drawing No:" + DrawingIndex);
+        CreateDrawingParent();
+        Debug.Log("info button text" + buttonText.text);
+
+
+    }
+
+    void CreateDrawingParent()
+    {
+        DrawingIndex++;
+        currentDrawingParent = new GameObject("Drawing_" + DrawingIndex);
+        currentDrawingParent.transform.parent = linesParent.transform;
+
+        lineIndex = -1;
+        linePointIndex = 0;
+        print=0;
+    }
+
+
+    public void HideChildren(Transform transform)
+    {
+        // Iterate through the children of RTSpheres
+        foreach (Transform child in transform)
+        {
+            // Deactivate the child GameObject
+            child.gameObject.SetActive(false);
+        }
     }
 
     public void StartDrawing()
@@ -101,7 +146,7 @@ public class DrawingController : MonoBehaviour
     void InstantiateLine(int index)
     {
         line = new GameObject("Line" + index.ToString());
-        line.transform.parent = linesParent.transform;
+        line.transform.parent = currentDrawingParent.transform;
         lineRenderer = line.AddComponent<LineRenderer>();
         lineRenderer.material = lineMaterial;
         lineRenderer.startWidth = lineWidth;
