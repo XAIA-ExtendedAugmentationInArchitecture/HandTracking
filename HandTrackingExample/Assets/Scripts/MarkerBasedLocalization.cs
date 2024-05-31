@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Microsoft.MixedReality.OpenXR;
+using TMPro;
 
 public class markerBasedLocalization: MonoBehaviour
 {
@@ -9,15 +10,41 @@ public class markerBasedLocalization: MonoBehaviour
     public GameObject XR_Rig;
     public bool TrackingOn = false;
     private Quaternion offsetRotation = Quaternion.Euler(90, 0, 0);
+    public TextMeshPro LocalizationText;
+    private GameObject Trackables;
 
     void Start()
     {
+        Trackables = XR_Rig.transform.Find("Trackables").gameObject;
+        Trackables.SetActive(false);
         if (Geometry != null)
         {
             Geometry.SetActive(false);
         }
+        LocalizationText.text = "Tracking: OFF";
     }
     
+    public void ToggleLocalization()
+    {
+        TrackingOn= !TrackingOn;
+        if (TrackingOn)
+        {
+            Trackables.SetActive(true);
+            LocalizationText.text = "Tracking: ON";
+        }
+        else
+        {
+            Trackables.SetActive(false);
+            LocalizationText.text = "Tracking: OFF";
+        }
+        
+    }
+
+    public void ToggleRendererVisibility(MeshRenderer meshRenderer)
+    {
+        meshRenderer.enabled = !meshRenderer.enabled;
+        
+    }
 
     //Update is called once per frame
     void Update()
@@ -26,7 +53,6 @@ public class markerBasedLocalization: MonoBehaviour
        {
             if (XR_Rig != null)
             {
-                GameObject Trackables = XR_Rig.transform.Find("Trackables").gameObject;
                 if (Trackables != null)
                 {
                     // Iterate through all children of Trackables

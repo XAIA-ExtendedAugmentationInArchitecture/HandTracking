@@ -11,11 +11,17 @@ using TMPro;
 public class DrawingController : MonoBehaviour
 {
     public bool drawingOn = false;
+    public bool farDrawing = true;
+
     public Transform reticleTransform;
-    public StatefulInteractable MeshInteractable;
+    public MeshCollider meshCollider;
+    public StatefulInteractable meshInteractable;
     public Material lineMaterial;
     public GameObject linesParent;
     public GameObject recordStateIndicator;
+    public TextMeshPro DrawingText;
+
+    public TextMeshPro ModeText;
     private LineRenderer lineRenderer;
     private float lineWidth = 0.002f;
     private int DrawingIndex = -1;
@@ -24,57 +30,141 @@ public class DrawingController : MonoBehaviour
     private int print=0;
     private GameObject reticleVisual;
     private GameObject line;
-    private float minDistance = 0.01f;
+    private float minDistance = 0.0025f;
     private Vector3 previousPosition = Vector3.zero;
 
     private GameObject currentDrawingParent;
-    public TextMeshProUGUI buttonText;
+
+    private HandsAggregatorSubsystem aggregator;
     
+    
+    IEnumerator EnableWhenSubsystemAvailable()
+    {
+        // Wait until the HandsAggregatorSubsystem is available
+        yield return new WaitUntil(() => aggregator != null);
+
+        // Once available, you can access its properties
+        string isPhysicalData = aggregator.subsystemDescriptor.id;
+        
+    }
 
     void Start()
     {
         reticleVisual = reticleTransform.gameObject.transform.Find("RingVisual").gameObject;
         recordStateIndicator.SetActive(false);
         CreateDrawingParent();
+
+        aggregator = XRSubsystemHelpers.GetFirstRunningSubsystem<HandsAggregatorSubsystem>();
+
+        if (aggregator != null)
+        {
+            // If the aggregator is available, enable functionality
+            StartCoroutine(EnableWhenSubsystemAvailable());
+        }
+        ModeText.text = "Hand Ray";
     }
 
     void Update()
-    {
-        if (reticleVisual.activeSelf==false)
+    {   
+        if (farDrawing)
         {
-            MeshInteractable.ForceSetToggled(false);
-        }
-        if (drawingOn)
-        {
-            if (linePointIndex == -1)
+            if (reticleVisual.activeSelf==false)
             {
-                previousPosition = reticleTransform.position;
-                linePointIndex = 0;
-                lineIndex++;
-                InstantiateLine(lineIndex);
+                meshInteractable.ForceSetToggled(false);
             }
-
-            if (Vector3.Distance(previousPosition, reticleTransform.position)> minDistance)
+            if (drawingOn)
             {
-                AddPointsToLine(reticleTransform);
-                previousPosition = reticleTransform.position;
-            }
+                if (linePointIndex == -1)
+                {
+                    previousPosition = reticleTransform.position;
+                    linePointIndex = 0;
+                    lineIndex++;
+                    InstantiateLine(lineIndex);
+                }
 
-            recordStateIndicator.SetActive(true);
-            
+                if (Vector3.Distance(previousPosition, reticleTransform.position)> minDistance)
+                {
+                    AddPointsToLine(reticleTransform.position);
+                    previousPosition = reticleTransform.position;
+                }
+
+                recordStateIndicator.SetActive(true);
+                
+            }
+            else
+            {
+                // if (linePointIndex != -1)
+                // {
+                //     GenerateMeshCollider();
+                // }
+                recordStateIndicator.SetActive(false);
+
+                linePointIndex = -1;
+
+            }
         }
         else
         {
-            // if (linePointIndex != -1)
-            // {
-            //     GenerateMeshCollider();
-            // }
-            recordStateIndicator.SetActive(false);
+            if (aggregator != null)
+            {
+                // Get a single joint (Index tip, on left hand, for example)
+                bool jointIsValid = aggregator.TryGetJoint(TrackedHandJoint.IndexTip, XRNode.RightHand, out HandJointPose jointPose);
 
-            linePointIndex = -1;
+                // Check whether the user's left hand is facing away (commonly used to check "aim" intent)
+                bool handIsValid = aggregator.TryGetPalmFacingAway(XRNode.LeftHand, out bool isLeftPalmFacingAway);
+                Debug.Log("The pose of the joint is" + jointIsValid + jointPose);
 
+                // Query pinch characteristics from the left hand.
+                bool handIsValidPinch = aggregator.TryGetPinchProgress(XRNode.RightHand, out bool isReadyToPinch, out bool isPinching, out float pinchAmount);
+                Debug.Log("The pinch is" + isPinching);
+
+
+                if (isPinching )
+                {
+                    if (linePointIndex == -1)
+                    {
+                        previousPosition = jointPose.Pose.position;
+                        linePointIndex = 0;
+                        lineIndex++;
+                        InstantiateLine(lineIndex);
+                    }
+
+                    if (Vector3.Distance(previousPosition, jointPose.Pose.position)> minDistance)
+                    {
+                        AddPointsToLine(jointPose.Pose.position);
+                        previousPosition = jointPose.Pose.position;
+                    }
+
+                    recordStateIndicator.SetActive(true);
+
+                }
+                else
+                {
+                    recordStateIndicator.SetActive(false);
+                    linePointIndex = -1;
+                }
+            }
         }
         
+    }
+
+    public void ToggleDrawingMode()
+    {
+        farDrawing =!farDrawing;
+
+        if (farDrawing)
+        {
+            meshInteractable.enabled=true;
+            meshCollider.enabled=true;
+            ModeText.text = "Hand Ray";
+        }
+        else
+        {
+            ModeText.text = "Pinch Gesture";
+            meshInteractable.enabled=false;
+            meshCollider.enabled=false;
+        }
+
     }
 
     public void StartNewDrawing()
@@ -82,7 +172,6 @@ public class DrawingController : MonoBehaviour
         HideChildren(linesParent.transform);
         Debug.Log("Start drawing No:" + DrawingIndex);
         CreateDrawingParent();
-        Debug.Log("info button text" + buttonText.text);
 
 
     }
@@ -90,6 +179,7 @@ public class DrawingController : MonoBehaviour
     void CreateDrawingParent()
     {
         DrawingIndex++;
+        DrawingText.text = "Drawing No: " + DrawingIndex.ToString();
         currentDrawingParent = new GameObject("Drawing_" + DrawingIndex);
         currentDrawingParent.transform.parent = linesParent.transform;
 
@@ -134,11 +224,11 @@ public class DrawingController : MonoBehaviour
         print=0;
     }
 
-    void AddPointsToLine(Transform reticleTransform)
+    void AddPointsToLine(Vector3 position)
     {
         lineRenderer.positionCount = linePointIndex + 1;
 
-        lineRenderer.SetPosition(linePointIndex, reticleTransform.position);
+        lineRenderer.SetPosition(linePointIndex, position);
 
         linePointIndex++;
     }

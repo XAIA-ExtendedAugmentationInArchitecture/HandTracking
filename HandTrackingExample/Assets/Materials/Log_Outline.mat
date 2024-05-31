@@ -7,13 +7,13 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Log_Mesh
-  m_Shader: {fileID: 4800000, guid: 6a1480e6da7ca8e409be9596ad447719, type: 3}
+  m_Name: Log_Outline
+  m_Shader: {fileID: 4800000, guid: e3f1cd06c42866f42b3af69185ef4300, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords:
+  m_ValidKeywords: []
+  m_InvalidKeywords:
   - _ENABLE_
-  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -34,9 +34,11 @@ Material:
     - _Fade_In_Start_: 0.25
     - _Intensity_: 1.19
     - _Radius_: 0.081
+    - _SilhouetteSize: 0.5
     - _Soften_: 0.239
     m_Colors:
     - _Center_: {r: 0.5, g: 0.5, b: 0, a: 0}
     - _Color_: {r: 1, g: 1, b: 1, a: 0.20784314}
+    - _SilhouetteColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
