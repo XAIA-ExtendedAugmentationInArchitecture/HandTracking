@@ -25,8 +25,8 @@ This guide provides step-by-step instructions on how to set up and use holograph
 2. **Connect from Unity**
    - In Unity, open the `Mixed Reality > Remoting > Holographic Remoting for Play Mode` window.
 
-   ![alt text](MRTKRemoting.png)
-   ![alt text](HolographicRemotingWindow.png)
+   ![alt text](ReadmeImages/MRTKRemoting.png)
+   ![alt text](ReadmeImages/HolographicRemotingWindow.png)
 
    - In the `Remote Host Name` enter the IP address from your HoloLens 2.
    - In the `Video Codec` select Auto or H264.
