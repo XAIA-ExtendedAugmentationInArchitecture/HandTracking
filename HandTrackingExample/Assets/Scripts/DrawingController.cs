@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Text;
 using MixedReality.Toolkit.Subsystems;
 using MixedReality.Toolkit;
 using System.Collections;
@@ -7,12 +10,17 @@ using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.OpenXR.Input;
 using TMPro;
+using DrawingsData;
+using Newtonsoft.Json;
 
 public class DrawingController : MonoBehaviour
 {
     public bool drawingOn = false;
     public bool farDrawing = true;
 
+    public GameObject Geometry;
+    public Drawings storedDrawings; 
+    public MqttPublisher mqttPublisher;
     public Transform reticleTransform;
     public MeshCollider meshCollider;
     public StatefulInteractable meshInteractable;
@@ -22,12 +30,14 @@ public class DrawingController : MonoBehaviour
     public TextMeshPro DrawingText;
 
     public TextMeshPro ModeText;
+    private int EnabledDrawingIndex = -1;
     private LineRenderer lineRenderer;
+
     private float lineWidth = 0.002f;
     private int DrawingIndex = -1;
     private int lineIndex = -1;
     private int linePointIndex = 0;
-    private int print=0;
+    private int print = 0;
     private GameObject reticleVisual;
     private GameObject line;
     private float minDistance = 0.0025f;
@@ -37,7 +47,11 @@ public class DrawingController : MonoBehaviour
 
     private HandsAggregatorSubsystem aggregator;
     
-    
+    public void SendToRhino()
+    {
+        mqttPublisher.PublishMessage("/kit_handtracking_drawings/", storedDrawings.drawings["drawing" + EnabledDrawingIndex.ToString()]);
+    }
+
     IEnumerator EnableWhenSubsystemAvailable()
     {
         // Wait until the HandsAggregatorSubsystem is available
@@ -50,6 +64,12 @@ public class DrawingController : MonoBehaviour
 
     void Start()
     {
+        storedDrawings = new Drawings
+        {
+            uid = meshCollider.gameObject.name,
+            drawings = new Dictionary<string, Drawing>()
+        };
+
         reticleVisual = reticleTransform.gameObject.transform.Find("RingVisual").gameObject;
         recordStateIndicator.SetActive(false);
         CreateDrawingParent();
@@ -61,7 +81,7 @@ public class DrawingController : MonoBehaviour
             // If the aggregator is available, enable functionality
             StartCoroutine(EnableWhenSubsystemAvailable());
         }
-        ModeText.text = "Hand Ray";
+        ModeText.text = "DRAW mode: Hand Ray";
     }
 
     void Update()
@@ -93,10 +113,12 @@ public class DrawingController : MonoBehaviour
             }
             else
             {
-                // if (linePointIndex != -1)
-                // {
-                //     GenerateMeshCollider();
-                // }
+                
+                if (linePointIndex != -1 && lineIndex != -1)
+                {
+                    StoreDrawnLine();
+                    //GenerateMeshCollider();
+                }
                 recordStateIndicator.SetActive(false);
 
                 linePointIndex = -1;
@@ -140,6 +162,11 @@ public class DrawingController : MonoBehaviour
                 }
                 else
                 {
+                    if (linePointIndex != -1)
+                    {
+                        StoreDrawnLine();
+                        //GenerateMeshCollider();
+                    }
                     recordStateIndicator.SetActive(false);
                     linePointIndex = -1;
                 }
@@ -156,11 +183,11 @@ public class DrawingController : MonoBehaviour
         {
             meshInteractable.enabled=true;
             meshCollider.enabled=true;
-            ModeText.text = "Hand Ray";
+            ModeText.text = "DRAW mode: Hand Ray";
         }
         else
         {
-            ModeText.text = "Pinch Gesture";
+            ModeText.text = "DRAW mode: Pinch Gesture";
             meshInteractable.enabled=false;
             meshCollider.enabled=false;
         }
@@ -176,16 +203,30 @@ public class DrawingController : MonoBehaviour
 
     }
 
+    public void VisualizeDrawing()
+    {
+        HideChildren(linesParent.transform);
+        EnabledDrawingIndex ++;
+        if (EnabledDrawingIndex == linesParent.transform.childCount)
+        {
+            EnabledDrawingIndex=0;
+        }
+        linesParent.transform.GetChild(EnabledDrawingIndex).gameObject.SetActive(true);
+    }
+
     void CreateDrawingParent()
     {
         DrawingIndex++;
-        DrawingText.text = "Drawing No: " + DrawingIndex.ToString();
+        
+        DrawingText.text = "Drawing No: " + DrawingIndex.ToString() + "    |";
         currentDrawingParent = new GameObject("Drawing_" + DrawingIndex);
         currentDrawingParent.transform.parent = linesParent.transform;
 
+        EnabledDrawingIndex = DrawingIndex;
         lineIndex = -1;
         linePointIndex = 0;
         print=0;
+
     }
 
 
@@ -238,16 +279,75 @@ public class DrawingController : MonoBehaviour
         line = new GameObject("Line" + index.ToString());
         line.transform.parent = currentDrawingParent.transform;
         lineRenderer = line.AddComponent<LineRenderer>();
+        lineRenderer.positionCount =0;
         lineRenderer.material = lineMaterial;
         lineRenderer.startWidth = lineWidth;
         lineRenderer.endWidth = lineWidth;
     }
 
+    void StoreDrawnLine()
+    {
+        if (lineRenderer == null || lineRenderer.positionCount == 0)
+            return;
+
+        Vector3[] positions = new Vector3[lineRenderer.positionCount];
+
+        for (int i = 0; i < lineRenderer.positionCount; i++)
+        {
+            positions[i] = lineRenderer.GetPosition(i);
+        }
+
+        if (!storedDrawings.drawings.ContainsKey("drawing" + DrawingIndex.ToString()))
+        {
+            storedDrawings.drawings["drawing" + DrawingIndex.ToString()] = new Drawing
+            {
+                frame = new Frame
+                {
+                    point = Geometry.transform. position,
+                    xaxis = Geometry.transform.right,
+                    zaxis = Geometry.transform.forward
+                },
+                lines = new Dictionary<string, Vector3[]>()
+            };
+        }
+
+        storedDrawings.drawings["drawing" + DrawingIndex.ToString()].lines["line" + lineIndex.ToString()] = positions;
+    }
+
+    public void SaveEnabledDrawing()
+    {
+        // Step 1: Get the name of the file
+        string name = storedDrawings.uid;
+        string drawing_name = "drawing" + EnabledDrawingIndex;
+
+        // Step 2: Get the timestamp at that time
+        string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+        // Step 3: Retrieve the value of the dictionary based on EnabledDrawingIndex
+        if (storedDrawings.drawings.TryGetValue("drawing" + EnabledDrawingIndex.ToString(), out Drawing drawing))
+        {
+            // Step 4: Serialize the value of the dictionary to JSON
+            string json = JsonConvert.SerializeObject(drawing);
+
+            // Step 5: Save the JSON data to a file on the HoloLens 2 device
+            string filePath = Path.Combine(Application.persistentDataPath, $"{timestamp}_{name}_{drawing_name}.json");
+            // byte[] data = Encoding.ASCII.GetBytes(json);
+            // UnityEngine.Windows.File.WriteAllBytes(filePath, data);
+            File.WriteAllText(filePath, json);
+
+            Debug.Log($"Drawing saved to: {filePath}");
+        }
+        else
+        {
+            Debug.LogWarning("Drawing not found in the dictionary.");
+        }
+    }
     public void Print()
     {
         Debug.Log("Hello" + print);
         print++;
     }
+
 
     public void GenerateMeshCollider()
     {
@@ -280,5 +380,22 @@ public class DrawingController : MonoBehaviour
         // line.AddComponent
     }
 
+    void OnApplicationQuit()
+    {
+        //Step 1: Get the name of the file
+        string name = storedDrawings.uid;
+        string drawing_name = "drawing" + EnabledDrawingIndex;
 
+        // Step 2: Get the timestamp at that time
+        string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+        // Step 4: Serialize the value of the dictionary to JSON
+        string json = JsonConvert.SerializeObject(storedDrawings);
+
+        // Step 5: Save the JSON data to a file on the HoloLens 2 device
+        string filePath = Path.Combine(Application.persistentDataPath, $"{timestamp}_{name}_backup.json");
+        File.WriteAllText(filePath, json);
+
+        Debug.Log($"Drawing saved to: {filePath}");
+    }
 }
