@@ -4,6 +4,10 @@ Handtracking for MRTK
 install newtonsoft: com.unity.nuget.newtonsoft-json
 
 
+# Receiving messages in Rhino from Unity
+   - install compas_eve : (https://github.com/compas-dev/compas_eve)
+
+
 # Holographic Remoting with Unity and HoloLens 2
 
 This guide provides step-by-step instructions on how to set up and use holographic remoting with Unity and HoloLens 2.
@@ -25,8 +29,8 @@ This guide provides step-by-step instructions on how to set up and use holograph
 2. **Connect from Unity**
    - In Unity, open the `Mixed Reality > Remoting > Holographic Remoting for Play Mode` window.
 
-   ![alt text](ReadmeImages/MRTKRemoting.png)
-   ![alt text](ReadmeImages/HolographicRemotingWindow.png)
+   ![alt text](ReadMEfiles/MRTKRemoting.png)
+   ![alt text](ReadMEfiles/HolographicRemotingWindow.png)
 
    - In the `Remote Host Name` enter the IP address from your HoloLens 2.
    - In the `Video Codec` select Auto or H264.
@@ -50,3 +54,5 @@ This guide provides step-by-step instructions on how to set up and use holograph
 
 - [Holographic Remoting Documentation](https://learn.microsoft.com/en-us/windows/mixed-reality/develop/unity/preview-and-debug-your-app?tabs=openxr)
 
+# Testing 
+   - Print this [QR code](ReadMEfiles/qr_code.pdf). We recommend using the small size.
