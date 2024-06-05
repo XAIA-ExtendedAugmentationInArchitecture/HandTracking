@@ -398,7 +398,11 @@ namespace MixedReality.Toolkit
 
         // Attempt to toggle our own IsToggled state.
         // Will obey ToggleMode.
-        private void TryToggle()
+        // Add new UnityEvents for toggling
+        public UnityEvent OnToggled = new UnityEvent();
+        public UnityEvent OnUntoggled = new UnityEvent();
+        
+        public void TryToggle()
         {
             // Check whether we're allowed to toggle.
             if (ToggleMode == ToggleType.Button || (ToggleMode == ToggleType.OneWayToggle && IsToggled.Active))
@@ -407,6 +411,15 @@ namespace MixedReality.Toolkit
             }
 
             IsToggled.Active = !IsToggled;
+            if (IsToggled.Active)
+            {
+                OnToggled.Invoke();
+            }
+            else
+            {
+                OnUntoggled.Invoke();
+            }
         }
+        
     }
 }
