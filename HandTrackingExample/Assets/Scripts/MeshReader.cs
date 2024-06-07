@@ -24,6 +24,7 @@ public class MeshReader : MonoBehaviour
         }
         else
         {
+            
             Debug.LogError("JSON file not found!");
         }
     }

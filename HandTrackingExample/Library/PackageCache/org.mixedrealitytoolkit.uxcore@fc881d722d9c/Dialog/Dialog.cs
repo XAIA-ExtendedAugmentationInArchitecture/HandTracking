@@ -102,6 +102,7 @@ namespace MixedReality.Toolkit.UX
         public IDialog SetBody(string body)
         {
             this.body = body;
+            Debug.Log("boooo" + body);
             return this;
         }
         

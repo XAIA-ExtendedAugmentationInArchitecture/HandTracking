@@ -39,11 +39,7 @@ public class MarkerLocalizer: MonoBehaviour
         
     }
 
-    public void ToggleRendererVisibility(MeshRenderer meshRenderer)
-    {
-        meshRenderer.enabled = !meshRenderer.enabled;
-        
-    }
+    
 
     //Update is called once per frame
     void Update()
@@ -61,6 +57,10 @@ public class MarkerLocalizer: MonoBehaviour
                         string arMarkerText = child.GetComponent<ARMarker>().GetDecodedString();
                         if (arMarkerText == "workspace origin")
                         {
+                            if (Geometry==null)
+                            {
+                                Geometry = meshGenerator.elementsParent;
+                            }
                             // If found, set the position and rotation of Geometry and activate it
                             Geometry.transform.position = child.position;
                             Geometry.transform.rotation = child.rotation * offsetRotation;

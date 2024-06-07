@@ -6,6 +6,12 @@ using System.Linq;
 namespace MeshElementData
 {
     [System.Serializable]
+    public class Result
+    {
+        public string result { get; set; }
+    }
+    
+    [System.Serializable]
     public class MeshData
     {
         public string name { get; set; }
@@ -47,7 +53,6 @@ namespace MeshElementData
         // Method to generate a mesh and attach it to a new game object
         public GameObject GenerateMesh()
         {
-            Debug.Log("Holaaaa3" );
             if (vertices == null || faces == null)
             {
                 Debug.LogError("Vertices or faces data is missing.");
@@ -85,7 +90,6 @@ namespace MeshElementData
             // Assign the mesh to the mesh filter
             meshFilter.mesh = mesh;
 
-            Debug.Log("Holaaaa3" + meshObject );
             return meshObject;
         }
 

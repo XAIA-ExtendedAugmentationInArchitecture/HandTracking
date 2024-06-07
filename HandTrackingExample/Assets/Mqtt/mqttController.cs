@@ -28,26 +28,32 @@ using Newtonsoft.Json;
 using M2MqttUnity;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
+using MeshElementData;
+using MixedReality.Toolkit.UX;
 
 
 public class MqttController : M2MqttUnityClient
 {
+    
+
     [Header("MQTT topics")]
     [Tooltip("Set the topic to subscribe. !!!ATTENTION!!! multi-level wildcard # subscribes to all topics")]
 
     public List<string> topicsSubscribe;
 
     public List<string> topicsPublish;
-
+    
     public Dictionary<string,object> message; // message to publish
-    public TMPro.TMP_Text Messages;
+    public UIController uIController; 
 
     [Tooltip("Set this to true to perform a testing cycle automatically on startup")]
     public bool autoTest = true;
 
 
+
     //using C# Property GET/SET and event listener to reduce Update overhead in the controlled objects
     private string m_msg;
+    public MeshData msgData;
 
     public string msg
     {
@@ -120,35 +126,30 @@ protected override void OnConnected()
     {
         base.OnConnected();
         isConnected=true;
-        //Messages.text = "MQTT: Connected ";
-        //Messages.enabled= true;
+
         // if (autoTest)
         // {
         //     Publish(topicPublish);
         // }
     }
 
-protected override void OnConnectionFailed(string errorMessage)
-    {
-        //Debug.Log("CONNECTION FAILED! " + errorMessage);
-        //Messages.text = "MQTT: CONNECTION FAILED! " + errorMessage + "To connect go to Menu > Communication > MQTT";
-       // Messages.enabled= true;
-    }
+// protected override void OnConnectionFailed()
+//     {
+//         isConnected=false;
+//         uIController.ActivateConnectionDialog("failed");
+//     }
 
 protected override void OnDisconnected()
     {
-        Debug.Log("Disconnected.");
         isConnected=false;
-        Messages.text = "MQTT: Disconnected";
-        Messages.enabled= true; 
+        uIController.ActivateConnectionDialog("disconnected");
+        
     }
 
 protected override void OnConnectionLost()
     {
-        Debug.Log("CONNECTION LOST!");
-        
-        Messages.text = "MQTT: CONNECTION LOST! To reconnect go to Menu > Communication > MQTT";
-        Messages.enabled= true;
+        isConnected=false;
+        uIController.ActivateConnectionDialog("lost");
     }
 
 protected override void SubscribeTopics()
@@ -174,16 +175,18 @@ protected override void Start()
     }
 
 
-
 protected override void DecodeMessage(string topic, byte[] message)
     {
         //The message is decoded
         msg = System.Text.Encoding.UTF8.GetString(message);
-        //MqttReceiver.MqttMessageData msg_ = JsonConvert.DeserializeObject<MqttReceiver.MqttMessageData>(msg); //
+        var result = JsonConvert.DeserializeObject<Result>(msg);
+        msgData = JsonConvert.DeserializeObject<MeshData>(result.result);
 
         Debug.Log("Received: " + msg);
+        Debug.Log("Received: " + msgData.normals);
         Debug.Log("from topic: " + topic);
 
+        uIController.MessageReceived(topic, msgData.name);
         StoreMessage(msg);
     }
 

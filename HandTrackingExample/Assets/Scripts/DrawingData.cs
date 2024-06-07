@@ -21,15 +21,22 @@ namespace DrawingsData
 
     }
 
+    [System.Serializable]
+    public class DrawingLine
+    {
+        public float[] color { get; set; } 
+
+        [JsonConverter(typeof(Vector3ArrayConverter))]
+        public Vector3[] positions { get; set; }
+
+    }
 
     [System.Serializable]
     public class Drawing
     {
-       // public string[] Colors; 
-        public Frame frame;
-
-        [JsonConverter(typeof(Vector3DictionaryConverter))]
-        public Dictionary<string, Vector3[]> lines { get; set; }
+        public Frame MCF { get; set;}
+        public Dictionary<string, Frame> objectFrames { get; set; }
+        public Dictionary<string, DrawingLine> lines { get; set; }
 
     }
 

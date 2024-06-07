@@ -11,12 +11,15 @@ using System.Dynamic;
 using MeshElementData;
 using Unity.VisualScripting;
 using MixedReality.Toolkit;
+using MixedReality.Toolkit.SpatialManipulation;
 
 public class MeshGeneratorFromJson : MonoBehaviour
 {
     public GameObject loading; // A GameObject that is disabled after the data is generated
     public GameObject elementsParent;
+    public GameObject locksParent;
     public DrawingController drawController;
+    public GameObject Padlock;
     private string path; 
     public string fileName; 
     public Material material;     			
@@ -25,25 +28,18 @@ public class MeshGeneratorFromJson : MonoBehaviour
 	void Start()
     {   
         elementsParent = new GameObject("Elements");
+        locksParent = new GameObject("Locks");
+        locksParent.SetActive(false);
         elementsParent.SetActive(false);
 
+        string dataFolderPath =Application.dataPath; // Constructing the path dynamically 
+        path = dataFolderPath + "/Data/" + fileName + ".json";
+        //string dataFolderPath = Directory.GetParent(Application.dataPath).Parent.FullName; // Constructing the path dynamically 
+        //path = dataFolderPath + "/data/" + fileName + ".json";
 
-        string dataFolderPath = Directory.GetParent(Application.dataPath).Parent.FullName; // Constructing the path dynamically 
-        path = dataFolderPath + "/data/" + fileName + ".json";
-        Debug.Log(path);
-
-
-        // If it's URL, download data in a coroutine
-        if (path.StartsWith("https:") || path.StartsWith("http:"))
-        {
-            StartCoroutine(LoadFromURL(path));
-        }
-        // If it's a file, load data in a thread
-        else
-        {
-            Debug.Log ("Path: " + path);
-            LoadFromJson(path);
-        }
+        Debug.Log ("Path: " + path);
+        LoadFromJson(path);
+    
         
     }
 	
@@ -53,7 +49,6 @@ public class MeshGeneratorFromJson : MonoBehaviour
 		MeshReader meshReader = new MeshReader();
 		meshReader.GetJsonFromFilePath(path);
 
-		// Make sure to lock to avoid multithreading problems
 		Generate(meshReader.data, elementsParent);
 	}
 
@@ -95,21 +90,35 @@ public class MeshGeneratorFromJson : MonoBehaviour
     // To dispatch coroutines
 	public readonly Queue<Action> ExecuteOnMainThread = new ();
 	
-    private void Generate(MeshData data, GameObject elParent)
+    public void Generate(MeshData data, GameObject elParent)
     {
 
         element = data.GenerateMesh();
         element.transform.parent = elParent.transform;
         data.AssignMaterial(element, material);
         
-        drawController.meshCollider = element.AddComponent<MeshCollider>();
-        
+        element.AddComponent<MeshCollider>();
         
         var interactable =element.AddComponent<StatefulInteractable>();
         interactable.ToggleMode = StatefulInteractable.ToggleType.Toggle;
         interactable.OnToggled.AddListener(() => drawController.StartDrawing());
         interactable.OnUntoggled.AddListener(() => drawController.StopDrawing());
 
-        drawController.meshInteractable = interactable;
+
+        GameObject lockInstance = Instantiate(Padlock);
+
+        Renderer renderer = element.GetComponent<Renderer>();
+        Bounds bounds = renderer.bounds;
+        Vector3 center = bounds.center;
+        Vector3 size = bounds.size;
+
+        lockInstance.GetComponent<Orbital>().LocalOffset = new Vector3(center[0], center[1]+ size[1]/2 + 0.075f , center[2]);
+        
+        lockInstance.name ="lock_" + element.name;
+        lockInstance.transform.parent = locksParent.transform;
+        SolverHandler lockSolver = lockInstance.GetComponent<SolverHandler>();
+        lockSolver.TrackedTargetType = TrackedObjectType.CustomOverride;
+        lockSolver.TransformOverride = element.transform;
+        lockInstance.GetComponent<ElementStateController>().target = element;
 	}
 }
