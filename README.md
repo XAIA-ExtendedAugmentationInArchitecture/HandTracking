@@ -10,5 +10,7 @@ Handtracking for MRTK
    
    - newtonsoft: com.unity.nuget.newtonsoft-json
 
+# Installation
+
 # Guides and Troubleshooting
 The step-by-step and troubleshooting guides can be found under the wiki pages of this repository [here](https://github.com/HUMA-LabforAdvancedTechnologyinArch/HandTracking/wiki).
