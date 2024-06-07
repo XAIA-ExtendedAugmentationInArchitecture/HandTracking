@@ -2,6 +2,10 @@
 Handtracking for MRTK
 
 # Dependancies
+   - [Unity 2023.2.18](https://unity.com/releases/editor/whats-new/2023.2.18#notes)
+     
+   - [Visual Studio Code](https://code.visualstudio.com/)
+   
    - [compas_eve](https://github.com/compas-dev/compas_eve)
    
    - newtonsoft: com.unity.nuget.newtonsoft-json
