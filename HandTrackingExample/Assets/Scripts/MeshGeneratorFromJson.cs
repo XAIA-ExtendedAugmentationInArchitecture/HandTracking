@@ -120,5 +120,8 @@ public class MeshGeneratorFromJson : MonoBehaviour
         lockSolver.TrackedTargetType = TrackedObjectType.CustomOverride;
         lockSolver.TransformOverride = element.transform;
         lockInstance.GetComponent<ElementStateController>().target = element;
+
+        element.transform.localPosition = Vector3.zero;
+        element.transform.localRotation = Quaternion.identity;
 	}
 }

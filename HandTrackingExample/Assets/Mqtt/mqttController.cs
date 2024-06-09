@@ -50,10 +50,10 @@ public class MqttController : M2MqttUnityClient
     public bool autoTest = true;
 
 
-
-    //using C# Property GET/SET and event listener to reduce Update overhead in the controlled objects
     private string m_msg;
     public MeshData msgData;
+    //using C# Property GET/SET and event listener to reduce Update overhead in the controlled objects
+    
 
     public string msg
     {
@@ -150,6 +150,11 @@ protected override void OnConnectionLost()
     {
         isConnected=false;
         uIController.ActivateConnectionDialog("lost");
+    }
+
+public void subscribeTopics()
+    {
+        SubscribeTopics();
     }
 
 protected override void SubscribeTopics()

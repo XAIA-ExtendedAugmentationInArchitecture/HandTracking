@@ -27,7 +27,7 @@ public class DrawingController : MonoBehaviour
     public Material lineMaterial;
     public GameObject linesParent;
     public GameObject recordStateIndicator;
-    private int EnabledDrawingIndex = -1;
+    public int EnabledDrawingIndex = -1;
     private LineRenderer lineRenderer;
 
     private float lineWidth = 0.002f;
@@ -41,18 +41,19 @@ public class DrawingController : MonoBehaviour
 
     private GameObject currentDrawingParent;
     private HandsAggregatorSubsystem aggregator;
-    private string topicPublish = "/kit_handtracking_drawings/";
     private string timestamp;
+    public string team;
     
     public void SendToRhino()
     {
         object message = storedDrawings.drawings["drawing" + EnabledDrawingIndex.ToString()];
+        
         Dictionary<string, object> msg_dict = new Dictionary<string, object>
         {
-            {"result", message},
+            {"result", message}
         };
         mqttController.message = msg_dict;
-        mqttController.Publish(topicPublish);
+        mqttController.Publish(mqttController.topicsPublish[0]);
 
     }
 
@@ -421,7 +422,7 @@ public class DrawingController : MonoBehaviour
             string json = JsonConvert.SerializeObject(drawing);
 
             // Step 5: Save the JSON data to a file on the HoloLens 2 device
-            string filePath = Path.Combine(Application.persistentDataPath, $"{timestamp}_{timestampDrawing}_{drawing_name}.json");
+            string filePath = Path.Combine(Application.persistentDataPath, $"{timestamp}_{timestampDrawing}_{team}_{drawing_name}.json");
             // byte[] data = Encoding.ASCII.GetBytes(json);
             // UnityEngine.Windows.File.WriteAllBytes(filePath, data);
             File.WriteAllText(filePath, json);
@@ -481,7 +482,7 @@ public class DrawingController : MonoBehaviour
             string json = JsonConvert.SerializeObject(storedDrawings);
 
             // Step 3: Save the JSON data to a file on the HoloLens 2 device
-            string filePath = Path.Combine(Application.persistentDataPath, $"{timestamp}_backup.json");
+            string filePath = Path.Combine(Application.persistentDataPath, $"{timestamp}_{team}_backup.json");
             File.WriteAllText(filePath, json);
 
             Debug.Log($"Drawing saved to: {filePath}");

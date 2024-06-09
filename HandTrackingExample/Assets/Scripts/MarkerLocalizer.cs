@@ -7,12 +7,14 @@ using TMPro;
 public class MarkerLocalizer: MonoBehaviour
 {
     public UIController uIController;
+    public DrawingController drawController;
     public MeshGeneratorFromJson meshGenerator;
     public GameObject XR_Rig;
     public bool TrackingOn = false;
     private Quaternion offsetRotation = Quaternion.Euler(90, 0, 0);
     private GameObject Trackables;
     private GameObject Geometry;
+    private Coroutine trackingCoroutine;
 
     void Start()
     {
@@ -23,22 +25,41 @@ public class MarkerLocalizer: MonoBehaviour
         Geometry = meshGenerator.elementsParent;
     }
     
-    public void ToggleLocalization()
+    public void EnableLocalization()
     {
-        TrackingOn= !TrackingOn;
-        if (TrackingOn)
-        {
-            Trackables.SetActive(true);
-            uIController.TrackingText.text = "Tracking: ON";
-        }
-        else
-        {
-            Trackables.SetActive(false);
-            uIController.TrackingText.text = "Tracking: OFF";
-        }
+        TrackingOn = true;   
+        Trackables.SetActive(true);
+        uIController.TrackingText.text = "Tracking: ON";
         
+        if (trackingCoroutine != null)
+        {
+            StopCoroutine(trackingCoroutine);
+        }
+        trackingCoroutine = StartCoroutine(TrackingTimer());
     }
 
+    private IEnumerator TrackingTimer()
+    {
+        yield return new WaitForSeconds(5);
+        if (TrackingOn)
+        {
+            DisableLocalization();
+        }
+        drawController.CreateDrawingParent();
+    }
+
+    public void DisableLocalization()
+    {
+        TrackingOn = false;
+        Trackables.SetActive(false);
+        uIController.TrackingText.text = "Tracking: OFF";
+
+        if (trackingCoroutine != null)
+        {
+            StopCoroutine(trackingCoroutine);
+            trackingCoroutine = null;
+        }
+    }
     
 
     //Update is called once per frame

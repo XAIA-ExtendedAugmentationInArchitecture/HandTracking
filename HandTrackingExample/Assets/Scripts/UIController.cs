@@ -29,6 +29,10 @@ public class UIController : MonoBehaviour
     public Material LineRed;
 
     public GameObject mqttReceivedDialog;
+
+    public GameObject mqttSendDialog;
+    public TextMeshProUGUI mqttSendDialogHeader;
+    public TextMeshProUGUI mqttSendDialogBody;
     public TextMeshProUGUI mqttReceivedDialogBody;
     public GameObject mqttConnectionDialog;
 
@@ -42,22 +46,16 @@ public class UIController : MonoBehaviour
     public TextMeshPro TrackingText;
     public GameObject TableMenu;
 
-    private bool shouldCall = true;
     
     // Start is called before the first frame update
     void Start()
     {
         TableMenu.SetActive(false);
 
-        Localize.OnClicked.AddListener(() => markerLocalizer.ToggleLocalization());
+        Localize.OnClicked.AddListener(() => markerLocalizer.EnableLocalization());
         Localize.OnClicked.AddListener(() => 
         {
-            meshGenerator.locksParent.SetActive(true); //TEMPORARY
-            shouldCall = !shouldCall;
-            if (shouldCall)
-            {
-                drawController.CreateDrawingParent();
-            }
+            meshGenerator.locksParent.SetActive(true); //TEMPORARY           
         });
 
         NewDrawing.OnClicked.AddListener(() => drawController.StartNewDrawing());
@@ -66,7 +64,11 @@ public class UIController : MonoBehaviour
 
         GameObject next = NextDrawing.gameObject.transform.parent.gameObject;
         VisualizeDrawing.OnClicked.AddListener(() => ToggleVisibility(next));
-        SendToRhino.OnClicked.AddListener(() => drawController.SendToRhino());
+        SendToRhino.OnClicked.AddListener(() =>
+        {
+            mqttSendDialogBody.text = "Do you want to send the drawing no." + drawController.EnabledDrawingIndex.ToString() + " back to Rhino?";
+            SetupSendToRhinoDialog();
+        });  
 
         
         VisualizeMesh.OnClicked.AddListener(() => ToggleRendererVisibility());
@@ -83,6 +85,11 @@ public class UIController : MonoBehaviour
         mqttConnectionDialog.SetActive(false);
         mqttConnectionDialog.GetComponent<Dialog>().SetNeutral("OK", args => mqttController.Connect());
 
+        mqttSendDialog.SetActive(false);
+        mqttSendDialog.GetComponent<Dialog>().SetPositive("Yes", args => drawController.SendToRhino());
+        mqttSendDialog.GetComponent<Dialog>().SetNegative("No", args => Debug.Log("Rejected"));
+
+
         PickTeam.SetActive(true);
         PickTeam.GetComponent<Dialog>().SetPositive("Team A", args => DefineMqttTopics("A"));
         PickTeam.GetComponent<Dialog>().SetNegative("Team B", args => DefineMqttTopics("B"));
@@ -93,18 +100,34 @@ public class UIController : MonoBehaviour
 
     }
 
+    void SetupSendToRhinoDialog()
+    {
+        var dialog = mqttSendDialog.GetComponent<Dialog>();
+        dialog.Reset();
+
+        dialog.SetPositive("Yes", args => drawController.SendToRhino());
+        dialog.SetNegative("No", args => Debug.Log("Rejected"));
+
+        mqttSendDialog.SetActive(true);
+    }
+
         void DefineMqttTopics(string team)
     {
         if (team=="A")
         {
             mqttController.topicsSubscribe.Add("/kitgkr_teamA_geometries/");
             mqttController.topicsPublish.Add("/kitgkr_teamA_drawings/");
+            drawController.team = "teamA";
+            mqttSendDialogHeader.text = "Team A: Send a Drawing to Rhino";
         }
         else if (team=="B")
         {
             mqttController.topicsSubscribe.Add("/kitgkr_teamB_geometries/");
             mqttController.topicsPublish.Add("/kitgkr_teamB_drawings/");
+            drawController.team = "teamB";
+            mqttSendDialogHeader.text = "Team B: Send a Drawing to Rhino";
         }
+        mqttController.subscribeTopics();
         StartDialog.SetActive(true);
     }
 
@@ -132,6 +155,11 @@ public class UIController : MonoBehaviour
 
     public void MessageReceived(string topic, string object_name)
     {
+        var dialog = mqttReceivedDialog.GetComponent<Dialog>();
+        dialog.Reset();
+
+        dialog.SetPositive("Yes", args => meshGenerator.Generate(mqttController.msgData, meshGenerator.elementsParent));
+        dialog.GetComponent<Dialog>().SetNegative("No", args => Debug.Log("Rejected"));
 
         mqttReceivedDialog.GetComponent<Dialog>().SetBody("Geometry: " + object_name + "\n Do you want to add this geometry in your digital space?");
         mqttReceivedDialogBody.text = "Geometry: " + object_name + "\n Do you want to add this geometry in your digital space?";
