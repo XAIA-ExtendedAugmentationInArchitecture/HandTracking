@@ -19,7 +19,7 @@ public class MeshGeneratorFromJson : MonoBehaviour
     public GameObject elementsParent;
     public GameObject locksParent;
     public DrawingController drawController;
-    public GameObject Padlock;
+    public GameObject padlocks;
     private string path; 
     public string fileName; 
     public Material material;     			
@@ -105,7 +105,7 @@ public class MeshGeneratorFromJson : MonoBehaviour
         interactable.OnUntoggled.AddListener(() => drawController.StopDrawing());
 
 
-        GameObject lockInstance = Instantiate(Padlock);
+        GameObject lockInstance = Instantiate(padlocks);
 
         Renderer renderer = element.GetComponent<Renderer>();
         Bounds bounds = renderer.bounds;

@@ -14,11 +14,9 @@ public class ElementStateController : MonoBehaviour
     private StatefulInteractable targetStatefulInteractable;
     private MeshCollider targetCollider;
     private PressableButton pressableButton; 
-    private Renderer objectRenderer;
 
-    // Specific RGB values for the toggled and untoggled states
-    private Color drawingColor = new Color(176f / 255f, 29f / 255f, 35f / 255f); 
-    private Color manipulateColor = new Color(47f / 255f, 106f / 255f, 56f / 255f); 
+    private GameObject closed;
+    private GameObject open;
 
     private bool toggled = true;
 
@@ -30,8 +28,8 @@ public class ElementStateController : MonoBehaviour
         {
             pressableButton.OnClicked.AddListener(() => ToggleState());
         }
-        objectRenderer = GetComponent<Renderer>();
-        objectRenderer.material.color = drawingColor;
+        closed = gameObject.FindObject("closed");
+        open = gameObject.FindObject("open");
     }
 
     public void ToggleState()
@@ -76,10 +74,9 @@ public class ElementStateController : MonoBehaviour
  
         }
 
-        if (objectRenderer != null)
-        {
-            objectRenderer.material.color = drawingColor;
-        }
+        closed.SetActive(true);
+        open.SetActive(false);
+
         Debug.Log("Mode: Drawing");
     }
 
@@ -109,10 +106,8 @@ public class ElementStateController : MonoBehaviour
 
         }
 
-        if (objectRenderer != null)
-        {
-            objectRenderer.material.color = manipulateColor;
-        }
+        closed.SetActive(false);
+        open.SetActive(true);
 
         Debug.Log("Mode:Manipulating");
     }

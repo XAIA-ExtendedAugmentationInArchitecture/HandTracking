@@ -26,7 +26,7 @@ public class DrawingController : MonoBehaviour
     //public GameObject reticleVisual;
     public Material lineMaterial;
     public GameObject linesParent;
-    public GameObject recordStateIndicator;
+
     public int EnabledDrawingIndex = -1;
     private LineRenderer lineRenderer;
 
@@ -77,7 +77,6 @@ public class DrawingController : MonoBehaviour
         };
 
         reticleVisual = reticleTransform.gameObject.transform.Find("RingVisual").gameObject;
-        recordStateIndicator.SetActive(false);
 
         aggregator = XRSubsystemHelpers.GetFirstRunningSubsystem<HandsAggregatorSubsystem>();
 
@@ -119,7 +118,6 @@ public class DrawingController : MonoBehaviour
                     previousPosition = reticleTransform.position;
                 }
 
-                recordStateIndicator.SetActive(true);
                 
             }
             else
@@ -130,7 +128,6 @@ public class DrawingController : MonoBehaviour
                     StoreDrawnLine();
                     //GenerateMeshCollider();
                 }
-                recordStateIndicator.SetActive(false);
 
                 linePointIndex = -1;
 
@@ -168,7 +165,6 @@ public class DrawingController : MonoBehaviour
                         previousPosition = jointPose.Pose.position;
                     }
 
-                    recordStateIndicator.SetActive(true);
 
                 }
                 else
@@ -178,7 +174,6 @@ public class DrawingController : MonoBehaviour
                         StoreDrawnLine();
                         //GenerateMeshCollider();
                     }
-                    recordStateIndicator.SetActive(false);
                     linePointIndex = -1;
                 }
             }
