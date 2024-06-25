@@ -16,6 +16,8 @@ namespace MeshElementData
     {
         public string name { get; set; }
 
+        public float[] color { get; set; }
+
         [JsonConverter(typeof(IntArrayArrayConverter))]
         public int[][] faces { get; set; }
 

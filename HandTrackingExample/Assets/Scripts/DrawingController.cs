@@ -400,6 +400,18 @@ public class DrawingController : MonoBehaviour
         }
         storedDrawings.drawings[dkey].lines[lkey].positions = positions;
 
+        storedDrawings.drawings[dkey].objectFrames = new Dictionary<string, Frame>();
+
+        foreach (Transform child in meshGenerator.elementsParent.transform)
+        {
+            storedDrawings.drawings[dkey].objectFrames[child.name] = new Frame
+            {
+                point = child.position,
+                xaxis = child.right,
+                zaxis = child.forward
+            };
+        }
+
     }
 
     public void SaveEnabledDrawing()

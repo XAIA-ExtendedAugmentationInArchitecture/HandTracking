@@ -24,6 +24,7 @@ public class MeshGeneratorFromJson : MonoBehaviour
     public string fileName; 
     public Material material;     			
     private GameObject element;
+    private float alphaValue = 0.25f;
 
 	void Start()
     {   
@@ -95,7 +96,13 @@ public class MeshGeneratorFromJson : MonoBehaviour
 
         element = data.GenerateMesh();
         element.transform.parent = elParent.transform;
-        data.AssignMaterial(element, material);
+
+        Material uniqueMaterial = new Material(material);
+        uniqueMaterial.name = element.name;
+        data.AssignMaterial(element, uniqueMaterial);
+
+        Color elColor= new Color(data.color[0], data.color[1], data.color[2], data.color[3]);
+        element.SetColor(elColor);
         
         element.AddComponent<MeshCollider>();
         
@@ -124,4 +131,23 @@ public class MeshGeneratorFromJson : MonoBehaviour
         element.transform.localPosition = Vector3.zero;
         element.transform.localRotation = Quaternion.identity;
 	}
+
+    public void AdjustTransparency(float sliderValue)
+    {
+        alphaValue = sliderValue;
+        foreach (Transform child in elementsParent.transform)
+        {
+            MeshRenderer mRenderer= child.gameObject.GetComponent<MeshRenderer>();
+            
+            if (mRenderer != null)
+            {
+                foreach (Material mat in mRenderer.materials)
+                {
+                    Color color = mat.color;
+                    color.a = alphaValue;
+                    mat.color = color;
+                }
+            }
+        }
+    }
 }
