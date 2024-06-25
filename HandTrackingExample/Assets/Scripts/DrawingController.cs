@@ -323,7 +323,7 @@ public class DrawingController : MonoBehaviour
 
     public void DeleteLines()
     {
-        foreach (Transform child in linesParent.transform)
+        foreach (Transform child in currentDrawingParent.transform)
         {
             // Destroy the child game object
             Destroy(child.gameObject);
@@ -331,6 +331,30 @@ public class DrawingController : MonoBehaviour
 
         lineIndex = -1;
         linePointIndex = 0;
+    }
+
+    public void UndoLine()
+    {
+        if (lineIndex >=0)
+        {
+            Destroy(currentDrawingParent.FindObject("Line" + lineIndex.ToString()));
+            
+
+            // Remove the line from the dictionary
+            string dkey = "drawing" + EnabledDrawingIndex.ToString();
+            if (storedDrawings.drawings.ContainsKey(dkey))
+            {
+                string lkey = lineIndex.ToString();
+                if (storedDrawings.drawings[dkey].lines.ContainsKey(lkey))
+                {
+                    storedDrawings.drawings[dkey].lines.Remove(lkey);
+                }
+            }
+
+            // Decrement line index and reset line point index
+            lineIndex--;
+            linePointIndex = -1;
+        }
     }
 
     void AddPointsToLine(Vector3 position)

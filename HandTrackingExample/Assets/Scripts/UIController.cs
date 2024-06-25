@@ -13,6 +13,7 @@ public class UIController : MonoBehaviour
 
     public PressableButton Localize;
     public PressableButton NewDrawing;
+    public PressableButton Undo;
     public PressableButton SaveDrawing;
     public PressableButton VisualizeDrawing;
     public PressableButton NextDrawing;
@@ -63,6 +64,8 @@ public class UIController : MonoBehaviour
         });
 
         NewDrawing.OnClicked.AddListener(() => drawController.StartNewDrawing());
+        Undo.OnClicked.AddListener(() =>drawController.UndoLine());
+
         NextDrawing.OnClicked.AddListener(() => drawController.VisualizeDrawing());
         SaveDrawing.OnClicked.AddListener(() => drawController.SaveEnabledDrawing());
 
