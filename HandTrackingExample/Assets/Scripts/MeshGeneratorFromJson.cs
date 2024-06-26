@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System.Dynamic;
 using MeshElementData;
 using Unity.VisualScripting;
+using TMPro;
 using MixedReality.Toolkit;
 using MixedReality.Toolkit.SpatialManipulation;
 
@@ -24,7 +25,7 @@ public class MeshGeneratorFromJson : MonoBehaviour
     public string fileName; 
     public Material material;     			
     private GameObject element;
-    private float alphaValue = 0.25f;
+    private float alphaValue = 0.20f;
 
 	void Start()
     {   
@@ -101,7 +102,7 @@ public class MeshGeneratorFromJson : MonoBehaviour
         uniqueMaterial.name = element.name;
         data.AssignMaterial(element, uniqueMaterial);
 
-        Color elColor= new Color(data.color[0], data.color[1], data.color[2], data.color[3]);
+        Color elColor= new Color(data.color[0], data.color[1], data.color[2], alphaValue);
         element.SetColor(elColor);
         
         element.AddComponent<MeshCollider>();
@@ -132,9 +133,23 @@ public class MeshGeneratorFromJson : MonoBehaviour
         element.transform.localRotation = Quaternion.identity;
 	}
 
-    public void AdjustTransparency(float sliderValue)
+    public void AdjustTransparency(bool transparencyUp, TMP_Text infoText)
     {
-        alphaValue = sliderValue;
+        if (transparencyUp && alphaValue<0.95f)
+        {
+           Debug.Log ("Hoii2" + alphaValue);
+            alphaValue =alphaValue + 0.1f;
+        }
+        else if (!transparencyUp && alphaValue>0.05f)
+        {
+            Debug.Log ("Hoii3" + alphaValue);
+            alphaValue =alphaValue - 0.1f;
+        }
+
+        infoText.text = Mathf.RoundToInt(alphaValue * 100).ToString() + "%";
+
+        Debug.Log("Hoiii" + infoText.text);
+
         foreach (Transform child in elementsParent.transform)
         {
             MeshRenderer mRenderer= child.gameObject.GetComponent<MeshRenderer>();
@@ -150,4 +165,23 @@ public class MeshGeneratorFromJson : MonoBehaviour
             }
         }
     }
+
+    // public void AdjustTransparency(float transparencyValue)
+    // {
+    //     alphaValue = transparencyValue;
+    //     foreach (Transform child in elementsParent.transform)
+    //     {
+    //         MeshRenderer mRenderer= child.gameObject.GetComponent<MeshRenderer>();
+            
+    //         if (mRenderer != null)
+    //         {
+    //             foreach (Material mat in mRenderer.materials)
+    //             {
+    //                 Color color = mat.color;
+    //                 color.a = alphaValue;
+    //                 mat.color = color;
+    //             }
+    //         }
+    //     }
+    // }
 }

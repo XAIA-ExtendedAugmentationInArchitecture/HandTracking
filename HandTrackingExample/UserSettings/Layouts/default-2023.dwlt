@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PixelRect:
     serializedVersion: 2
-    x: 0
+    x: 1920
     y: 43
     width: 1920
     height: 989
@@ -170,7 +170,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 150}
   m_MaxSize: {x: 24288, y: 24288}
   vertical: 0
-  controlID: 80
+  controlID: 116
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -195,7 +195,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 150}
   m_MaxSize: {x: 16192, y: 24288}
   vertical: 1
-  controlID: 81
+  controlID: 71
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -220,7 +220,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 0
-  controlID: 82
+  controlID: 72
 --- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -348,7 +348,7 @@ MonoBehaviour:
     m_TextWithWhitespace: "Holographic Remoting for Play Mode\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 0
+    x: 1920
     y: 484
     width: 563
     height: 184
@@ -384,7 +384,7 @@ MonoBehaviour:
     m_TextWithWhitespace: "Scene\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 564
+    x: 2484
     y: 73
     width: 919
     height: 595
@@ -844,9 +844,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: 0.3241361, y: 0.041063156, z: 0.090011224}
+    m_Target: {x: 0.077178285, y: 0.087954715, z: 0.009148162}
     speed: 2
-    m_Value: {x: 0.3241361, y: 0.041063156, z: 0.090011224}
+    m_Value: {x: 0.077178285, y: 0.087954715, z: 0.009148162}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -892,13 +892,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: 0.1757098, y: -0.06345223, z: 0.011351546, w: 0.98235685}
+    m_Target: {x: 0.3181219, y: -0.036964957, z: 0.012413109, w: 0.9472766}
     speed: 2
-    m_Value: {x: 0.17570506, y: -0.06345052, z: 0.011351241, w: 0.9823304}
+    m_Value: {x: 0.31811318, y: -0.036963943, z: 0.012412769, w: 0.9472506}
   m_Size:
-    m_Target: 0.2815621
+    m_Target: 0.11108042
     speed: 2
-    m_Value: 0.2815621
+    m_Value: 0.10629705
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -950,7 +950,7 @@ MonoBehaviour:
     m_TextWithWhitespace: "Hierarchy\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 0
+    x: 1920
     y: 73
     width: 563
     height: 390
@@ -967,10 +967,10 @@ MonoBehaviour:
     m_OverlaysVisible: 1
   m_SceneHierarchy:
     m_TreeViewState:
-      scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 4ab60000
-      m_LastClickedID: 46666
-      m_ExpandedIDs: 86e6ffffe2faffffe4faffff
+      scrollPos: {x: 0, y: 159}
+      m_SelectedIDs: 08d8feff04d8feff
+      m_LastClickedID: -75772
+      m_ExpandedIDs: eab7ffffecb7ffffeeb7fffff8b7fffffab7ffffc2eeffffcceeffff2af2ffff2cf2ffff36f2ffff3cf2ffff3ef2ffff4cf2ffffe2faffffe4faffff4ab60000acb7000088bb0000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -1061,7 +1061,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 82}
     m_SelectedIDs: 52c70000
     m_LastClickedID: 51026
-    m_ExpandedIDs: 000000001cc700001ec7000020c7000022c7000024c7000026c7000028c700002ac700002cc700002ec7000030c7000032c7000034c7000036c7000038c700003ac700003cc700003ec7000040c7000042c7000044c7000046c7000048c700004ac700004cc700004ec7000050c7000054c7000056c7000058c700005ac700005cc700005ec7000056c8000068c8000060c9000000ca9a3bffffff7f
+    m_ExpandedIDs: 000000001cc700001ec7000020c7000022c7000024c7000026c7000028c700002ac700002cc700002ec7000030c7000032c7000034c7000036c7000038c700003ac700003cc700003ec7000040c7000042c7000044c7000046c7000048c700004ac700004cc700004ec7000050c7000052c7000054c7000056c7000058c700005ac700005cc700005ec7000060c7000062c70000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1090,7 +1090,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000001cc700001ec7000020c7000022c7000024c7000026c7000028c700002ac700002cc700002ec7000030c7000032c7000034c7000036c7000038c700003ac700003cc700003ec7000040c7000042c7000044c7000046c7000048c700004ac700004cc700004ec7000050c7000052c7000054c7000056c7000058c700005ac700005cc700005ec70000
+    m_ExpandedIDs: 000000001cc700001ec7000020c7000022c7000024c7000026c7000028c700002ac700002cc700002ec7000030c7000032c7000034c7000036c7000038c700003ac700003cc700003ec7000040c7000042c7000044c7000046c7000048c700004ac700004cc700004ec7000050c7000052c7000054c7000056c7000058c700005ac700005cc700005ec7000060c7000062c70000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1169,7 +1169,7 @@ MonoBehaviour:
     m_TextWithWhitespace: "Console\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 0
+    x: 1920
     y: 689
     width: 1484
     height: 302
@@ -1205,7 +1205,7 @@ MonoBehaviour:
     m_TextWithWhitespace: "Inspector\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 1485
+    x: 3405
     y: 73
     width: 434
     height: 918
@@ -1254,7 +1254,7 @@ MonoBehaviour:
     m_TextWithWhitespace: "Game\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 564
+    x: 2484
     y: 73
     width: 919
     height: 595

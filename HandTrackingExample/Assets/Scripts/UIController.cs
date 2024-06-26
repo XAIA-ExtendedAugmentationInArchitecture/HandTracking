@@ -20,8 +20,10 @@ public class UIController : MonoBehaviour
     public PressableButton SendToRhino;
 
     public PressableButton VisualizeMesh;
-    public GameObject TransparencySliderParent;
-    public Slider TransparencySlider;
+    public GameObject TransparencyParent;
+    public PressableButton TrasparencyUp;
+    public PressableButton TrasparencyDown;
+    public TMP_Text TransparencyInfo;
 
     public PressableButton DrawingMode;
 
@@ -73,9 +75,12 @@ public class UIController : MonoBehaviour
             SetupSendToRhinoDialog();
         });  
 
-        TransparencySliderParent.SetActive(false);
-        VisualizeMesh.OnClicked.AddListener(() => TransparencySliderParent.SetActive(!TransparencySliderParent.activeSelf));
-        TransparencySlider.OnValueUpdated.AddListener((SliderEventData eventData) => meshGenerator.AdjustTransparency(eventData.NewValue));
+        TransparencyParent.SetActive(false);
+        
+        VisualizeMesh.OnClicked.AddListener(() => TransparencyParent.SetActive(!TransparencyParent.activeSelf));
+        TrasparencyUp.OnClicked.AddListener(() => meshGenerator.AdjustTransparency(true, TransparencyInfo));
+        TrasparencyDown.OnClicked.AddListener(() => meshGenerator.AdjustTransparency(false, TransparencyInfo));
+
         DrawingMode.OnClicked.AddListener(() => drawController.ToggleDrawingMode());
 
         GreenColor.OnClicked.AddListener(() => drawController.lineMaterial = LineGreen);
