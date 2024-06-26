@@ -90,6 +90,8 @@ public class MarkerLocalizer: MonoBehaviour
                             uIController.TableMenu.transform.position = child.position;
                             uIController.TableMenu.transform.rotation = child.rotation * offsetRotation;
                             uIController.TableMenu.SetActive(true);
+
+                            meshGenerator.locksParent.SetActive(true);
                             return; // Exit the loop once the desired marker is found
                         }
                     }                    

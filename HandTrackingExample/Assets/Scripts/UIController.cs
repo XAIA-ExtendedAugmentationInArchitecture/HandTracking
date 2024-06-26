@@ -58,10 +58,6 @@ public class UIController : MonoBehaviour
         TableMenu.SetActive(false);
 
         Localize.OnClicked.AddListener(() => markerLocalizer.EnableLocalization());
-        Localize.OnClicked.AddListener(() => 
-        {
-            meshGenerator.locksParent.SetActive(true); //TEMPORARY           
-        });
 
         NewDrawing.OnClicked.AddListener(() => drawController.StartNewDrawing());
         Undo.OnClicked.AddListener(() =>drawController.UndoLine());
