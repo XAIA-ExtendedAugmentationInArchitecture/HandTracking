@@ -20,6 +20,8 @@ public class UIController : MonoBehaviour
     public PressableButton SendToRhino;
 
     public PressableButton VisualizeMesh;
+
+    public PressableButton Locks;
     public GameObject TransparencyParent;
     public PressableButton TrasparencyUp;
     public PressableButton TrasparencyDown;
@@ -74,6 +76,8 @@ public class UIController : MonoBehaviour
             mqttSendDialogBody.text = "Do you want to send the drawing no." + drawController.EnabledDrawingIndex.ToString() + " back to Rhino?";
             SetupSendToRhinoDialog();
         });  
+
+        Locks.OnClicked.AddListener(() => meshGenerator.locksParent.SetActive(!meshGenerator.locksParent.activeSelf));
 
         TransparencyParent.SetActive(false);
         
