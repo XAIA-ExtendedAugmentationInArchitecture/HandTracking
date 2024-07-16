@@ -13,11 +13,15 @@ using TMPro;
 using DrawingsData;
 using Newtonsoft.Json;
 using MixedReality.Toolkit.UX;
+using MixedReality.Toolkit.SpatialManipulation;
 
 public class DrawingController : MonoBehaviour
 {
     public bool drawingOn = false;
-    public bool farDrawing = true;
+    public bool pointsOn = false;
+    private bool farDrawing = false;
+
+    public string drawingMode = "farDrawing";
     public UIController uIController;
     public MeshGeneratorFromJson meshGenerator;
     public Drawings storedDrawings; 
@@ -29,25 +33,33 @@ public class DrawingController : MonoBehaviour
 
     public int EnabledDrawingIndex = -1;
 
+    private LineRenderer lineRenderer;
     private LineRenderer lineRenderer_realtime;
     private LineRenderer lineRenderer_simplified;
+
+    public Material ControlPointMaterial;
+
+    private float simplifyingFactor = 0.02f;
+    private float lineSegmentSize = 0.01f;
+    private float gizmoSize = 0.0035f;
 
     private float lineWidth = 0.002f;
     private int DrawingIndex = -1;
     private int lineIndex = -1;
     private int linePointIndex = 0;
     private GameObject reticleVisual;
-    private GameObject line;
+    private GameObject lineObject;
+    private GameObject lineObjectSimplified;
     private float minDistance = 0.0025f;
     private Vector3 previousPosition = Vector3.zero;
 
     private GameObject currentDrawingParent;
     private HandsAggregatorSubsystem aggregator;
     private string timestamp;
+
     public string team;
 
-    //curve
-    public List<Vector3> originalCurvePoints = new List<Vector3>();
+
     int targetPointCount = 10;
 
     public void SendToRhino()
@@ -96,7 +108,7 @@ public class DrawingController : MonoBehaviour
 
     void Update()
     {   
-        if (farDrawing)
+        if (drawingMode == "farDrawing")
         {
             if (reticleVisual.activeSelf==false)
             {
@@ -115,36 +127,28 @@ public class DrawingController : MonoBehaviour
                 {
                     // Set the initial position for the line
                     previousPosition = reticleTransform.position;
-                    // Initialize the line point index
                     linePointIndex = 0;
-                    // Increment the line index for creating a new line
                     lineIndex++;
                     // Instantiate a new line renderer for the current line index
-                    InstantiateLine(lineIndex);
+                    lineRenderer_realtime = InstantiateLine(lineIndex, "realtime");
                     Debug.Log("Line index is" + lineIndex + "lineRenderer" + lineRenderer_realtime);
                 }
 
                 if (Vector3.Distance(previousPosition, reticleTransform.position)> minDistance)
                 {
-                    Debug.Log("Position is" + reticleTransform.position);
                     AddPointsToLine(lineRenderer_realtime, reticleTransform.position);
-                    lineRenderer_realtime.Simplify(0.025f);
-                    originalCurvePoints.Add(reticleTransform.position);
                     previousPosition = reticleTransform.position;
                 }
 
-                
             }
             else
             {
                 
                 if (linePointIndex != -1 && lineIndex != -1)
                 {
-                    Debug.Log("origianl points are" + originalCurvePoints.Count);
-                    Debug.Log("targetPointCount are" + targetPointCount);
-                    List<Vector3> simplifiedCurve = SimplifyCurve(originalCurvePoints, targetPointCount);
-                    InstantiateLine(targetPointCount);
-                    StoreDrawnLine(lineRenderer_simplified);
+
+                    SimplifyDrawing();
+                    //StoreDrawnLine(lineRenderer_realtime);
                     //GenerateMeshCollider();
                 }
 
@@ -152,7 +156,7 @@ public class DrawingController : MonoBehaviour
 
             }
         }
-        else
+        else if (drawingMode == "pinchDrawing")
         {
             if (aggregator != null)
             {
@@ -165,55 +169,32 @@ public class DrawingController : MonoBehaviour
 
                 // Query pinch characteristics from the left hand.
                 bool handIsValidPinch = aggregator.TryGetPinchProgress(XRNode.RightHand, out bool isReadyToPinch, out bool isPinching, out float pinchAmount);
-                //Debug.Log("The pinch is" + isPinching);
-
 
                 if (isPinching)
                 {
-                    Debug.Log("Pinch is " + isPinching);
                     if (linePointIndex == -1)
                     {
-                        // Set the initial position for the line
-                        previousPosition = reticleTransform.position;
-                        // Initialize the line point index
+                        previousPosition = jointPose.Pose.position;
                         linePointIndex = 0;
-                        // Increment the line index for creating a new line
                         lineIndex++;
                         // Instantiate a new line renderer for the current line index
-                        lineRenderer_realtime = InstantiateLine(lineIndex);
+                        lineRenderer_realtime = InstantiateLine(lineIndex, "realtime");
                         Debug.Log("Line index is" + lineIndex + "lineRenderer" + lineRenderer_realtime);
                     }
 
                     if (Vector3.Distance(previousPosition, jointPose.Pose.position)> minDistance)
                     {
-                        Debug.Log("there is a line with a material" + lineRenderer_realtime.material);
                         AddPointsToLine(lineRenderer_realtime, jointPose.Pose.position);
-                        originalCurvePoints.Add(jointPose.Pose.position);
                         previousPosition = jointPose.Pose.position;
-                        Debug.Log("origianl points are" + originalCurvePoints.Count);
                     }
 
 
                 }
                 else
                 {
-
-                    if (linePointIndex != -1)
+                    if (linePointIndex != -1 && lineIndex!=-1)
                     {
-                        Debug.Log("Pinch is" + isPinching);
-                        Debug.Log("originalCurvePoints is " + originalCurvePoints.Count);
-
-                        //Once we stop pinching we simplify
-                        List<Vector3> simplifiedPoints = SimplifyCurve(originalCurvePoints, targetPointCount);
-                        lineRenderer_simplified = InstantiateLine(lineIndex);
-                        lineRenderer_simplified.positionCount = simplifiedPoints.Count;
-                        // Set the positions of the LineRenderer
-                        for (int i = 0; i < simplifiedPoints.Count; i++)
-                        {
-                            lineRenderer_simplified.SetPosition(i, simplifiedPoints[i]);
-                        }
-                        //then we store it
-                        StoreDrawnLine(lineRenderer_simplified);
+                        SimplifyDrawing();
                         //GenerateMeshCollider();
                     }
                     linePointIndex = -1;
@@ -221,6 +202,84 @@ public class DrawingController : MonoBehaviour
             }
         }
         
+    }
+
+    void SimplifyDrawing()
+    {
+        lineRenderer_simplified = InstantiateLine(lineIndex, "simplified");
+                        
+        Vector3[] originalPositions = new Vector3[lineRenderer_realtime.positionCount];
+        lineRenderer_realtime.GetPositions(originalPositions);
+        lineRenderer_simplified.positionCount = originalPositions.Length;
+        lineRenderer_simplified.SetPositions(originalPositions);
+
+        lineObject.SetActive(false);
+
+        // Calculate the total length of the line
+        float totalLength = CalculateTotalLength(originalPositions);
+
+        // Check if the total length exceeds the threshold and adjust parameters
+        if (totalLength > 0.5f)
+        {
+            simplifyingFactor = 0.02f;
+            lineSegmentSize = 0.01f;
+            gizmoSize = 0.0035f;
+        }
+        else
+        {
+            simplifyingFactor = 0.01f;
+            lineSegmentSize = 0.005f;
+            gizmoSize = 0.0035f; 
+        }
+        
+        lineRenderer_simplified.Simplify(simplifyingFactor);
+        //then we store it
+        StoreDrawnLine(lineRenderer_simplified);
+
+        CreateCurvedLinePoints(lineRenderer_simplified, lineObjectSimplified);
+        lineObjectSimplified.AddComponent<CurvedLineRenderer>();
+        lineObjectSimplified.GetComponent<CurvedLineRenderer>().lineSegmentSize =lineSegmentSize;
+        lineObjectSimplified.GetComponent<CurvedLineRenderer>().gizmoSize = gizmoSize;
+}
+
+    float CalculateTotalLength(Vector3[] positions)
+    {
+        float length = 0.0f;
+        for (int i = 0; i < positions.Length - 1; i++)
+        {
+            length += Vector3.Distance(positions[i], positions[i + 1]);
+        }
+        return length;
+    }
+
+    void CreateCurvedLinePoints(LineRenderer lineRenderer, GameObject parentObject)
+    {
+        // Get the positions from the simplified LineRenderer
+        Vector3[] simplifiedPositions = new Vector3[lineRenderer.positionCount];
+        lineRenderer.GetPositions(simplifiedPositions);
+
+        // For each position, create a new GameObject and attach a CurvedLinePoint component
+        foreach (Vector3 position in simplifiedPositions)
+        {
+            GameObject pointObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            pointObject.transform.position = position;
+            pointObject.transform.localScale = new Vector3(gizmoSize * 2, gizmoSize * 2, gizmoSize * 2);
+            pointObject.transform.parent = parentObject.transform;
+            pointObject.name = "ControlPoint";
+            pointObject.AddComponent<SphereCollider>();
+
+            pointObject.GetComponent<Renderer>().material = ControlPointMaterial;
+
+            ObjectManipulator targetObjectManipulator = pointObject.AddComponent<ObjectManipulator>();
+            targetObjectManipulator.AllowedManipulations = TransformFlags.Move | TransformFlags.Rotate;
+            targetObjectManipulator.AllowedInteractionTypes = InteractionFlags.Near | InteractionFlags.Ray | InteractionFlags.Gaze | InteractionFlags.Generic;
+            
+
+
+            CurvedLinePoint curvedLinePoint = pointObject.AddComponent<CurvedLinePoint>();
+            pointObject.GetComponent<Renderer>().enabled = false;
+            targetObjectManipulator.enabled = false; 
+        }
     }
 
     List<Vector3> SimplifyCurve(List<Vector3> points, int targetCount)
@@ -255,15 +314,30 @@ public class DrawingController : MonoBehaviour
 
     public void ToggleDrawingMode()
     {
-        farDrawing =!farDrawing;
 
-        if (farDrawing)
+        if (drawingMode =="farDrawing")
         {
-            uIController.ModeText.text = "DRAW mode: Hand Ray";
+            drawingMode ="pinchDrawing";
+            pointsOn = false;
+            farDrawing = false;
+            uIController.ModeText.text = "DRAW mode: Pinch Gesture";
+        }
+        else if (drawingMode =="pinchDrawing")
+        {
+            drawingMode ="controlPoints";
+            pointsOn = true;
+            farDrawing = false;
+            uIController.ModeText.text = "DRAW mode: Control Points";
+
+            EnableControlPoints(pointsOn);
         }
         else
         {
-            uIController.ModeText.text = "DRAW mode: Pinch Gesture";
+            drawingMode ="farDrawing";
+            pointsOn = false;
+            farDrawing = true;
+            uIController.ModeText.text = "DRAW mode: Hand Ray";
+            EnableControlPoints(pointsOn);
         }
 
         foreach (Transform child in meshGenerator.elementsParent.transform)
@@ -271,8 +345,24 @@ public class DrawingController : MonoBehaviour
             child.gameObject.GetComponent<MeshCollider>().enabled=farDrawing;
             child.gameObject.GetComponent<StatefulInteractable>().enabled=farDrawing;
         }
+    }
 
-
+    void EnableControlPoints(bool enable)
+    {
+        // Iterate over each child of currentDrawingParent
+        Debug.Log(currentDrawingParent.name + enable );
+        foreach (Transform child in currentDrawingParent.transform)
+        {
+            // Check if the child GameObject has the specific tag you are interested in
+            if (child.CompareTag("simplified"))
+            {
+                foreach (Transform grandchild in child.transform)
+            {
+                grandchild.gameObject.GetComponent<Renderer>().enabled = enable;
+                grandchild.gameObject.GetComponent<ObjectManipulator>().enabled = enable;
+            }
+            }
+        }
     }
 
     public void StartNewDrawing()
@@ -302,7 +392,8 @@ public class DrawingController : MonoBehaviour
         }
 
         CreateDrawingParent();
-        Debug.Log("Start drawing No:" + DrawingIndex);
+        Debug.Log("Start drawing No:" + DrawingIndex + "  "+ linePointIndex);
+        
 
 
     }
@@ -315,7 +406,10 @@ public class DrawingController : MonoBehaviour
         {
             EnabledDrawingIndex=0;
         }
-        linesParent.transform.GetChild(EnabledDrawingIndex).gameObject.SetActive(true);
+        currentDrawingParent = linesParent.transform.GetChild(EnabledDrawingIndex).gameObject;
+        lineIndex = (currentDrawingParent.transform.childCount /2 ) -1;
+        currentDrawingParent.SetActive(true);
+        EnableControlPoints(pointsOn);
 
         foreach (var kvp in storedDrawings.drawings["drawing"+ EnabledDrawingIndex.ToString()].objectFrames)
         {
@@ -384,13 +478,13 @@ public class DrawingController : MonoBehaviour
     public void StartDrawing()
     {
         drawingOn = true;
-        Debug.Log("Drawing on a mesh is ON");
+        //Debug.Log("Drawing on a mesh is ON");
     }
 
     public void StopDrawing()
     {
         drawingOn = false;
-        Debug.Log("Drawing on a mesh is OFF");
+        //Debug.Log("Drawing on a mesh is OFF");
     }
 
     public void DeleteLines()
@@ -409,7 +503,8 @@ public class DrawingController : MonoBehaviour
     {
         if (lineIndex >=0)
         {
-            Destroy(currentDrawingParent.FindObject("Line" + lineIndex.ToString()));
+            Debug.Log (currentDrawingParent.name + " ! Line" + lineIndex.ToString());
+            currentDrawingParent.DestroyGameObjectAndChildren("Line" + lineIndex.ToString(), false);
             
 
             // Remove the line from the dictionary
@@ -446,11 +541,22 @@ public class DrawingController : MonoBehaviour
         linePointIndex++;
     }
 
-    LineRenderer InstantiateLine(int index)
+    LineRenderer InstantiateLine(int index, string type)
     {
-        GameObject lineObject = new GameObject("Line " + index.ToString());
-        lineObject.transform.parent = currentDrawingParent.transform;
-        LineRenderer newLine = lineObject.AddComponent<LineRenderer>();
+        LineRenderer newLine = new LineRenderer();
+        if (type=="realtime")
+        {
+            lineObject = new GameObject("Line" + index.ToString());
+            lineObject.transform.parent = currentDrawingParent.transform;
+            newLine = lineObject.AddComponent<LineRenderer>();
+        }
+        else
+        {
+            lineObjectSimplified = new GameObject("Line" + index.ToString());
+            lineObjectSimplified.transform.parent = currentDrawingParent.transform;
+            newLine = lineObjectSimplified.AddComponent<LineRenderer>();
+            lineObjectSimplified.tag = "simplified";
+        }
 
         newLine.material = lineMaterial;
         newLine.startWidth = lineWidth;
@@ -556,7 +662,7 @@ public class DrawingController : MonoBehaviour
 
         if (collider == null)
         {
-            collider = line.AddComponent<MeshCollider>();
+            collider = lineObject.AddComponent<MeshCollider>();
         }
 
 
@@ -578,7 +684,7 @@ public class DrawingController : MonoBehaviour
 
         collider.sharedMesh = mesh;
 
-        PressableButton lineButton = line.AddComponent<PressableButton>();
+        PressableButton lineButton = lineObject.AddComponent<PressableButton>();
         lineButton.OnClicked.AddListener(() => DestroyLine(lineButton.gameObject));
     }
 

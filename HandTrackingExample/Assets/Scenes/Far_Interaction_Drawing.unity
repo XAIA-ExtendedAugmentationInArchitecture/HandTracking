@@ -24483,6 +24483,7 @@ MonoBehaviour:
   lineMaterial: {fileID: 2100000, guid: bf46c9253189852458bd95a8c197ebcf, type: 2}
   linesParent: {fileID: 976448188}
   EnabledDrawingIndex: -1
+  ControlPointMaterial: {fileID: 2100000, guid: 73267b6030358514486261e39bf445ee, type: 2}
   team: 
   originalCurvePoints: []
 --- !u!4 &1196527041

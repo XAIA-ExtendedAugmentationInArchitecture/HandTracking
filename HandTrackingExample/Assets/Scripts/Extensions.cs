@@ -96,7 +96,7 @@ public static class GameObjectExtensions
             }
         }
     }
-    public static void DestroyGameObjectAndChildren(this GameObject parent, bool andParent=true)
+    public static void DestroyGameObjectAndChildren(this GameObject parent, string name="all", bool andParent=true)
     {
         if (parent!=null)
         {
@@ -106,8 +106,12 @@ public static class GameObjectExtensions
                 // Get the child GameObject
                 GameObject child = parent.transform.GetChild(i).gameObject;
 
-                // Recursively destroy children of the child
-                DestroyGameObjectAndChildren(child);
+                if ((name == "all" || name == child.name))
+                {
+                    // Recursively destroy children of the child
+                    DestroyGameObjectAndChildren(child);
+                }
+                
             }
 
             // Destroy the target GameObject
