@@ -28,7 +28,9 @@ public class DrawingController : MonoBehaviour
     public GameObject linesParent;
 
     public int EnabledDrawingIndex = -1;
-    private LineRenderer lineRenderer;
+
+    private LineRenderer lineRenderer_realtime;
+    private LineRenderer lineRenderer_simplified;
 
     private float lineWidth = 0.002f;
     private int DrawingIndex = -1;
@@ -43,7 +45,11 @@ public class DrawingController : MonoBehaviour
     private HandsAggregatorSubsystem aggregator;
     private string timestamp;
     public string team;
-    
+
+    //curve
+    public List<Vector3> originalCurvePoints = new List<Vector3>();
+    int targetPointCount = 10;
+
     public void SendToRhino()
     {
         object message = storedDrawings.drawings["drawing" + EnabledDrawingIndex.ToString()];
@@ -104,17 +110,26 @@ public class DrawingController : MonoBehaviour
             }
             if (drawingOn)
             {
+                // Check if this is the first time the line is being created
                 if (linePointIndex == -1)
                 {
+                    // Set the initial position for the line
                     previousPosition = reticleTransform.position;
+                    // Initialize the line point index
                     linePointIndex = 0;
+                    // Increment the line index for creating a new line
                     lineIndex++;
+                    // Instantiate a new line renderer for the current line index
                     InstantiateLine(lineIndex);
+                    Debug.Log("Line index is" + lineIndex + "lineRenderer" + lineRenderer_realtime);
                 }
 
                 if (Vector3.Distance(previousPosition, reticleTransform.position)> minDistance)
                 {
-                    AddPointsToLine(reticleTransform.position);
+                    Debug.Log("Position is" + reticleTransform.position);
+                    AddPointsToLine(lineRenderer_realtime, reticleTransform.position);
+                    lineRenderer_realtime.Simplify(0.025f);
+                    originalCurvePoints.Add(reticleTransform.position);
                     previousPosition = reticleTransform.position;
                 }
 
@@ -125,7 +140,11 @@ public class DrawingController : MonoBehaviour
                 
                 if (linePointIndex != -1 && lineIndex != -1)
                 {
-                    StoreDrawnLine();
+                    Debug.Log("origianl points are" + originalCurvePoints.Count);
+                    Debug.Log("targetPointCount are" + targetPointCount);
+                    List<Vector3> simplifiedCurve = SimplifyCurve(originalCurvePoints, targetPointCount);
+                    InstantiateLine(targetPointCount);
+                    StoreDrawnLine(lineRenderer_simplified);
                     //GenerateMeshCollider();
                 }
 
@@ -142,36 +161,59 @@ public class DrawingController : MonoBehaviour
 
                 // Check whether the user's left hand is facing away (commonly used to check "aim" intent)
                 bool handIsValid = aggregator.TryGetPalmFacingAway(XRNode.LeftHand, out bool isLeftPalmFacingAway);
-                Debug.Log("The pose of the joint is" + jointIsValid + jointPose);
+                //Debug.Log("The pose of the joint is" + jointIsValid + jointPose);
 
                 // Query pinch characteristics from the left hand.
                 bool handIsValidPinch = aggregator.TryGetPinchProgress(XRNode.RightHand, out bool isReadyToPinch, out bool isPinching, out float pinchAmount);
-                Debug.Log("The pinch is" + isPinching);
+                //Debug.Log("The pinch is" + isPinching);
 
 
-                if (isPinching )
+                if (isPinching)
                 {
+                    Debug.Log("Pinch is " + isPinching);
                     if (linePointIndex == -1)
                     {
-                        previousPosition = jointPose.Pose.position;
+                        // Set the initial position for the line
+                        previousPosition = reticleTransform.position;
+                        // Initialize the line point index
                         linePointIndex = 0;
+                        // Increment the line index for creating a new line
                         lineIndex++;
-                        InstantiateLine(lineIndex);
+                        // Instantiate a new line renderer for the current line index
+                        lineRenderer_realtime = InstantiateLine(lineIndex);
+                        Debug.Log("Line index is" + lineIndex + "lineRenderer" + lineRenderer_realtime);
                     }
 
                     if (Vector3.Distance(previousPosition, jointPose.Pose.position)> minDistance)
                     {
-                        AddPointsToLine(jointPose.Pose.position);
+                        Debug.Log("there is a line with a material" + lineRenderer_realtime.material);
+                        AddPointsToLine(lineRenderer_realtime, jointPose.Pose.position);
+                        originalCurvePoints.Add(jointPose.Pose.position);
                         previousPosition = jointPose.Pose.position;
+                        Debug.Log("origianl points are" + originalCurvePoints.Count);
                     }
 
 
                 }
                 else
                 {
+
                     if (linePointIndex != -1)
                     {
-                        StoreDrawnLine();
+                        Debug.Log("Pinch is" + isPinching);
+                        Debug.Log("originalCurvePoints is " + originalCurvePoints.Count);
+
+                        //Once we stop pinching we simplify
+                        List<Vector3> simplifiedPoints = SimplifyCurve(originalCurvePoints, targetPointCount);
+                        lineRenderer_simplified = InstantiateLine(lineIndex);
+                        lineRenderer_simplified.positionCount = simplifiedPoints.Count;
+                        // Set the positions of the LineRenderer
+                        for (int i = 0; i < simplifiedPoints.Count; i++)
+                        {
+                            lineRenderer_simplified.SetPosition(i, simplifiedPoints[i]);
+                        }
+                        //then we store it
+                        StoreDrawnLine(lineRenderer_simplified);
                         //GenerateMeshCollider();
                     }
                     linePointIndex = -1;
@@ -179,6 +221,36 @@ public class DrawingController : MonoBehaviour
             }
         }
         
+    }
+
+    List<Vector3> SimplifyCurve(List<Vector3> points, int targetCount)
+    {
+        if (points.Count <= targetCount)
+        {
+            return new List<Vector3>(points);
+        }
+
+        List<Vector3> simplifiedPoints = new List<Vector3>(points);
+        while (simplifiedPoints.Count > targetCount)
+        {
+            simplifiedPoints = SimplifyOnce(simplifiedPoints);
+        }
+
+        return simplifiedPoints;
+    }
+
+    List<Vector3> SimplifyOnce(List<Vector3> points)
+    {
+        List<Vector3> result = new List<Vector3>();
+        for (int i = 0; i < points.Count; i++)
+        {
+            if (i % 2 == 0)
+            {
+                result.Add(points[i]);
+            }
+        }
+
+        return result;
     }
 
     public void ToggleDrawingMode()
@@ -357,8 +429,16 @@ public class DrawingController : MonoBehaviour
         }
     }
 
-    void AddPointsToLine(Vector3 position)
+    void AddPointsToLine(LineRenderer lineRenderer, Vector3 position)
     {
+        if (lineRenderer == null)
+        {
+            Debug.LogError("LineRenderer is null. Cannot add points.");
+            return;
+        }
+
+        Debug.Log($"Adding point at index {linePointIndex} with position {position}");
+
         lineRenderer.positionCount = linePointIndex + 1;
 
         lineRenderer.SetPosition(linePointIndex, position);
@@ -366,27 +446,30 @@ public class DrawingController : MonoBehaviour
         linePointIndex++;
     }
 
-    void InstantiateLine(int index)
+    LineRenderer InstantiateLine(int index)
     {
-        line = new GameObject("Line" + index.ToString());
-        line.transform.parent = currentDrawingParent.transform;
-        lineRenderer = line.AddComponent<LineRenderer>();
-        lineRenderer.positionCount =0;
-        lineRenderer.material = lineMaterial;
-        lineRenderer.startWidth = lineWidth;
-        lineRenderer.endWidth = lineWidth;
+        GameObject lineObject = new GameObject("Line " + index.ToString());
+        lineObject.transform.parent = currentDrawingParent.transform;
+        LineRenderer newLine = lineObject.AddComponent<LineRenderer>();
+
+        newLine.material = lineMaterial;
+        newLine.startWidth = lineWidth;
+        newLine.endWidth = lineWidth;
+        newLine.positionCount = 0;
+
+        return newLine;
     }
 
-    void StoreDrawnLine()
+    void StoreDrawnLine(LineRenderer name)
     {
-        if (lineRenderer == null || lineRenderer.positionCount == 0)
+        if (name == null || name.positionCount == 0)
             return;
 
-        Vector3[] positions = new Vector3[lineRenderer.positionCount];
+        Vector3[] positions = new Vector3[name.positionCount];
 
-        for (int i = 0; i < lineRenderer.positionCount; i++)
+        for (int i = 0; i < name.positionCount; i++)
         {
-            positions[i] = lineRenderer.GetPosition(i);
+            positions[i] = name.GetPosition(i);
         }
         
         string dkey = "drawing" + DrawingIndex.ToString();
@@ -467,7 +550,7 @@ public class DrawingController : MonoBehaviour
     }
 
 
-    public void GenerateMeshCollider()
+    public void GenerateMeshCollider(LineRenderer name)
     {
         MeshCollider collider = GetComponent<MeshCollider>();
 
@@ -478,7 +561,7 @@ public class DrawingController : MonoBehaviour
 
 
         Mesh mesh = new Mesh();
-        lineRenderer.BakeMesh(mesh, true);
+        name.BakeMesh(mesh, true);
 
         // if you need collisions on both sides of the line, simply duplicate & flip facing the other direction!
         // This can be optimized to improve performance ;)

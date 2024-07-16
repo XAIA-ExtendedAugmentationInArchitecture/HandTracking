@@ -24484,6 +24484,7 @@ MonoBehaviour:
   linesParent: {fileID: 976448188}
   EnabledDrawingIndex: -1
   team: 
+  originalCurvePoints: []
 --- !u!4 &1196527041
 Transform:
   m_ObjectHideFlags: 0

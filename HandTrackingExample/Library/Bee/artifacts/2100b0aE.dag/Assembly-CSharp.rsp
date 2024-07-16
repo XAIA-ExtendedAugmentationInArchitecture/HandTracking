@@ -519,6 +519,7 @@
 "Assets/Prefabs/ARMarkerScripts/PrefabMonoBehaviour.cs"
 "Assets/Prefabs/ARMarkerScripts/SampleMarker.cs"
 "Assets/Prefabs/ARMarkerScripts/TextPanel.cs"
+"Assets/Scripts/Bezier.cs"
 "Assets/Scripts/CoordinateSystemConverters.cs"
 "Assets/Scripts/datamanagment.cs"
 "Assets/Scripts/DataManagmentDM.cs"
@@ -531,10 +532,12 @@
 "Assets/Scripts/hands.cs"
 "Assets/Scripts/handscript_dm.cs"
 "Assets/Scripts/Instantiator.cs"
+"Assets/Scripts/LineRendererSmoother.cs"
 "Assets/Scripts/MarkerLocalizer.cs"
 "Assets/Scripts/MeshElementData.cs"
 "Assets/Scripts/MeshGeneratorFromJson.cs"
 "Assets/Scripts/MeshReader.cs"
+"Assets/Scripts/NewBehaviourScript.cs"
 "Assets/Scripts/UIController.cs"
 -langversion:9.0
 
