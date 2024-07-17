@@ -64,7 +64,9 @@ public class DrawingController : MonoBehaviour
 
     public void SendToRhino()
     {
-        object message = storedDrawings.drawings["drawing" + EnabledDrawingIndex.ToString()];
+        string dkey = "drawing" + EnabledDrawingIndex.ToString();
+        UpdatePositionsInDictionary (dkey);
+        object message = storedDrawings.drawings[dkey];
         
         Dictionary<string, object> msg_dict = new Dictionary<string, object>
         {
@@ -426,7 +428,7 @@ public class DrawingController : MonoBehaviour
         DrawingIndex++;
         
         uIController.DrawingText.text = "Drawing No: " + DrawingIndex.ToString() + "    |";
-        currentDrawingParent = new GameObject("Drawing_" + DrawingIndex);
+        currentDrawingParent = new GameObject("drawing" + DrawingIndex);
         currentDrawingParent.transform.parent = linesParent.transform;
 
         string dkey = "drawing" + DrawingIndex.ToString();
@@ -503,14 +505,14 @@ public class DrawingController : MonoBehaviour
         if (lineIndex >=0)
         {
             Debug.Log (currentDrawingParent.name + " ! Line" + lineIndex.ToString());
-            currentDrawingParent.DestroyGameObjectAndChildren("Line" + lineIndex.ToString(), false);
+            currentDrawingParent.DestroyGameObjectAndChildren("line" + lineIndex.ToString(), false);
             
 
             // Remove the line from the dictionary
             string dkey = "drawing" + EnabledDrawingIndex.ToString();
             if (storedDrawings.drawings.ContainsKey(dkey))
             {
-                string lkey = lineIndex.ToString();
+                string lkey = "line"+ lineIndex.ToString();
                 if (storedDrawings.drawings[dkey].lines.ContainsKey(lkey))
                 {
                     storedDrawings.drawings[dkey].lines.Remove(lkey);
@@ -545,13 +547,13 @@ public class DrawingController : MonoBehaviour
         LineRenderer newLine = new LineRenderer();
         if (type=="realtime")
         {
-            lineObject = new GameObject("Line" + index.ToString());
+            lineObject = new GameObject("line" + index.ToString());
             lineObject.transform.parent = currentDrawingParent.transform;
             newLine = lineObject.AddComponent<LineRenderer>();
         }
         else
         {
-            lineObjectSimplified = new GameObject("Line" + index.ToString());
+            lineObjectSimplified = new GameObject("line" + index.ToString());
             lineObjectSimplified.transform.parent = currentDrawingParent.transform;
             newLine = lineObjectSimplified.AddComponent<LineRenderer>();
             lineObjectSimplified.tag = "simplified";
@@ -571,11 +573,7 @@ public class DrawingController : MonoBehaviour
             return;
 
         Vector3[] positions = new Vector3[name.positionCount];
-
-        for (int i = 0; i < name.positionCount; i++)
-        {
-            positions[i] = name.GetPosition(i);
-        }
+        name.GetPositions(positions);
         
         string dkey = "drawing" + DrawingIndex.ToString();
 
@@ -594,7 +592,7 @@ public class DrawingController : MonoBehaviour
             };
         }
 
-        string lkey =  lineIndex.ToString();
+        string lkey =  "line"+ lineIndex.ToString();
         
         if (!storedDrawings.drawings[dkey].lines.ContainsKey(dkey))
         {
@@ -629,19 +627,20 @@ public class DrawingController : MonoBehaviour
     public void SaveEnabledDrawing()
     {
         // Step 1: Get the name of the file
-        string drawing_name = "drawing" + EnabledDrawingIndex.ToString();
+        string dkey = "drawing" + EnabledDrawingIndex.ToString();
 
+        UpdatePositionsInDictionary(dkey);
         // Step 2: Get the timestamp at that time
         string timestampDrawing = DateTime.Now.ToString("yyyyMMddHHmmss");
 
         // Step 3: Retrieve the value of the dictionary based on EnabledDrawingIndex
-        if (storedDrawings.drawings.TryGetValue(drawing_name, out Drawing drawing))
+        if (storedDrawings.drawings.TryGetValue(dkey, out Drawing drawing))
         {
             // Step 4: Serialize the value of the dictionary to JSON
             string json = JsonConvert.SerializeObject(drawing);
 
             // Step 5: Save the JSON data to a file on the HoloLens 2 device
-            string filePath = Path.Combine(Application.persistentDataPath, $"{timestamp}_{timestampDrawing}_{team}_{drawing_name}.json");
+            string filePath = Path.Combine(Application.persistentDataPath, $"{timestamp}_{timestampDrawing}_{team}_{dkey}.json");
             // byte[] data = Encoding.ASCII.GetBytes(json);
             // UnityEngine.Windows.File.WriteAllBytes(filePath, data);
             File.WriteAllText(filePath, json);
@@ -693,10 +692,57 @@ public class DrawingController : MonoBehaviour
     }
     
 
+    void UpdatePositionsInDictionary(string dkey)
+    {
+        GameObject drawing = linesParent.FindObject(dkey);
+
+        foreach (Transform child in drawing.transform)
+        {
+            
+            if (child.CompareTag("simplified"))
+            {
+                string lKey = child.gameObject.name;
+
+                CurvedLineRenderer cLine = child.gameObject.GetComponent<CurvedLineRenderer>();
+                
+                if (cLine == null)
+                {
+                    Debug.LogError("CurvedLineRenderer component not found on: " + lKey);
+                    continue;
+                }
+
+                if (cLine.saved)
+                {
+                    continue;
+                }
+
+                if (!storedDrawings.drawings.TryGetValue(dkey, out var drawingData) || !drawingData.lines.TryGetValue(lKey, out var lineData))
+                {
+                    Debug.LogError("Key not found in drawings dictionary: " + dkey + " or line key: " + lKey);
+                    continue;
+                }
+
+                lineData.positions = new Vector3[cLine.linePositions.Length];
+                for (int i = 0; i < cLine.linePositions.Length; i++)
+                {
+                    lineData.positions[i] = cLine.linePositions[i];
+                } 
+
+                cLine.saved = true;  
+            }
+        }
+    }
+
+     
     void OnApplicationQuit()
     {   
         if (storedDrawings.drawings.ContainsKey("drawing0")) //storedDrawings.drawings["drawing0"].lines.Count !=0)
         {
+            foreach (var dKey in storedDrawings.drawings.Keys)
+            {
+                UpdatePositionsInDictionary(dKey);
+            }
+
             // Step 2: Serialize the value of the dictionary to JSON
             string json = JsonConvert.SerializeObject(storedDrawings);
 

@@ -15,8 +15,10 @@ public class CurvedLineRenderer : MonoBehaviour
 	private LineRenderer lineRenderer;
 	//PRIVATE
 	private CurvedLinePoint[] linePoints = new CurvedLinePoint[0];
-	private Vector3[] linePositions = new Vector3[0];
+	[HideInInspector] public Vector3[] linePositions = new Vector3[0];
 	private Vector3[] linePositionsOld = new Vector3[0];
+
+	[HideInInspector] public bool saved = false;
 
 	// Update is called once per frame
 	public void Update () 
@@ -69,12 +71,14 @@ public class CurvedLineRenderer : MonoBehaviour
 			line.SetVertexCount( smoothedPoints.Length );
 			line.SetPositions( smoothedPoints );
 			//line.SetWidth( lineWidth, lineWidth );
+
+			saved = false;
 		}
 	}
 
 	void OnDrawGizmosSelected()
 	{
-		Update();
+		//Update();
 	}
 
 	void OnDrawGizmos()

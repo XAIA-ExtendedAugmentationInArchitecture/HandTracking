@@ -17,8 +17,8 @@ using MixedReality.Toolkit.SpatialManipulation;
 public class MeshGeneratorFromJson : MonoBehaviour
 {
     public GameObject loading; // A GameObject that is disabled after the data is generated
-    public GameObject elementsParent;
-    public GameObject locksParent;
+    [HideInInspector] public GameObject elementsParent;
+    [HideInInspector] public GameObject locksParent;
     public DrawingController drawController;
     public GameObject padlocks;
     private string path; 
@@ -40,7 +40,7 @@ public class MeshGeneratorFromJson : MonoBehaviour
         //path = dataFolderPath + "/data/" + fileName + ".json";
 
         Debug.Log ("Path: " + path);
-        LoadFromJson(path);
+        //LoadFromJson(path);
     
         
     }
