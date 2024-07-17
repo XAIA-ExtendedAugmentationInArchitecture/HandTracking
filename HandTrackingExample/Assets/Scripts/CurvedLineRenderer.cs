@@ -9,7 +9,7 @@ public class CurvedLineRenderer : MonoBehaviour
 	public float lineSegmentSize = 0.01f;
 	//public float lineWidth = 0.1f;
 	[Header("Gizmos")]
-	public bool showGizmos = true;
+	public bool showGizmos = false;
 	public float gizmoSize = 0.0075f;
 	public Color gizmoColor = new Color(1,0,0,0.5f);
 	private LineRenderer lineRenderer;

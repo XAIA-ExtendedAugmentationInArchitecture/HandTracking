@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class CurvedLinePoint : MonoBehaviour 
@@ -30,11 +30,12 @@ public class CurvedLinePoint : MonoBehaviour
 	//update parent line when this point moved
 	void OnDrawGizmosSelected()
 	{
-		CurvedLineRenderer curvedLine = this.transform.parent.GetComponent<CurvedLineRenderer>();
+		//CurvedLineRenderer curvedLine = this.transform.parent.GetComponent<CurvedLineRenderer>();
+		
 
-		if( curvedLine != null )
-		{
-			curvedLine.Update();
-		}
+		// if( curvedLine != null )
+		// {
+		// 	curvedLine.Update();
+		// }
 	}
 }

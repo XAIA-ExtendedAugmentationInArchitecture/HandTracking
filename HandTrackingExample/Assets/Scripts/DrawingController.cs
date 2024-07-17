@@ -266,7 +266,6 @@ public class DrawingController : MonoBehaviour
             pointObject.transform.localScale = new Vector3(gizmoSize * 2, gizmoSize * 2, gizmoSize * 2);
             pointObject.transform.parent = parentObject.transform;
             pointObject.name = "ControlPoint";
-            pointObject.AddComponent<SphereCollider>();
 
             pointObject.GetComponent<Renderer>().material = ControlPointMaterial;
 
