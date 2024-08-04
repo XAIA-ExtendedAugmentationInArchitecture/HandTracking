@@ -17,15 +17,18 @@ using MixedReality.Toolkit.SpatialManipulation;
 
 public class DrawingController : MonoBehaviour
 {
-    public bool drawingOn = false;
-    public bool pointsOn = false;
+    [HideInInspector] public bool drawingOn = false;
+    [HideInInspector] public bool pointsOn = false;
+    [HideInInspector] public bool pinPointsOn = false;
     private bool farDrawing = false;
 
-    public string drawingMode = "farDrawing";
+    [HideInInspector] public string drawingMode = "farDrawing";
     public UIController uIController;
     public MeshGeneratorFromJson meshGenerator;
     public Drawings storedDrawings; 
     public MqttController mqttController;
+
+    public PinManager pinManager;
     public Transform reticleTransform;
     //public GameObject reticleVisual;
     public Material lineMaterial;
@@ -53,18 +56,16 @@ public class DrawingController : MonoBehaviour
     private float minDistance = 0.0025f;
     private Vector3 previousPosition = Vector3.zero;
 
-    private GameObject currentDrawingParent;
+    [HideInInspector] public GameObject currentDrawingParent;
     private HandsAggregatorSubsystem aggregator;
     private string timestamp;
 
-    public string team;
-
-
-    int targetPointCount = 10;
+    [HideInInspector] public string team;
 
     public void SendToRhino()
     {
         string dkey = "drawing" + EnabledDrawingIndex.ToString();
+        SavePinPoints(dkey);
         UpdatePositionsInDictionary (dkey);
         object message = storedDrawings.drawings[dkey];
         
@@ -327,18 +328,28 @@ public class DrawingController : MonoBehaviour
         {
             drawingMode ="controlPoints";
             pointsOn = true;
-            farDrawing = false;
             uIController.ModeText.text = "DRAW mode: Control Points";
 
+            EnableControlPoints(pointsOn);
+        }
+        else if (drawingMode =="controlPoints")
+        {
+            drawingMode ="pinPoints";
+            pointsOn = false;
+            pinPointsOn = true;
+            uIController.ModeText.text = "DRAW mode: Pin Points";
+            ActivatePinPoints(pinPointsOn);
+            pinManager.newPin.SetActive(pinPointsOn);
             EnableControlPoints(pointsOn);
         }
         else
         {
             drawingMode ="farDrawing";
-            pointsOn = false;
             farDrawing = true;
+            pinPointsOn = false;
+            ActivatePinPoints(pinPointsOn);
+            pinManager.newPin.SetActive(pinPointsOn);
             uIController.ModeText.text = "DRAW mode: Hand Ray";
-            EnableControlPoints(pointsOn);
         }
 
         foreach (Transform child in meshGenerator.elementsParent.transform)
@@ -351,7 +362,6 @@ public class DrawingController : MonoBehaviour
     void EnableControlPoints(bool enable)
     {
         // Iterate over each child of currentDrawingParent
-        Debug.Log(currentDrawingParent.name + enable );
         foreach (Transform child in currentDrawingParent.transform)
         {
             // Check if the child GameObject has the specific tag you are interested in
@@ -366,11 +376,25 @@ public class DrawingController : MonoBehaviour
         }
     }
 
+    void ActivatePinPoints(bool activate)
+    {
+        // Iterate over each child of currentDrawingParent
+
+        GameObject pins = currentDrawingParent.FindObject("pins");
+        foreach (Transform child in pins.transform)
+        {
+            child.gameObject.GetComponent<ObjectManipulator>().enabled = activate;
+            child.gameObject.GetComponent<BoxCollider>().enabled = activate;
+        }
+    }
+
     public void StartNewDrawing()
     {
         HideChildren(linesParent.transform);
 
         string dkey = "drawing" + DrawingIndex.ToString();
+        pinManager.newPin.name ="pin0";
+        pinManager.pinIndex =1;
 
         
         Transform parent = meshGenerator.elementsParent.transform;
@@ -410,7 +434,14 @@ public class DrawingController : MonoBehaviour
         currentDrawingParent = linesParent.transform.GetChild(EnabledDrawingIndex).gameObject;
         lineIndex = (currentDrawingParent.transform.childCount /2 ) -1;
         currentDrawingParent.SetActive(true);
+
+        int existingPins = currentDrawingParent.FindObject("pins").transform.childCount;
+        pinManager.newPin.name ="pin" + existingPins;
+        pinManager.pinIndex = existingPins + 1;
+
+
         EnableControlPoints(pointsOn);
+        ActivatePinPoints(pinPointsOn);
 
         foreach (var kvp in storedDrawings.drawings["drawing"+ EnabledDrawingIndex.ToString()].objectFrames)
         {
@@ -427,8 +458,18 @@ public class DrawingController : MonoBehaviour
     {
         DrawingIndex++;
         
+        if (DrawingIndex == 0)
+        {
+            Vector3 newPos = meshGenerator.elementsParent.transform.position + (meshGenerator.elementsParent.transform.rotation * pinManager.initialPinPosition);
+            Quaternion newRot = meshGenerator.elementsParent.transform.rotation;
+            pinManager.InstantiatePin(newPos, newRot);
+            pinManager.newPin.SetActive(false); 
+        }
+
         uIController.DrawingText.text = "Drawing No: " + DrawingIndex.ToString() + "    |";
         currentDrawingParent = new GameObject("drawing" + DrawingIndex);
+        GameObject pinPoints = new GameObject("pins");
+        pinPoints.transform.parent = currentDrawingParent.transform;
         currentDrawingParent.transform.parent = linesParent.transform;
 
         string dkey = "drawing" + DrawingIndex.ToString();
@@ -629,6 +670,7 @@ public class DrawingController : MonoBehaviour
         // Step 1: Get the name of the file
         string dkey = "drawing" + EnabledDrawingIndex.ToString();
 
+        SavePinPoints(dkey);
         UpdatePositionsInDictionary(dkey);
         // Step 2: Get the timestamp at that time
         string timestampDrawing = DateTime.Now.ToString("yyyyMMddHHmmss");
@@ -691,7 +733,7 @@ public class DrawingController : MonoBehaviour
         Destroy(gObject);
     }
     
-
+    
     void UpdatePositionsInDictionary(string dkey)
     {
         GameObject drawing = linesParent.FindObject(dkey);
@@ -733,7 +775,28 @@ public class DrawingController : MonoBehaviour
         }
     }
 
-     
+    void SavePinPoints(string dkey)
+    {
+        GameObject pinsToSave = linesParent.FindObject(dkey).FindObject("pins");
+
+        if ( storedDrawings.drawings[dkey].pinPoints ==null)
+        {
+            storedDrawings.drawings[dkey].pinPoints = new Dictionary<string, Frame>();
+        }
+
+        foreach (Transform child in pinsToSave.transform)
+        {
+            string pKey = child.gameObject.name;
+            storedDrawings.drawings[dkey].pinPoints[pKey] = new Frame
+            {
+                point = child.position,
+                xaxis = child.right,
+                zaxis = child.forward
+            };
+        }
+    }
+
+
     void OnApplicationQuit()
     {   
         if (storedDrawings.drawings.ContainsKey("drawing0")) //storedDrawings.drawings["drawing0"].lines.Count !=0)
@@ -741,6 +804,7 @@ public class DrawingController : MonoBehaviour
             foreach (var dKey in storedDrawings.drawings.Keys)
             {
                 UpdatePositionsInDictionary(dKey);
+                SavePinPoints(dKey);
             }
 
             // Step 2: Serialize the value of the dictionary to JSON

@@ -40,7 +40,7 @@ public class MeshGeneratorFromJson : MonoBehaviour
         //path = dataFolderPath + "/data/" + fileName + ".json";
 
         Debug.Log ("Path: " + path);
-        //LoadFromJson(path);
+        LoadFromJson(path);
     
         
     }

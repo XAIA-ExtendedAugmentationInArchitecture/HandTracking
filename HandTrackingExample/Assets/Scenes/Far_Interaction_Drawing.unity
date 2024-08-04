@@ -24455,6 +24455,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1196527041}
   - component: {fileID: 1196527040}
+  - component: {fileID: 1196527042}
   m_Layer: 0
   m_Name: DrawingController
   m_TagString: Untagged
@@ -24475,17 +24476,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   drawingOn: 0
-  farDrawing: 1
+  pointsOn: 0
+  pinPointsOn: 0
+  drawingMode: farDrawing
   uIController: {fileID: 1186327472}
   meshGenerator: {fileID: 1430000868}
   mqttController: {fileID: 702887251}
+  pinManager: {fileID: 1196527042}
   reticleTransform: {fileID: 174499545}
   lineMaterial: {fileID: 2100000, guid: bf46c9253189852458bd95a8c197ebcf, type: 2}
   linesParent: {fileID: 976448188}
   EnabledDrawingIndex: -1
   ControlPointMaterial: {fileID: 2100000, guid: 73267b6030358514486261e39bf445ee, type: 2}
+  currentDrawingParent: {fileID: 0}
   team: 
-  originalCurvePoints: []
 --- !u!4 &1196527041
 Transform:
   m_ObjectHideFlags: 0
@@ -24501,6 +24505,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1196527042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1196527039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8d2d5056717b9442ae701a58e19cbce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initialPinPosition: {x: 0.12, y: 0, z: 0.045}
+  drawingController: {fileID: 1196527040}
+  PinPrefab: {fileID: 6098683624633781378, guid: 3333b1924c82cc444b30aa47081a70f5, type: 3}
+  newPin: {fileID: 0}
+  pinIndex: 0
 --- !u!1 &1200582255
 GameObject:
   m_ObjectHideFlags: 0

@@ -462,7 +462,6 @@
 -analyzer:"C:/Program Files/Unity/Hub/Editor/2023.2.18f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.Properties.SourceGenerator.dll"
 -analyzer:"C:/Program Files/Unity/Hub/Editor/2023.2.18f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.SourceGenerators.dll"
 -analyzer:"C:/Program Files/Unity/Hub/Editor/2023.2.18f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.UIToolkit.SourceGenerator.dll"
-"Assets/FaceCamera.cs"
 "Assets/Mqtt/M2Mqtt/Exceptions/MqttClientException.cs"
 "Assets/Mqtt/M2Mqtt/Exceptions/MqttCommunicationException.cs"
 "Assets/Mqtt/M2Mqtt/Exceptions/MqttConnectionException.cs"
@@ -527,12 +526,14 @@
 "Assets/Scripts/DrawingData.cs"
 "Assets/Scripts/ElementStateController.cs"
 "Assets/Scripts/Extensions.cs"
+"Assets/Scripts/FaceCamera.cs"
 "Assets/Scripts/LineRendererSmoother.cs"
 "Assets/Scripts/LineSmoother.cs"
 "Assets/Scripts/MarkerLocalizer.cs"
 "Assets/Scripts/MeshElementData.cs"
 "Assets/Scripts/MeshGeneratorFromJson.cs"
 "Assets/Scripts/MeshReader.cs"
+"Assets/Scripts/PinManager.cs"
 "Assets/Scripts/UIController.cs"
 -langversion:9.0
 

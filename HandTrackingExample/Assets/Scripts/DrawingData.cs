@@ -37,6 +37,7 @@ namespace DrawingsData
         public Frame MCF { get; set;}
         public Dictionary<string, Frame> objectFrames { get; set; }
         public Dictionary<string, DrawingLine> lines { get; set; }
+        public Dictionary<string, Frame> pinPoints { get; set; }
 
     }
 
