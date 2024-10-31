@@ -1,0 +1,296 @@
+{
+    "priority": [
+        "plank0", "plank1", "plank2", "plank3", "plank4",
+        "plank5", "plank6", "plank7", "plank8", "plank9",
+        "plank10", "plank11", "plank12", "plank13", "plank14",
+        "plank15", "plank16", "plank17", "plank18", "plank19"
+    ],
+    "priorityLengths": [
+        0.6, 1.15, 1.2, 1.0, 0.78, 
+        0.9, 1.45, 1.3, 0.55, 1.15,
+        1.2, 0.6, 1.9, 0.8, 0.7, 
+        0.8, 1.9, 0.8, 0.7, 0.8
+    ],
+    "planks": {
+        "plank0": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.089,
+                "length": 0.6
+            },
+            "color": [0.34, 0.45, 0.21, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank1": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.14,
+                "length": 1.15
+            },
+            "color": [0.16, 0.26, 0.77, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank2": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.089,
+                "length": 1.2
+            },
+            "color": [0.33, 0.47, 0.91, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank3": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.064,
+                "length": 1.0
+            },
+            "color": [0.75, 0.5, 0.13, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank4": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.089,
+                "length": 0.78
+            },
+            "color": [0.34, 0.45, 0.21, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank5": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.14,
+                "length": 0.9
+            },
+            "color": [0.16, 0.26, 0.77, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank6": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.089,
+                "length": 1.45
+            },
+            "color": [0.33, 0.47, 0.91, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank7": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.064,
+                "length": 1.3
+            },
+            "color": [0.75, 0.5, 0.13, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank8": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.089,
+                "length": 0.55
+            },
+            "color": [0.34, 0.45, 0.21, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank9": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.14,
+                "length": 1.15
+            },
+            "color": [0.16, 0.26, 0.77, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank10": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.089,
+                "length": 1.2
+            },
+            "color": [0.33, 0.47, 0.91, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank11": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.064,
+                "length": 0.6
+            },
+            "color": [0.75, 0.5, 0.13, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank12": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.089,
+                "length": 1.9
+            },
+            "color": [0.34, 0.45, 0.21, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank13": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.14,
+                "length": 0.8
+            },
+            "color": [0.16, 0.26, 0.77, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank14": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.089,
+                "length": 0.7
+            },
+            "color": [0.33, 0.47, 0.91, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank15": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.064,
+                "length": 0.8
+            },
+            "color": [0.75, 0.5, 0.13, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank16": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.089,
+                "length": 1.9
+            },
+            "color": [0.34, 0.45, 0.21, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank17": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.14,
+                "length": 0.8
+            },
+            "color": [0.16, 0.26, 0.77, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank18": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.089,
+                "length": 0.7
+            },
+            "color": [0.33, 0.47, 0.91, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        },
+        "plank19": {
+            "dimensions": {
+                "width": 0.038, 
+                "height": 0.064,
+                "length": 0.8
+            },
+            "color": [0.75, 0.5, 0.13, 0.25],
+            "constraints": {
+                "curvature": 1.2
+            },
+            "bendedGeo": {
+                "count": 0
+            }
+        }
+    }
+}
