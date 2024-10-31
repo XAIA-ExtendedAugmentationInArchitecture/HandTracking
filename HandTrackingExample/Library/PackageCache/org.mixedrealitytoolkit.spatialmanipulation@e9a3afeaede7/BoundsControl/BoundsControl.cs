@@ -447,7 +447,7 @@ namespace MixedReality.Toolkit.SpatialManipulation
         private Bounds currentBounds = new Bounds();
 
         // The box visuals GameObject instantiated at Awake.
-        private GameObject boxInstance;
+        [HideInInspector] public GameObject boxInstance;
 
         // Used to determine whether the associated interactable was moved between select/deselect,
         // which drives whether the handles get toggled on/off. If the interactable was moved less than a

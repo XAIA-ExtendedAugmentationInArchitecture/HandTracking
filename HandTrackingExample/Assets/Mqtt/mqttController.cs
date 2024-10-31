@@ -29,6 +29,7 @@ using M2MqttUnity;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using MeshElementData;
+using DrawingsData;
 using MixedReality.Toolkit.UX;
 
 
@@ -52,6 +53,8 @@ public class MqttController : M2MqttUnityClient
 
     private string m_msg;
     public MeshData msgData;
+    public Drawings msgDataLines;
+    public MultipleMeshesData msgDataMeshes;
     //using C# Property GET/SET and event listener to reduce Update overhead in the controlled objects
     
 
@@ -182,16 +185,68 @@ protected override void Start()
 
 protected override void DecodeMessage(string topic, byte[] message)
     {
+        // The message is decoded
+        // msg = System.Text.Encoding.UTF8.GetString(message);
+
+        // // Parse the message into a JObject to access its 'result' field
+        // var messageObj = Newtonsoft.Json.Linq.JObject.Parse(msg);
+        // var result = messageObj["result"];
+
+        // // Debug message
+        // Debug.Log("Received message on topic: " + topic);
+
+        // // Determine the type of the 'result' field
+        // if (result.Type == Newtonsoft.Json.Linq.JTokenType.Array)
+        // {
+        //     // The result is a JSON array (list in Python)
+        //     Debug.Log("Received: JSON array ");
+        //     // var listResult = (Newtonsoft.Json.Linq.JArray)result;
+        //     // ProcessListResult(listResult);
+        // }
+        // else if (result.Type == Newtonsoft.Json.Linq.JTokenType.Object)
+        // {
+        //     Debug.Log("Received: JSON object ");
+        //     // The result is a JSON object (dict in Python)
+        //     // var dictResult = (Newtonsoft.Json.Linq.JObject)result;
+        //     // ProcessFullMessage(dictResult);
+        // }
+        // else if (result.Type == Newtonsoft.Json.Linq.JTokenType.String)
+        // {
+        //     Debug.Log("Received: JSON string ");
+        //     // The result is a string containing JSON
+        //     // var strResult = result.ToString();
+        //     // var dictResult = Newtonsoft.Json.Linq.JObject.Parse(strResult);
+        //     // ProcessFullMessage(dictResult);
+        // }
+        // else
+        // {
+        //     Debug.LogWarning("Unknown message format received.");
+        // }
+
+        // uIController.MessageReceived(topic, "received");
         //The message is decoded
         msg = System.Text.Encoding.UTF8.GetString(message);
         var result = JsonConvert.DeserializeObject<Result>(msg);
-        msgData = JsonConvert.DeserializeObject<MeshData>(result.result);
-
+        if (topic == "/kitgkr_teamA_geometry/" || topic == "/kitgkr_teamB_geometry/")
+        {
+            msgData = JsonConvert.DeserializeObject<MeshData>(result.result);
+            uIController.MessageReceived(topic, msgData.name);
+        }
+        else if (topic == "/kitgkr_teamA_lines/" || topic == "/kitgkr_teamA_lines/")
+        {
+            msgDataLines = JsonConvert.DeserializeObject<Drawings>(result.result);
+            uIController.MessageReceived(topic, msgDataLines.uid);
+        }
+        else if (topic == "/kitgkr_teamA_geometries/" || topic == "/kitgkr_teamA_geometries/")
+        {
+            msgDataMeshes = JsonConvert.DeserializeObject<MultipleMeshesData>(result.result);
+            uIController.MessageReceived(topic, msgDataMeshes.uid);
+        }
+        
         Debug.Log("Received: " + msg);
-        Debug.Log("Received: " + msgData.normals);
         Debug.Log("from topic: " + topic);
 
-        uIController.MessageReceived(topic, msgData.name);
+        
         StoreMessage(msg);
     }
 

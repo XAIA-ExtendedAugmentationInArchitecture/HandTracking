@@ -25,6 +25,7 @@ namespace DrawingsData
     public class DrawingLine
     {
         public float[] color { get; set; } 
+        public bool periodic { get; set; } 
 
         [JsonConverter(typeof(Vector3ArrayConverter))]
         public Vector3[] positions { get; set; }
@@ -35,6 +36,7 @@ namespace DrawingsData
     public class Drawing
     {
         public Frame MCF { get; set;}
+        public float scale { get; set;}
         public Dictionary<string, Frame> objectFrames { get; set; }
         public Dictionary<string, DrawingLine> lines { get; set; }
         public Dictionary<string, Frame> pinPoints { get; set; }

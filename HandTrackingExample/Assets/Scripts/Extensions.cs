@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using DrawingsData;
+using UnityEngine.XR;
+using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.OpenXR.Input;
+using MixedReality.Toolkit;
+using MixedReality.Toolkit.SpatialManipulation;
 
 
 public static class GameObjectExtensions
@@ -145,32 +150,117 @@ public static class GameObjectExtensions
         collider.size = bounds.size;
     }
     public static void SetBoundingBoxColliderAsParent(this GameObject gobject)
-    {
-        Renderer[] renderers = gobject.GetComponentsInChildren<Renderer>();
-        Bounds bounds = new Bounds(Vector3.zero, Vector3.zero);
+{
+    Renderer[] renderers = gobject.GetComponentsInChildren<Renderer>(true);
+    Bounds bounds = new Bounds(Vector3.zero, Vector3.zero);
+    bool hasBounds = false;
 
-        if (renderers.Length == 0)
+    if (renderers.Length == 0)
+    {
+        Debug.LogWarning("No renderers found in the GameObject hierarchy.");
+        return;
+    }
+
+    foreach (Renderer renderer in renderers)
+    {
+        GameObject currentObject = renderer.gameObject;
+
+        // Exclude LineRenderer from bounds calculation
+        if (currentObject.GetComponent<LineRenderer>() != null)
+            continue;
+
+        // Get the object's bounds in world space
+        Bounds objectBounds = renderer.bounds;
+
+        if (!hasBounds)
         {
-            Debug.LogWarning("No renderers found in the GameObject hierarchy.");
-            
+            // Initialize bounds with the first valid renderer's bounds
+            bounds = objectBounds;
+            hasBounds = true;
         }
         else
         {
-            bounds = renderers[0].bounds;
-
-            for (int i = 1; i < renderers.Length; i++)
-            {
-                bounds.Encapsulate(renderers[i].bounds);
-            }
+            // Encapsulate the new object's world bounds
+            bounds.Encapsulate(objectBounds);
         }
 
-        BoxCollider collider = gobject.AddComponent<BoxCollider>();
-        Renderer renderer =  gobject.AddComponent<MeshRenderer>();
-        renderer.bounds = bounds;
-        collider.center = bounds.center - gobject.transform.position;
-        collider.size = bounds.size;
-        
+        Debug.Log($"Object: {currentObject.name} | Local Scale: {currentObject.transform.localScale} | Bounds Size: {bounds.size}");
     }
+
+    if (hasBounds)
+    {
+        // Add or get an existing BoxCollider
+        BoxCollider collider = gobject.GetComponent<BoxCollider>();
+        if (collider == null)
+        {
+            collider = gobject.AddComponent<BoxCollider>();
+        }
+
+        // Set the size and center of the collider based on world bounds
+        // We need to convert the bounds center back to local space relative to the GameObject
+        collider.center = gobject.transform.InverseTransformPoint(bounds.center);
+        
+        // Adjust the size based on the GameObject's local scale
+        Vector3 localScale = gobject.transform.lossyScale;
+        collider.size = new Vector3(bounds.size.x / localScale.x, bounds.size.y / localScale.y, bounds.size.z / localScale.z);
+        
+        Debug.Log($"Collider Center: {collider.center} | Collider Size: {collider.size}");
+    }
+}
+
+    // public static void SetBoundingBoxColliderAsParent(this GameObject gobject)
+    // {
+    //     Renderer[] renderers = gobject.GetComponentsInChildren<Renderer>(true);
+    //     Bounds bounds = new Bounds(Vector3.zero, Vector3.zero);
+
+    //     bool hasBounds = false;
+
+    //     if (renderers.Length == 0)
+    //     {
+    //         Debug.LogWarning("No renderers found in the GameObject hierarchy.");
+    //     }
+    //     else
+    //     {
+    //         for (int i = 0; i < renderers.Length; i++)
+    //         {
+    //             GameObject currentObject = renderers[i].gameObject;
+
+    //             // Exclude LineRenderer from bounds calculation
+    //             if (currentObject.GetComponent<LineRenderer>() != null)
+    //             {
+    //                 continue;
+    //             }
+
+    //             if (!hasBounds)
+    //             {
+    //                 // Initialize bounds with the first valid renderer (non-LineRenderer)
+    //                 bounds = renderers[i].bounds;
+    //                 bounds.size = Vector3.Scale(bounds.size, renderers[i].gameObject.transform.localScale);
+    //                 hasBounds = true;
+    //             }
+    //             else
+    //             {
+    //                 // Encapsulate remaining objects
+    //                 Bounds scaledBounds = renderers[i].bounds;
+    //                 scaledBounds.size = Vector3.Scale(scaledBounds.size, renderers[i].gameObject.transform.localScale);
+    //                 bounds.Encapsulate(scaledBounds);
+    //             }
+
+    //             Debug.Log("Object: " + renderers[i].gameObject.name + " | Local Scale: " + renderers[i].gameObject.transform.localScale + " | Bounds Size: " + bounds.size);
+    //         }
+    //     }
+
+    //     if (hasBounds)
+    //     {
+    //         // Add BoxCollider and set its properties
+    //         Debug.Log("Heyyy3");
+    //         BoxCollider collider = gobject.AddComponent<BoxCollider>();
+    //         collider.center = bounds.center; // - gobject.transform.position;
+    //         collider.size = bounds.size; //Vector3.Scale(bounds.size, gobject.transform.localScale);
+    //     }
+    // }
+
+
     public static void SetActiveChildrenColliders(this GameObject parent, bool activate, string childName ="all")
     {
         // Iterate through all child objects
@@ -188,6 +278,76 @@ public static class GameObjectExtensions
                 }
             }
         }
+    }
+
+
+    public static void MakeInteractableBoundBox(this GameObject gobject, GameObject boundsPrefab, bool make, bool first = false)
+    {
+        BoxCollider boundingBox = gobject.GetComponent<BoxCollider>();
+        ObjectManipulator objManipulator = gobject.GetComponent<ObjectManipulator>();
+        MinMaxScaleConstraint scaleConstraint = gobject.GetComponent<MinMaxScaleConstraint>();
+        BoundsControl boundsControl = gobject.GetComponent<BoundsControl>();
+        if (boundingBox != null)
+        {
+            Object.Destroy(boundingBox);
+        }
+        if (objManipulator!=null)
+        {
+            Object.Destroy(objManipulator);
+        }
+        if (boundsControl!=null)
+        {
+            Object.Destroy(boundsControl.boxInstance);
+            Object.Destroy(boundsControl);
+        }
+        if (scaleConstraint!=null)
+        {
+            Object.Destroy(scaleConstraint);
+        }
+
+        if (make)
+        {
+            gobject.SetBoundingBoxColliderAsParent();
+
+            if (first && gobject.GetComponent<BoxCollider>() == null)
+            {
+                // Add a BoxCollider with size 30cm x 30cm x 30cm (0.3 units in Unity)
+                BoxCollider boxCollider = gobject.AddComponent<BoxCollider>();
+                boxCollider.size = new Vector3(0.3f, 0.3f, 0.3f);
+
+                // Calculate the desired center position in world space
+                Camera mainCamera = Camera.main;
+                if (mainCamera != null)
+                {
+                    Vector3 cameraForward = mainCamera.transform.forward;
+                    Vector3 cameraPosition = mainCamera.transform.position;
+
+                    // Position 50cm (0.5 units) in front of the camera
+                    Vector3 desiredCenterWorldPosition = cameraPosition + cameraForward * 0.5f;
+
+                    // Convert world position to local space of gobject
+                    Vector3 desiredCenterLocalPosition = gobject.transform.InverseTransformPoint(desiredCenterWorldPosition);
+
+                    // Set the center of the BoxCollider
+                    boxCollider.center = desiredCenterLocalPosition;
+                }
+            }
+
+            objManipulator = gobject.AddComponent<ObjectManipulator>();
+            objManipulator.AllowedManipulations = TransformFlags.Move | TransformFlags.Rotate | TransformFlags.Scale ;
+            objManipulator.AllowedInteractionTypes = InteractionFlags.Near | InteractionFlags.Ray | InteractionFlags.Generic; 
+            objManipulator.selectMode = InteractableSelectMode.Multiple;
+            scaleConstraint = gobject.AddComponent<MinMaxScaleConstraint>();
+
+            scaleConstraint.MinimumScale = Vector3.one * 0.01f; 
+            scaleConstraint.MaximumScale = Vector3.one * 1.00f;
+
+            boundsControl = gobject.AddComponent<BoundsControl>();
+            boundsControl.BoundsVisualsPrefab = boundsPrefab;
+            boundsControl.ConstraintsManager = gobject.GetComponent<ConstraintManager>();
+        
+        }
+
     }
 
     public static void InstantiateInside(this GameObject gobject, GameObject container, bool xz_to_xy = true)
@@ -256,13 +416,11 @@ public static class GameObjectExtensions
         Vector3 finalTranslation = translationVector ?? Vector3.zero;
 
         gobject.transform.position = Camera.main.transform.position + Camera.main.transform.rotation * finalTranslation;
-        Debug.Log("Bazingaaa1");
         gobject.transform.rotation =  Camera.main.transform.rotation;
         if (xz_to_xy)
         {
             gobject.transform.Rotate(-90f, 0f, 0f);
         }
-        Debug.Log("Bazingaaa2");
         
     }
 }

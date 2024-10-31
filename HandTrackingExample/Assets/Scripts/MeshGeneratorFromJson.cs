@@ -18,11 +18,14 @@ public class MeshGeneratorFromJson : MonoBehaviour
 {
     public GameObject loading; // A GameObject that is disabled after the data is generated
     [HideInInspector] public GameObject elementsParent;
+    [HideInInspector] public Stock stock;
     [HideInInspector] public GameObject locksParent;
     public DrawingController drawController;
     public GameObject padlocks;
     private string path; 
-    public string fileName; 
+    private string path2;
+    public string fileName;
+    public string fileNameStock; 
     public Material material;     			
     private GameObject element;
     private float alphaValue = 0.20f;
@@ -36,13 +39,17 @@ public class MeshGeneratorFromJson : MonoBehaviour
 
         string dataFolderPath =Application.dataPath; // Constructing the path dynamically 
         path = dataFolderPath + "/Data/" + fileName + ".json";
+        path2 = dataFolderPath + "/Data/" + fileNameStock + ".json";
         //string dataFolderPath = Directory.GetParent(Application.dataPath).Parent.FullName; // Constructing the path dynamically 
         //path = dataFolderPath + "/data/" + fileName + ".json";
 
         Debug.Log ("Path: " + path);
         LoadFromJson(path);
     
-        
+        string jsonContent = File.ReadAllText(path2);
+        stock = JsonConvert.DeserializeObject<Stock>(jsonContent);
+
+
     }
 	
 	void LoadFromJson(string path) 
@@ -92,6 +99,15 @@ public class MeshGeneratorFromJson : MonoBehaviour
     // To dispatch coroutines
 	public readonly Queue<Action> ExecuteOnMainThread = new ();
 	
+    public void GenerateMultiple(MultipleMeshesData data, GameObject elParent)
+    {
+        foreach (var elementPair in data.elements) // Loop through each element in the dictionary
+        {
+            MeshData meshData = elementPair.Value;
+            Generate( meshData, elParent);
+        }
+    }
+
     public void Generate(MeshData data, GameObject elParent)
     {
 

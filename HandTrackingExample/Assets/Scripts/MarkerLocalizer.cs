@@ -9,9 +9,8 @@ public class MarkerLocalizer: MonoBehaviour
     public UIController uIController;
     public DrawingController drawController;
     public MeshGeneratorFromJson meshGenerator;
-
     public GameObject XR_Rig;
-    public bool TrackingOn = false;
+    [HideInInspector] public bool TrackingOn = false;
     private Quaternion offsetRotation = Quaternion.Euler(90, 0, 0);
     private GameObject Trackables;
     private GameObject Geometry;
@@ -95,8 +94,12 @@ public class MarkerLocalizer: MonoBehaviour
                             uIController.TableMenu.transform.rotation = rot;
                             uIController.TableMenu.SetActive(true);
 
-                            drawController.pinManager.newPin.transform.position = pos + (rot * drawController.pinManager.initialPinPosition);
-                            drawController.pinManager.newPin.transform.rotation = rot;
+                            if (drawController.pinManager.newPin)
+                            {
+                                drawController.pinManager.newPin.transform.position = pos + (rot * drawController.pinManager.initialPinPosition);
+                                drawController.pinManager.newPin.transform.rotation = rot;
+                            }
+                            
 
                             meshGenerator.locksParent.SetActive(true);
                             return; // Exit the loop once the desired marker is found

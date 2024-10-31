@@ -10,12 +10,19 @@ namespace MeshElementData
     {
         public string result { get; set; }
     }
+    [System.Serializable]
+    public class Dimensions
+    {
+        public float width { get; set; }
+        public float height { get; set; }
+        public float length { get; set; }
+    }
     
     [System.Serializable]
     public class MeshData
     {
         public string name { get; set; }
-
+        public Dimensions dimensions { get; set; }
         public float[] color { get; set; }
 
         [JsonConverter(typeof(IntArrayArrayConverter))]
@@ -114,5 +121,48 @@ namespace MeshElementData
                 Debug.LogError("The game object does not have a MeshRenderer component.");
             }
         }
+    
     }
+
+[System.Serializable]
+public class MultipleMeshesData
+{
+    public string uid { get; set; }
+    public Dictionary<string, MeshData> elements { get; set; }
+}
+
+[System.Serializable]
+public class Stock
+{
+    public string[] priority { get; set; }
+    public float[] priorityLengths { get; set; }
+    public Dictionary<string, Plank> planks { get; set; }
+}
+
+[System.Serializable]
+public class Plank
+{
+    public Dimensions dimensions { get; set; }
+    public float[] color { get; set; }
+    public Constraints constraints { get; set; }
+    public BendedGeo bendedGeo { get; set; }
+}
+
+[System.Serializable]
+public class Constraints
+{
+    public double curvature { get; set; }
+}
+
+[System.Serializable]
+public class BendedGeo
+{
+    public int count { get; set; }
+
+    [JsonConverter(typeof(Vector3ArrayConverter))]
+    public Vector3[] curves { get; set; }
+    public string[] curvesId { get; set; }
+    public float[] curvesLengths { get; set; }
+}
+
 }
