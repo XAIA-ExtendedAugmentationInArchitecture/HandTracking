@@ -462,6 +462,8 @@
 -analyzer:"C:/Program Files/Unity/Hub/Editor/2023.2.18f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.Properties.SourceGenerator.dll"
 -analyzer:"C:/Program Files/Unity/Hub/Editor/2023.2.18f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.SourceGenerators.dll"
 -analyzer:"C:/Program Files/Unity/Hub/Editor/2023.2.18f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.UIToolkit.SourceGenerator.dll"
+"Assets/ConstrainedMovement.cs"
+"Assets/DynamicMoveAxisConstraint.cs"
 "Assets/LineConnector.cs"
 "Assets/Mqtt/M2Mqtt/Exceptions/MqttClientException.cs"
 "Assets/Mqtt/M2Mqtt/Exceptions/MqttCommunicationException.cs"
@@ -519,7 +521,10 @@
 "Assets/Prefabs/ARMarkerScripts/PrefabMonoBehaviour.cs"
 "Assets/Prefabs/ARMarkerScripts/SampleMarker.cs"
 "Assets/Prefabs/ARMarkerScripts/TextPanel.cs"
+"Assets/Scripts/BendGeometry copy.cs"
+"Assets/Scripts/BendGeometry.cs"
 "Assets/Scripts/CatmullRomSpline.cs"
+"Assets/Scripts/CompasMesh.cs"
 "Assets/Scripts/CoordinateSystemConverters.cs"
 "Assets/Scripts/CurveControlPoint.cs"
 "Assets/Scripts/CurveManipulator.cs"
@@ -535,6 +540,7 @@
 "Assets/Scripts/PinManager.cs"
 "Assets/Scripts/PlankBender.cs"
 "Assets/Scripts/PlankElementData.cs"
+"Assets/Scripts/PriorityMapper.cs"
 "Assets/Scripts/UIController.cs"
 -langversion:9.0
 

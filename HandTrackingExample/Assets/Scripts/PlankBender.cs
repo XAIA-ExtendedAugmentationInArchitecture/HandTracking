@@ -72,9 +72,30 @@ using System.Linq;
             }
             mesh.RecalculateBounds();
 
-            MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
-            MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            meshRenderer.sharedMaterial = new Material(Shader.Find("Standard"));
+            MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
+            if (meshFilter == null)
+            {
+                meshFilter = gameObject.AddComponent<MeshFilter>();
+            }
+
+            MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
+            if (meshRenderer == null)
+            {
+                meshRenderer = gameObject.AddComponent<MeshRenderer>();
+            }
+            
+            Material material = new Material(Shader.Find("Standard"));
+            material.SetFloat("_Mode", 3); // Set the rendering mode to Transparent (0 = Opaque, 1 = Cutout, 2 = Fade, 3 = Transparent)
+            material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            material.SetInt("_ZWrite", 0);
+            material.DisableKeyword("_ALPHATEST_ON");
+            material.EnableKeyword("_ALPHABLEND_ON");
+            material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            material.renderQueue = 3000;
+
+            meshRenderer.sharedMaterial = material;
+
             meshRenderer.sharedMaterial.color = color;
             // Assign the mesh to the mesh filter
             meshFilter.mesh = mesh;
@@ -84,8 +105,8 @@ using System.Linq;
         void GenerateBendedPlankData()
         {
             // Create a rectangular profile with a given width and height
-            width = width * scale *0.2f;  // Width of the rectangle (scaled to match the diameter)
-            height = height * scale *0.2f;  // Height of the rectangle (you can adjust this ratio)
+            width = width * scale; // *0.2f;  // Width of the rectangle (scaled to match the diameter)
+            height = height * scale ; //*0.2f;  // Height of the rectangle (you can adjust this ratio)
 
             // Define the rectangular profile (4 corners)
             profile = new Vector3[resolution];

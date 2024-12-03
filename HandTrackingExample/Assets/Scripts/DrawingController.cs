@@ -239,10 +239,10 @@ public class DrawingController : MonoBehaviour
 
         Destroy(lineObject);
         lineRenderer_simplified = lineObjectSimplified.GetComponent<LineRenderer>();
-        if (pinch)
-        {
-            lineRenderer_simplified = curveManipulator.FlattenCurve(lineRenderer_simplified);
-        }  
+        // if (pinch)
+        // {
+        //     lineRenderer_simplified = curveManipulator.FlattenCurve(lineRenderer_simplified);
+        // }  
          
         //then we store it
         StoreDrawnLine(lineRenderer_simplified);
@@ -436,7 +436,7 @@ public class DrawingController : MonoBehaviour
             {
                 foreach (Transform grandchild in child.transform)
             {
-                if (grandchild.name== "ControlPoint")
+                if (grandchild.name == "ControlPoint")
                 {
                     grandchild.gameObject.GetComponent<Renderer>().enabled = enable;
                     grandchild.gameObject.GetComponent<ObjectManipulator>().enabled = enable;
@@ -999,6 +999,28 @@ public class DrawingController : MonoBehaviour
             };
         }
     }
+
+    public void SavePriorityData(
+    Dictionary<string, List<(string pointName, bool direction)>> priority)
+    {
+        // Step 1: Generate a timestamp
+        string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+        // Step 2: Create a unique filename using the timestamp, the word "priority", and the team name
+        string fileName = $"{timestamp}_priority_{team}.json";
+
+        // Step 3: Define the file path to save the JSON data
+        string filePath = Path.Combine(Application.persistentDataPath, fileName);
+
+        // Step 4: Serialize the priority dictionary to JSON
+        string json = JsonConvert.SerializeObject(priority, Formatting.Indented);
+
+        // Step 5: Save the JSON data to a file
+        File.WriteAllText(filePath, json);
+
+        Debug.Log($"Priority data saved to: {filePath}");
+    }
+
 
 
     void OnApplicationQuit()

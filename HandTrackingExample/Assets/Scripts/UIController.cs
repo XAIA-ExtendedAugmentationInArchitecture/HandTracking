@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using MixedReality.Toolkit;
 using MixedReality.Toolkit.UX;
+using MixedReality.Toolkit.SpatialManipulation;
 
 public class UIController : MonoBehaviour
 {
@@ -10,7 +12,7 @@ public class UIController : MonoBehaviour
     public DrawingController drawController;
     public MqttController mqttController;
     public MeshGeneratorFromJson meshGenerator;
-
+    public BendGeometry benGeo;
     public PressableButton Localize;
     public PressableButton NewDrawing;
     //public PressableButton Undo;
@@ -32,6 +34,8 @@ public class UIController : MonoBehaviour
     public PressableButton ScaleButton;
     public GameObject ScaleParent;
     public PressableButton RealScaleButton;
+    public PressableButton NextScale;
+    public PressableButton PrevScale;
     public TMP_Text ScaleInfo;
 
     public PressableButton Locks;
@@ -65,13 +69,37 @@ public class UIController : MonoBehaviour
 
     public TextMeshPro DrawingText;
     public TextMeshPro ModeText;
-    public TextMeshPro TrackingText;
+    public TextMeshPro TrackingText; 
     public GameObject TableMenu;
 
+    public PressableButton InventoryButton;
+    public GameObject Submenu;
+    public PressableButton nextPart;
+    public PressableButton previousPart;
+    public PressableButton DirectionToggle;
+    public Slider bendSlider;
+    public PressableButton nextGeo;
+    public PressableButton previousGeo;
+    public PressableButton ManipulatorToggle;
+
+    public PressableButton PriorityMapper;
+    private int ind = 0;
+
+    private float[] scales = { 0.5f, 0.2f, 0.1f, 0.05f, 0.02f, 0.01f, 0.004f, 0.002f, 0.001f };
+    private int currentScaleIndex = 0;
     
     // Start is called before the first frame update
     void Start()
-    {
+    {   
+        Submenu.SetActive(false);
+        InventoryButton.OnClicked.AddListener(() =>  ToggleVisibility(Submenu));
+        InventoryButton.OnClicked.AddListener(() => drawController.ActivateStandBy());
+        nextGeo.OnClicked.AddListener(ShowNextGeo);
+        previousGeo.OnClicked.AddListener(ShowPreviousGeo);
+        nextPart.OnClicked.AddListener(OnNextPart);
+        previousPart.OnClicked.AddListener(OnPreviousPart);
+        ManipulatorToggle.OnClicked.AddListener(() =>  ToggleObjectManipulator(ManipulatorToggle.IsToggled));
+
         TableMenu.SetActive(false);
 
         Localize.OnClicked.AddListener(() => markerLocalizer.EnableLocalization());
@@ -110,6 +138,11 @@ public class UIController : MonoBehaviour
         ScaleButton.OnClicked.AddListener(() => drawController.ToggleScale());
         ScaleButton.OnClicked.AddListener(() => drawController.ActivateStandBy());
         RealScaleButton.OnClicked.AddListener(() => drawController.currentDrawingParent.transform.localScale = Vector3.one);
+        RealScaleButton.OnClicked.AddListener(() =>  meshGenerator.inventoryParent.transform.localScale = Vector3.one);
+        
+        NextScale.OnClicked.AddListener(OnNextScalePressed);
+        PrevScale.OnClicked.AddListener(OnPrevScalePressed);
+
 
         TransparencyParent.SetActive(false);
 
@@ -150,7 +183,17 @@ public class UIController : MonoBehaviour
         if (ScaleParent.activeSelf)
         {
             float scaleValue = drawController.currentDrawingParent.transform.localScale.x;
-            ScaleInfo.text = "1:" + Mathf.RoundToInt(1/ scaleValue).ToString();
+            meshGenerator.inventoryParent.transform.localScale = Vector3.one * scaleValue;
+            if (scaleValue > 0.1f)
+            {
+                ScaleInfo.text = "1:" + (Mathf.Round((1 / scaleValue) * 10f) / 10f).ToString(); 
+            }
+            else
+            {
+              ScaleInfo.text = "1:" + Mathf.RoundToInt(1/ scaleValue).ToString();  
+            }
+            // ScaleInfo.text = (scaleValue*100).ToString() + "%";
+            // ScaleInfo.text = "1:" + Mathf.RoundToInt(1/ scaleValue).ToString();
         }
     }
 
@@ -265,6 +308,167 @@ public class UIController : MonoBehaviour
         }
         mqttConnectionDialog.GetComponent<Dialog>().SetBody("Do you want to try to reconnect?");
         mqttConnectionDialog.SetActive(true);
+    }
+
+    void OnNextPart()
+    {
+        benGeo.ChangeIndex(true, bendSlider, DirectionToggle); // Forward navigation
+    }
+
+    void OnPreviousPart()
+    {
+        benGeo.ChangeIndex(false, bendSlider, DirectionToggle); // Backward navigation
+    }
+
+    void ShowNextGeo()
+    {
+        if (meshGenerator.inventoryParent.transform.childCount == 0) return;
+
+        // Increment index and wrap around if necessary
+        ind = (ind + 1) % meshGenerator.inventoryParent.transform.childCount;
+        SetActiveGeo(ind);
+
+    }
+
+    void ShowPreviousGeo()
+    {
+        if (meshGenerator.inventoryParent.transform.childCount == 0) return;
+
+        // Decrement index and wrap around if necessary
+        ind = (ind - 1 + meshGenerator.inventoryParent.transform.childCount) % meshGenerator.inventoryParent.transform.childCount;
+        SetActiveGeo(ind);
+    }
+
+    void SetActiveGeo(int index)
+    {
+        if ( benGeo!= null)
+        {
+            benGeo.RecolorPlankMeshes();
+        }
+        // Deactivate all children first
+        for (int i = 0; i < meshGenerator.inventoryParent.transform.childCount; i++)
+        {
+            GameObject child = meshGenerator.inventoryParent.transform.GetChild(i).gameObject;
+            bool isActive = (i == index);
+            child.SetActive(isActive);
+
+            // Update the BendGeometry reference if this is the active child
+            if (isActive)
+            {
+                // Get the BendGeometry component
+                benGeo = child.GetComponent<BendGeometry>();
+
+                // Ensure benGeo is not null before adding listeners
+                if (benGeo != null)
+                {
+                    // Remove existing listeners to avoid duplication
+                    DirectionToggle.OnClicked.RemoveAllListeners();
+                    bendSlider.OnValueUpdated.RemoveAllListeners();
+
+                    // Add listeners
+                    DirectionToggle.OnClicked.AddListener(() =>
+                    {
+                        bendSlider.Value=0.5f;
+                    });
+
+                    Debug.Log("Here");
+                    bendSlider.OnValueUpdated.AddListener(eventData =>
+                    {
+                        benGeo.OnBendSliderChanged(eventData.NewValue); // Extract the NewValue and pass it
+                    });
+
+                }
+                else
+                {
+                    
+                    Debug.LogWarning("BendGeometry component not found on the active child.");
+                }
+            }
+            else
+            {
+                bool isOn = child.GetComponent<BendGeometry>().moved;
+                child.SetActive(isOn);
+            }
+        }
+    }
+
+    void ToggleObjectManipulator(bool enable)
+    {
+        // Iterate through all children of inventoryParent
+        foreach (Transform child in meshGenerator.inventoryParent.transform)
+        {
+            // Try to get the ObjectManipulator component
+            var objectManipulator = child.GetComponent<ObjectManipulator>();
+            var renderer = child.GetComponent<MeshRenderer>();
+            if (objectManipulator != null)
+            {
+                objectManipulator.enabled = enable;
+            }
+            if (renderer != null)
+            {
+                renderer.enabled = !enable;
+            }
+        }
+    }
+
+    public void MapElements()
+    {
+        PriorityMapper priorityMapper= new PriorityMapper();
+        List<LineRenderer> lineRenderers= new List<LineRenderer>();
+
+        foreach (Transform child in drawController.currentDrawingParent.transform)
+        {
+            LineRenderer ln = child.gameObject.GetComponent<LineRenderer>();
+            if (ln != null)
+            {
+                lineRenderers.Add(ln);
+            }
+        }
+
+        List<Vector3> points = new List<Vector3>();
+        List<(Vector3,Vector3)> endPoints = new List<(Vector3,Vector3)>();
+
+        List<string> pointNames = new List<string>();
+        
+        foreach(Transform child in meshGenerator.inventoryParent.transform)
+        {
+            Vector3 pt = child.GetComponent<BendGeometry>().CalculateMeanPoint();
+            (Vector3,Vector3) endpts = child.GetComponent<BendGeometry>().CalculateEndPoints();
+
+            string ptName = child.gameObject.name;
+            if (pt != null)
+            {
+                points.Add(pt);
+                endPoints.Add(endpts);
+                if (ptName != null)
+                {
+                    pointNames.Add(ptName);
+                }
+            }
+        }
+
+        Dictionary<LineRenderer, List<string>> priorityOrder = priorityMapper.MapPointsToLineRenderers(lineRenderers, points, pointNames, 0.5f);
+        Dictionary<string, List<(string pointName, bool direction)>> priority = priorityMapper.MergePriorityData(priorityOrder,points, endPoints, pointNames, lineRenderers);
+
+        drawController.SavePriorityData(priority);
+    }
+
+    void OnNextScalePressed()
+    {
+        currentScaleIndex = (currentScaleIndex + 1) % scales.Length;
+        UpdateScale();
+    }
+
+    void OnPrevScalePressed()
+    {
+        currentScaleIndex = (currentScaleIndex - 1 + scales.Length) % scales.Length;
+        UpdateScale();
+    }
+
+    void UpdateScale()
+    {
+        float scale = scales[currentScaleIndex];
+        drawController.currentDrawingParent.transform.localScale = Vector3.one * scale;
     }
 
 }

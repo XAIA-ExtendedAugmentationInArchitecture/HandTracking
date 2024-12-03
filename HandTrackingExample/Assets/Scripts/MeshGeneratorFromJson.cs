@@ -10,9 +10,11 @@ using Newtonsoft.Json;
 using System.Dynamic;
 using MeshElementData;
 using Unity.VisualScripting;
+using UnityEngine.XR.Interaction.Toolkit;
 using TMPro;
 using MixedReality.Toolkit;
 using MixedReality.Toolkit.SpatialManipulation;
+using System.Text.RegularExpressions;
 
 public class MeshGeneratorFromJson : MonoBehaviour
 {
@@ -30,6 +32,12 @@ public class MeshGeneratorFromJson : MonoBehaviour
     private GameObject element;
     private float alphaValue = 0.20f;
 
+    public GameObject inventoryParent;
+    public Material[] materials;
+    public Inventory inventory;
+    private string folderpath =""; // "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\data\\" ;
+    private string library =  ""; //"C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\data\\material_library.json" ;
+
 	void Start()
     {   
         elementsParent = new GameObject("Elements");
@@ -44,13 +52,42 @@ public class MeshGeneratorFromJson : MonoBehaviour
         //path = dataFolderPath + "/data/" + fileName + ".json";
 
         Debug.Log ("Path: " + path);
-        LoadFromJson(path);
+        // LoadFromJson(path);
     
-        string jsonContent = File.ReadAllText(path2);
-        stock = JsonConvert.DeserializeObject<Stock>(jsonContent);
+        // string jsonContent = File.ReadAllText(path2);
+        // stock = JsonConvert.DeserializeObject<Stock>(jsonContent);
 
+        folderpath = dataFolderPath + "/Data/" ;
+        library = folderpath  + "material_library" + ".json";
+
+        inventoryParent = new GameObject("Inventory");
+
+        LoadInventoryFromJson(library);
 
     }
+
+    void LoadInventoryFromJson(string path) 
+	{
+		// Create mesh Reader
+		MeshReader meshReader = new MeshReader();
+		meshReader.GetInventoryFromFilePath(path);
+        inventory = meshReader.libraryData;
+
+        for(int i=0; i< inventory.priority.Length; i++)
+        {
+            string name = inventory.priority[i];
+            Match match = Regex.Match(name, @"^[A-Za-z]+_\d+");
+
+            if (match.Success)
+            {
+                string elementpath = Path.Combine(folderpath, match.Value + ".json"); 
+                Debug.Log(match.Value);
+                meshReader.GetMemberFromFilePath(elementpath);
+                inventory.members[match.Value] = meshReader.memberData; 
+                GenerateMember(meshReader.memberData, match.Value, inventoryParent);
+            }
+        }	
+	}
 	
 	void LoadFromJson(string path) 
 	{
@@ -153,18 +190,15 @@ public class MeshGeneratorFromJson : MonoBehaviour
     {
         if (transparencyUp && alphaValue<0.95f)
         {
-           Debug.Log ("Hoii2" + alphaValue);
             alphaValue =alphaValue + 0.1f;
         }
         else if (!transparencyUp && alphaValue>0.05f)
         {
-            Debug.Log ("Hoii3" + alphaValue);
             alphaValue =alphaValue - 0.1f;
         }
 
         infoText.text = Mathf.RoundToInt(alphaValue * 100).ToString() + "%";
 
-        Debug.Log("Hoiii" + infoText.text);
 
         foreach (Transform child in elementsParent.transform)
         {
@@ -182,22 +216,48 @@ public class MeshGeneratorFromJson : MonoBehaviour
         }
     }
 
-    // public void AdjustTransparency(float transparencyValue)
-    // {
-    //     alphaValue = transparencyValue;
-    //     foreach (Transform child in elementsParent.transform)
-    //     {
-    //         MeshRenderer mRenderer= child.gameObject.GetComponent<MeshRenderer>();
-            
-    //         if (mRenderer != null)
-    //         {
-    //             foreach (Material mat in mRenderer.materials)
-    //             {
-    //                 Color color = mat.color;
-    //                 color.a = alphaValue;
-    //                 mat.color = color;
-    //             }
-    //         }
-    //     }
-    // }
+    public void GenerateMember(MemberData memberData, string name, GameObject elParent)
+    {
+        element = memberData.mesh.GenerateMesh();
+        element.name = name;
+        element.transform.parent = elParent.transform;
+
+        foreach (Material mat in materials)
+        {
+            if (mat != null && mat.name == name)
+            {
+                memberData.mesh.AssignMaterial(element, mat);
+                break; 
+            }
+        }
+
+        BendGeometry bentGeo = element.AddComponent<BendGeometry>();
+        bentGeo.types = memberData.types;
+        bentGeo.width = memberData.dimensions.length;
+        bentGeo.height = memberData.dimensions.height;
+        bentGeo.initialGeo = memberData.Vector3Parts();
+        bentGeo.InitializeValues();
+        bentGeo.InitializeColors();
+        bentGeo.InitializePlankMeshes();
+
+        //element.AddComponent<MeshCollider>();
+        ObjectManipulator objMan= element.AddComponent<ObjectManipulator>();
+        objMan.AllowedManipulations = TransformFlags.Move | TransformFlags.Rotate;
+        objMan.AllowedInteractionTypes = InteractionFlags.Near | InteractionFlags.Ray | InteractionFlags.Generic; 
+
+        objMan.selectEntered.AddListener((SelectEnterEventArgs args) =>
+        {
+            if (!bentGeo.moved)
+            {
+                bentGeo.moved = true;
+                Debug.Log("Object moved for the first time!");
+
+                objMan.selectEntered.RemoveAllListeners();
+            }
+        });
+
+        objMan.enabled = false;
+        element.SetActive(false); 
+	}
+
 }

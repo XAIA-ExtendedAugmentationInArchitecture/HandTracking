@@ -165,4 +165,44 @@ public class BendedGeo
     public float[] curvesLengths { get; set; }
 }
 
+
+
+[System.Serializable]
+public class Inventory
+{
+    public string[] priority { get; set; }
+    public bool[] direction { get; set; } //true == original direction of the element or false==reversed
+    public float[] priorityLengths { get; set; }
+    public Dictionary<string, MemberData> members { get; set; } = new Dictionary<string, MemberData>();
+}
+
+[System.Serializable]
+public class MemberData
+{
+    public string uid { get; set; }
+    public Dimensions dimensions { get; set; }
+
+    public MeshData mesh { get; set; }
+    public List<int> types { get; set; }
+    public List<List<float>> parts { get; set; }
+
+    public List<Vector3[]> Vector3Parts()
+    {
+        List<Vector3[]> vector3Parts = new List<Vector3[]>();
+
+        foreach (var part in parts)
+        {
+            if (part.Count >= 2) // Ensure there are at least two values
+            {
+                Vector3[] vectorPair = new Vector3[2];
+                vectorPair[0] = new Vector3(part[0], 0, 0);
+                vectorPair[1] = new Vector3(part[1], 0, 0);
+                vector3Parts.Add(vectorPair);
+            }
+        }
+
+        return vector3Parts;
+    }
+}
+
 }

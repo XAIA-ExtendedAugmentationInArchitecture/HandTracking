@@ -23,7 +23,7 @@ public class CurveManipulator : MonoBehaviour
     [HideInInspector] public LineRenderer lineRenderer;  // Reference to the original LineRenderer component
     public List<float> plankLengths; // List of segment lengths
     public Material lineMaterial;      // Material for the new LineRenderers
-    public float lineWidth = 0.1f;     // Width of the new line segments
+    public float lineWidth = 0.25f;     // Width of the new line segments
     public Plane projectionPlane ;
 
     private CurveControlPoint[] controlPoints = new CurveControlPoint[0];
@@ -70,7 +70,8 @@ public class CurveManipulator : MonoBehaviour
         newLine.material = lineMaterial;
         newLine.startWidth = lineWidth;
         newLine.endWidth = lineWidth;
-        newLine.alignment = LineAlignment.TransformZ;
+        newLine.alignment = LineAlignment.View;
+        // newLine.alignment = LineAlignment.TransformZ;
         newLine.positionCount = 0;
         newLine.loop = isPeriodic; 
 
@@ -329,9 +330,11 @@ public class CurveManipulator : MonoBehaviour
 			Vector3[] smoothedPoints = GetInterpolatedPoints( controlPositions, 0.1f, isPeriodic);
 
 			//set line settings
-			lineRenderer.SetVertexCount(smoothedPoints.Length );
+			lineRenderer.positionCount = smoothedPoints.Length;
 			lineRenderer.SetPositions( smoothedPoints );
-			lineRenderer.SetWidth( lineWidth, lineWidth );
+			lineRenderer.startWidth = lineWidth;
+            lineRenderer.endWidth = lineWidth;
+
 			saved = false;
 		}
 	}

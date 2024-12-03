@@ -102,6 +102,25 @@ public class MarkerLocalizer: MonoBehaviour
                             
 
                             meshGenerator.locksParent.SetActive(true);
+
+                            meshGenerator.inventoryParent.transform.position = pos;
+                            meshGenerator.inventoryParent.transform.rotation = rot;
+
+
+                            // Define movement amounts along local axes
+                            float movementX = 0.7f;
+                            float movementY = 0.2f;/* your desired movement along local y-axis */;
+                            float movementZ = 0.0f/* your desired movement along local z-axis */;
+
+                            // Calculate movement vector based on local axes
+                            Vector3 movement = (movementX * meshGenerator.inventoryParent.transform.right) +
+                                            (movementY * meshGenerator.inventoryParent.transform.up) +
+                                            (movementZ * meshGenerator.inventoryParent.transform.forward);
+
+                            // Apply movement to the object's position
+                            meshGenerator.inventoryParent.transform.position += movement;
+
+
                             return; // Exit the loop once the desired marker is found
                         }
                     }                    
