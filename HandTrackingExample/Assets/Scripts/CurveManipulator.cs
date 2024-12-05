@@ -32,7 +32,7 @@ public class CurveManipulator : MonoBehaviour
     [HideInInspector] public bool saved = false;
     [HideInInspector] public bool hasControlPoints = false;
     [HideInInspector] public float smoothSegSize = 0.2f;
-    private float ctrlPtSize = 0.015f;
+    private float ctrlPtSize = 0.06f;
     private bool isPeriodic = false;
 
     private void Start()
