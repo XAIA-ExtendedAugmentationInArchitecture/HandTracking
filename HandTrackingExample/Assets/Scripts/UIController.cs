@@ -371,7 +371,7 @@ public class UIController : MonoBehaviour
                         bendSlider.Value=0.5f;
                     });
 
-                    Debug.Log("Here");
+                    Debug.Log("ABC000 Here");
                     bendSlider.OnValueUpdated.AddListener(eventData =>
                     {
                         benGeo.OnBendSliderChanged(eventData.NewValue); // Extract the NewValue and pass it

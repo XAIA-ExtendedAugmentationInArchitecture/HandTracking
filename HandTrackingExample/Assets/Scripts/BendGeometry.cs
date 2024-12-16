@@ -54,15 +54,15 @@ public class BendGeometry : MonoBehaviour
                     index = i;
                     found = true;
                     bendSlider.Value = bendValues[i];
-                    var interactable = sideToggle.GetComponent<StatefulInteractable>();
-                    if (interactable != null)
-                    {
-                        interactable.ForceSetToggled(side[i]); // Use SetToggled() method
-                    }
-                    else
-                    {
-                        Debug.LogWarning("StatefulInteractable component missing on PressableButton.");
-                    }
+                    // var interactable = sideToggle.GetComponent<StatefulInteractable>();
+                    // if (interactable != null)
+                    // {
+                    //     interactable.ForceSetToggled(side[i]); // Use SetToggled() method
+                    // }
+                    // else
+                    // {
+                    //     Debug.LogWarning("StatefulInteractable component missing on PressableButton.");
+                    // }
                     break;
                 }
             }
@@ -76,15 +76,15 @@ public class BendGeometry : MonoBehaviour
                     {
                         index = i;
                         bendSlider.Value = bendValues[i];
-                        var interactable = sideToggle.GetComponent<StatefulInteractable>();
-                        if (interactable != null)
-                        {
-                            interactable.ForceSetToggled(side[i]); // Use SetToggled() method
-                        }
-                        else
-                        {
-                            Debug.LogWarning("StatefulInteractable component missing on PressableButton.");
-                        }
+                        // var interactable = sideToggle.GetComponent<StatefulInteractable>();
+                        // if (interactable != null)
+                        // {
+                        //     interactable.ForceSetToggled(side[i]); // Use SetToggled() method
+                        // }
+                        // else
+                        // {
+                        //     Debug.LogWarning("StatefulInteractable component missing on PressableButton.");
+                        // }
                         break;
                     }
                 }
@@ -100,15 +100,15 @@ public class BendGeometry : MonoBehaviour
                     index = i;
                     found = true;
                     bendSlider.Value = bendValues[i];
-                    var interactable = sideToggle.GetComponent<StatefulInteractable>();
-                    if (interactable != null)
-                    {
-                        interactable.ForceSetToggled(side[i]); // Use SetToggled() method
-                    }
-                    else
-                    {
-                        Debug.LogWarning("StatefulInteractable component missing on PressableButton.");
-                    }
+                    // var interactable = sideToggle.GetComponent<StatefulInteractable>();
+                    // if (interactable != null)
+                    // {
+                    //     interactable.ForceSetToggled(side[i]); // Use SetToggled() method
+                    // }
+                    // else
+                    // {
+                    //     Debug.LogWarning("StatefulInteractable component missing on PressableButton.");
+                    // }
                     break;
                 }
             }
@@ -122,21 +122,21 @@ public class BendGeometry : MonoBehaviour
                     {
                         index = i;
                         bendSlider.Value = bendValues[i];
-                        var interactable = sideToggle.GetComponent<StatefulInteractable>();
-                        if (interactable != null)
-                        {
-                            interactable.ForceSetToggled(side[i]); // Use SetToggled() method
-                        }
-                        else
-                        {
-                            Debug.LogWarning("StatefulInteractable component missing on PressableButton.");
-                    }
+                        // var interactable = sideToggle.GetComponent<StatefulInteractable>();
+                        // if (interactable != null)
+                        // {
+                        //     interactable.ForceSetToggled(side[i]); // Use SetToggled() method
+                        // }
+                        // else
+                        // {
+                        //     Debug.LogWarning("StatefulInteractable component missing on PressableButton.");
+                        // }
                         break;
                     }
                 }
             }
         }
-
+        Debug.Log ("ABCA " + index + "  " + bendValue + "  " +  bendValues[index]);
         ProcessBending();
     }
 
@@ -144,6 +144,7 @@ public class BendGeometry : MonoBehaviour
     public void OnSideToggleChanged(bool isOn)
     {
         side[index] = isOn;
+        Debug.Log ("ABCError ");
         ProcessBending();
     }
 
@@ -161,8 +162,7 @@ public class BendGeometry : MonoBehaviour
             bendValue = Mathf.Lerp(0.99f, 0.00f, value / 0.5f);
             side[index] = false;
         }
-
-        bendValues[index] = bendValue;
+        bendValues[index] = value; 
         ProcessBending();
     }
 
