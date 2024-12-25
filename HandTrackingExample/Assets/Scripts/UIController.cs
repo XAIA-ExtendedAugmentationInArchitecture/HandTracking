@@ -20,6 +20,7 @@ public class UIController : MonoBehaviour
     public PressableButton VisualizeDrawing;
     public PressableButton NextDrawing;
     public PressableButton SendToRhino;
+    public PressableButton SendPriority;
     public PressableButton PeriodicButton;
     public GameObject Periodic;
     public TMP_Text PeriodicInfo;
@@ -56,6 +57,9 @@ public class UIController : MonoBehaviour
 
     public GameObject mqttReceivedDialog;
 
+    public GameObject mqttPriorityDialog;
+    public TextMeshProUGUI mqttPriorityDialogBody;
+
     public GameObject mqttSendDialog;
     public TextMeshProUGUI mqttSendDialogHeader;
     public TextMeshProUGUI mqttSendDialogBody;
@@ -87,6 +91,9 @@ public class UIController : MonoBehaviour
 
     private float[] scales = { 0.5f, 0.2f, 0.1f, 0.05f, 0.02f, 0.01f, 0.004f, 0.002f, 0.001f };
     private int currentScaleIndex = 0;
+
+    private Dictionary<string, List<(List<(string pointName, bool direction, List<List<float>> intervals)>, float parameter)>> priority;
+
     
     // Start is called before the first frame update
     void Start()
@@ -116,6 +123,14 @@ public class UIController : MonoBehaviour
         {
             mqttSendDialogBody.text = "Do you want to send the drawing no." + drawController.EnabledDrawingIndex.ToString() + " back to Rhino?";
             SetupSendToRhinoDialog();
+        });
+
+        VisualizeDrawing.OnClicked.AddListener(() => ToggleVisibility(next));
+
+        SendPriority.OnClicked.AddListener(() =>
+        {
+            mqttPriorityDialogBody.text = "Do you want to send the mapping to Rhino?";
+            SetupSendPriorityDialog();
         });  
 
         Periodic.SetActive(false);
@@ -167,6 +182,9 @@ public class UIController : MonoBehaviour
         mqttSendDialog.GetComponent<Dialog>().SetPositive("Yes", args => drawController.SendToRhino());
         mqttSendDialog.GetComponent<Dialog>().SetNegative("No", args => Debug.Log("Rejected"));
 
+        mqttPriorityDialog.SetActive(false);
+        mqttPriorityDialog.GetComponent<Dialog>().SetPositive("Yes", args => drawController.SendPriorityData(priority));
+        mqttPriorityDialog.GetComponent<Dialog>().SetNegative("No", args => Debug.Log("Rejected"));
 
         PickTeam.SetActive(true);
         PickTeam.GetComponent<Dialog>().SetPositive("Team A", args => DefineMqttTopics("A"));
@@ -221,6 +239,16 @@ public class UIController : MonoBehaviour
         mqttSendDialog.SetActive(true);
     }
 
+    void SetupSendPriorityDialog()
+    {
+        var dialog = mqttPriorityDialog.GetComponent<Dialog>();
+        dialog.Reset();
+        dialog.SetPositive("Yes", args => drawController.SendPriorityData(priority));
+        dialog.SetNegative("No", args => Debug.Log("Rejected"));
+
+        mqttPriorityDialog.SetActive(true);
+    }
+
     void DefineMqttTopics(string team)
     {
         if (team=="A")
@@ -229,6 +257,7 @@ public class UIController : MonoBehaviour
             mqttController.topicsSubscribe.Add("/kitgkr_teamA_geometry/");
             mqttController.topicsSubscribe.Add("/kitgkr_teamA_lines/");
             mqttController.topicsPublish.Add("/kitgkr_teamA_drawings/");
+            mqttController.topicsPublish.Add("/kitgkr_teamA_priority/");
             drawController.team = "teamA";
             mqttSendDialogHeader.text = "Team A: Send a Drawing to Rhino";
         }
@@ -238,6 +267,7 @@ public class UIController : MonoBehaviour
             mqttController.topicsSubscribe.Add("/kitgkr_teamB_geometry/");
             mqttController.topicsSubscribe.Add("/kitgkr_teamB_lines/");
             mqttController.topicsPublish.Add("/kitgkr_teamB_drawings/");
+            mqttController.topicsPublish.Add("/kitgkr_teamB_priority/");
             drawController.team = "teamB";
             mqttSendDialogHeader.text = "Team B: Send a Drawing to Rhino";
         }
@@ -415,6 +445,7 @@ public class UIController : MonoBehaviour
     {
         PriorityMapper priorityMapper= new PriorityMapper();
         List<LineRenderer> lineRenderers= new List<LineRenderer>();
+        List<List<List<float>>> parts = new List<List<List<float>>> {};
 
         foreach (Transform child in drawController.currentDrawingParent.transform)
         {
@@ -444,13 +475,16 @@ public class UIController : MonoBehaviour
                 {
                     pointNames.Add(ptName);
                 }
+                parts.Add(child.GetComponent<BendGeometry>().parts);
             }
         }
 
-        Dictionary<LineRenderer, List<string>> priorityOrder = priorityMapper.MapPointsToLineRenderers(lineRenderers, points, pointNames, 0.5f);
-        Dictionary<string, List<(string pointName, bool direction)>> priority = priorityMapper.MergePriorityData(priorityOrder,points, endPoints, pointNames, lineRenderers);
 
-        drawController.SavePriorityData(priority);
+        Dictionary<LineRenderer, List<string>> priorityOrder = priorityMapper.MapPointsToLineRenderers(lineRenderers, points, pointNames, 0.5f);
+        priority = priorityMapper.MergePriorityData(priorityOrder,points, parts, endPoints, pointNames, lineRenderers);
+
+        SetupSendPriorityDialog();
+        //drawController.SavePriorityData(priority);
     }
 
     void OnNextScalePressed()

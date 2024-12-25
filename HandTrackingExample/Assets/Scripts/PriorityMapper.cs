@@ -52,7 +52,7 @@ public class PriorityMapper : MonoBehaviour
         lineRenderer.SetPositions(reorderedPositions);
     }
 
-    (Vector3, int, float) FindClosestPoint(Vector3 point, LineRenderer curve)
+    (Vector3, int, float, float) FindClosestPoint(Vector3 point, LineRenderer curve)
     {
         Vector3 closestPoint = Vector3.zero;
         float minDistance = Mathf.Infinity;
@@ -75,8 +75,12 @@ public class PriorityMapper : MonoBehaviour
             }
         }
 
-        return (closestPoint, closestIndex, minDistance);
+        // Remap the closest index to the range [0, 1]
+        float normalizedParameter = pointCount > 1 ? closestIndex / (float)(pointCount - 1) : 0;
+
+        return (closestPoint, closestIndex, minDistance, normalizedParameter);
     }
+
 
     bool FindDirection(List<Vector3> points, LineRenderer curve)
     {
@@ -93,8 +97,8 @@ public class PriorityMapper : MonoBehaviour
         }
 
         // Find the closest points to the start and end points of the list
-        var (closestStartPoint, startIndex, startDistance) = FindClosestPoint(points[0], curve);
-        var (closestEndPoint, endIndex, endDistance) = FindClosestPoint(points[points.Count - 1], curve);
+        var (closestStartPoint, startIndex, startDistance, _) = FindClosestPoint(points[0], curve);
+        var (closestEndPoint, endIndex, endDistance, _) = FindClosestPoint(points[points.Count - 1], curve);
 
         // Compare indices to determine the direction
         if (startIndex < endIndex)
@@ -229,7 +233,7 @@ public class PriorityMapper : MonoBehaviour
             // Find the closest LineRenderer for the current point
             foreach (LineRenderer line in lineRenderers)
             {
-                var (_, index, distance) = FindClosestPoint(point, line);
+                var (_, index, distance,_) = FindClosestPoint(point, line);
 
                 if (distance < minDistance && distance <= threshold)
                 {
@@ -256,7 +260,7 @@ public class PriorityMapper : MonoBehaviour
             foreach (var pointName in lineToPointMap[line])
             {
                 int pointIndex = pointNames.IndexOf(pointName);
-                var (_, index, _) = FindClosestPoint(points[pointIndex], line);
+                var (_, index, _, _) = FindClosestPoint(points[pointIndex], line);
                 validPoints.Add((pointName, index));
             }
 
@@ -273,73 +277,76 @@ public class PriorityMapper : MonoBehaviour
         return lineToPointMap;
     }
 
-    public Dictionary<string, List<(string pointName, bool direction)>> MergePriorityData(
+    public Dictionary<string, List<(List<(string pointName, bool direction, List<List<float>> intervals)>, float parameter)>> MergePriorityData(
     Dictionary<LineRenderer, List<string>> priorityOrder,
     List<Vector3> points,
+    List<List<List<float>>> parts,
     List<(Vector3 start, Vector3 end)> endPoints,
     List<string> pointNames,
     List<LineRenderer> lineRenderers)
     {
-        // Dictionary to store the directions
-        Dictionary<LineRenderer, List<bool>> priorityDirection = new Dictionary<LineRenderer, List<bool>>();
+        // Dictionary to store the directions for each LineRenderer
+        Dictionary<LineRenderer, bool> lineDirection = new Dictionary<LineRenderer, bool>();
 
-        // Initialize the direction dictionary with empty lists
+        // Determine direction for each LineRenderer using the first pair of endPoints
         foreach (var line in lineRenderers)
         {
-            priorityDirection[line] = new List<bool>();
-        }
-
-        // Create a copy of the dictionary entries to iterate over
-        foreach (var kvp in new Dictionary<LineRenderer, List<string>>(priorityOrder))
-        {
-            LineRenderer line = kvp.Key;
-            List<string> assignedPointNames = kvp.Value;
-
-            // For each assigned point name, check its direction
-            foreach (string pointName in assignedPointNames)
+            if (priorityOrder.ContainsKey(line))
             {
-                // Modify the collection as needed
-                int index = pointNames.IndexOf(pointName);
-                if (index >= 0 && index < endPoints.Count)
-                {
-                    // Get the endpoints for this point
-                    (Vector3 start, Vector3 end) = endPoints[index];
-
-                    // Check direction using the FindDirection function
-                    bool direction = FindDirection(new List<Vector3> { start, end }, line);
-
-                    // Save the direction in the priorityDirection dictionary
-                    priorityDirection[line].Add(direction);
-                }
+                bool direction = FindDirection(new List<Vector3> { endPoints[0].start, endPoints[0].end }, line);
+                lineDirection[line] = direction;
             }
         }
 
+        // Dictionary to store the closest distance for each LineRenderer
+        Dictionary<LineRenderer, float> lineDistances = new Dictionary<LineRenderer, float>();
 
-        // Merge priorityOrder and priorityDirection into the final dictionary
-        Dictionary<string, List<(string pointName, bool direction)>> priority = new Dictionary<string, List<(string, bool)>>();
+        foreach (var line in lineRenderers)
+        {
+            if (lineDirection.ContainsKey(line))
+            {
+                // Use start or end based on the direction
+                Vector3 referencePoint = lineDirection[line] ? endPoints[0].start : endPoints[0].end;
 
+                // Find the closest distance to the LineRenderer
+                var (_, _,_, parameter) = FindClosestPoint(referencePoint, line);
+                lineDistances[line] = parameter;
+            }
+        }
+
+        // Final dictionary to store the merged priority data
+        Dictionary<string, List<(List<(string pointName, bool direction, List<List<float>> intervals)>, float parameter)>> priority =
+            new Dictionary<string, List<(List<(string, bool, List<List<float>>)> , float)>>();
+
+        // Combine data into the required format
         foreach (var kvp in priorityOrder)
         {
             LineRenderer line = kvp.Key;
             List<string> assignedPointNames = kvp.Value;
-            List<bool> directions = priorityDirection[line];
+            bool direction = lineDirection[line];
+            float parameter = lineDistances[line];
 
-            List<(string, bool)> combinedData = new List<(string, bool)>();
+            List<(string, bool, List<List<float>>)> innerData = new List<(string, bool, List<List<float>>)>();
 
-            // Combine point names with directions
             for (int i = 0; i < assignedPointNames.Count; i++)
             {
                 string pointName = assignedPointNames[i];
-                bool direction = directions.Count > i ? directions[i] : false;
-                combinedData.Add((pointName, direction));
+                List<List<float>> intervals = parts[i];
+
+                // Add point data to the inner list
+                innerData.Add((pointName, direction, intervals));
             }
 
-            // Use the LineRenderer's GameObject name as the key
-            priority[line.name] = combinedData;
+            // Combine inner data with the single distance (parameter)
+            priority[line.name] = new List<(List<(string, bool, List<List<float>>)>, float)>
+            {
+                (innerData, parameter)
+            };
         }
 
         return priority;
     }
+
 
 
 

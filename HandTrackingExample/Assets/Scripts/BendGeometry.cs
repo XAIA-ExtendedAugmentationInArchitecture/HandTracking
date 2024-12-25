@@ -16,6 +16,8 @@ public class BendGeometry : MonoBehaviour
     private int index = 0;
     private int originalIndex = 0;
     private float bendValue = 0.0f; // Default bend value
+    private float connectOverlap = 0.20f;
+    public List<List<float>> parts = new List<List<float>>();
     public List<Vector3[]> initialGeo = new List<Vector3[]>(); // List of straight lines (each represented by start and end points)
     public List<int> types = new List<int>(); // clear areas type=0,  defects type=1, connection areas type=2
     public List<Color> colors = new List<Color>(); // 0 for the selected one, 1 for the clear areas type=0, 2 for the defects type=1 and so on
@@ -54,15 +56,6 @@ public class BendGeometry : MonoBehaviour
                     index = i;
                     found = true;
                     bendSlider.Value = bendValues[i];
-                    // var interactable = sideToggle.GetComponent<StatefulInteractable>();
-                    // if (interactable != null)
-                    // {
-                    //     interactable.ForceSetToggled(side[i]); // Use SetToggled() method
-                    // }
-                    // else
-                    // {
-                    //     Debug.LogWarning("StatefulInteractable component missing on PressableButton.");
-                    // }
                     break;
                 }
             }
@@ -76,15 +69,6 @@ public class BendGeometry : MonoBehaviour
                     {
                         index = i;
                         bendSlider.Value = bendValues[i];
-                        // var interactable = sideToggle.GetComponent<StatefulInteractable>();
-                        // if (interactable != null)
-                        // {
-                        //     interactable.ForceSetToggled(side[i]); // Use SetToggled() method
-                        // }
-                        // else
-                        // {
-                        //     Debug.LogWarning("StatefulInteractable component missing on PressableButton.");
-                        // }
                         break;
                     }
                 }
@@ -100,15 +84,6 @@ public class BendGeometry : MonoBehaviour
                     index = i;
                     found = true;
                     bendSlider.Value = bendValues[i];
-                    // var interactable = sideToggle.GetComponent<StatefulInteractable>();
-                    // if (interactable != null)
-                    // {
-                    //     interactable.ForceSetToggled(side[i]); // Use SetToggled() method
-                    // }
-                    // else
-                    // {
-                    //     Debug.LogWarning("StatefulInteractable component missing on PressableButton.");
-                    // }
                     break;
                 }
             }
@@ -122,15 +97,6 @@ public class BendGeometry : MonoBehaviour
                     {
                         index = i;
                         bendSlider.Value = bendValues[i];
-                        // var interactable = sideToggle.GetComponent<StatefulInteractable>();
-                        // if (interactable != null)
-                        // {
-                        //     interactable.ForceSetToggled(side[i]); // Use SetToggled() method
-                        // }
-                        // else
-                        // {
-                        //     Debug.LogWarning("StatefulInteractable component missing on PressableButton.");
-                        // }
                         break;
                     }
                 }
@@ -183,8 +149,8 @@ public class BendGeometry : MonoBehaviour
             GameObject plankObj = new GameObject($"Plank{i}");
             plankObj.transform.parent = this.gameObject.transform;
 
-            Color plankColor = (types[i] == 0) ? colors[1] : colors[2];
-
+            //Color plankColor = (types[i] == 0) ? colors[1] : colors[2];
+            Color plankColor = (i == index) ? colors[0] : colors[types[i] + 1];
             plankObjects.Add(plankBender.GeneratePlankMesh(
                 Vector3.up, 1.0f, width, height, initialGeo[i], plankObj, plankColor));
         }
@@ -208,6 +174,10 @@ public class BendGeometry : MonoBehaviour
         colors.Add(new Color(Color.green.r, Color.green.g, Color.green.b, 0.3f)); // for the selected color
         colors.Add(new Color(Color.white.r, Color.white.g, Color.white.b, 0.3f)); //  for the type = 0
         colors.Add(new Color(Color.red.r, Color.red.g, Color.red.b, 0.3f));  // for the type = 1
+        colors.Add(new Color(Color.blue.r, Color.blue.g, Color.blue.b, 0.3f));
+        colors.Add(new Color(Color.grey.r, Color.grey.g, Color.grey.b, 0.3f));
+        colors.Add(new Color(Color.magenta.r, Color.magenta.g, Color.magenta.b, 0.3f));
+        colors.Add(new Color(Color.yellow.r, Color.yellow.g, Color.yellow.b, 0.3f));
     }
 
     public void InitializeLineRenderers()
@@ -277,7 +247,8 @@ public class BendGeometry : MonoBehaviour
             Vector3[] updatedPolyline = bentGeo[i].ToArray();
             GameObject plankObj = plankObjects[i];
 
-            Color plankColor = (i == index) ? colors[0] : (types[i] == 0 ? colors[1] : colors[2]);
+            Color plankColor = (i == index) ? colors[0] : colors[types[i] + 1];
+            //Color plankColor = (i == index) ? colors[0] : (types[i] == 0 ? colors[1] : colors[2]);
 
             plankBender.GeneratePlankMesh(Vector3.up, 1.0f, width, height, updatedPolyline, plankObj, plankColor);
         }
@@ -295,8 +266,8 @@ public class BendGeometry : MonoBehaviour
         {
             Vector3[] updatedPolyline = bentGeo[i].ToArray();
             GameObject plankObj = plankObjects[i];
-
-            Color plankColor = (types[i] == 0) ? colors[1] : colors[2];
+            Color plankColor = (i == index) ? colors[0] : colors[types[i] + 1];
+            //Color plankColor = (types[i] == 0) ? colors[1] : colors[2];
 
             plankBender.GeneratePlankMesh(Vector3.up, 1.0f, width, height, updatedPolyline, plankObj, plankColor);
         }
@@ -586,6 +557,232 @@ public class BendGeometry : MonoBehaviour
     Debug.Log($"First Point: {firstPoint}, Last Point: {lastPoint}");
 
     return (firstPoint, lastPoint);
+}
+
+    public void CreatConnections()
+    {
+        List<int> newTypes = new List<int>();
+        List<Vector3[]> newGeo = new List<Vector3[]>();
+        TransformLine(connectOverlap, types, initialGeo, out newTypes, out newGeo);
+        types = newTypes;
+        initialGeo = newGeo;
+        InitializeValues();
+        InitializeColors();
+        InitializePlankMeshes();
+    }
+public void TransformLine(float jointLen, List<int> originalTypes, List<Vector3[]> originalLine,
+                              out List<int> transformedTypes, out List<Vector3[]> transformedLine)
+    {
+        // Make a copy of the data
+        List<int> workTypes = new List<int>(originalTypes);
+        List<Vector3[]> workLine = new List<Vector3[]>();
+        foreach (var seg in originalLine)
+        {
+            workLine.Add(new Vector3[] { seg[0], seg[1] });
+        }
+
+        ProcessBoundary(jointLen, true, ref workTypes, ref workLine);
+        ProcessBoundary(jointLen, false, ref workTypes, ref workLine);
+
+        transformedTypes = workTypes;
+        transformedLine = workLine;
+    }
+
+    private void ProcessBoundary(float jointLen, bool isStart, ref List<int> types, ref List<Vector3[]> line)
+{
+    float needed = jointLen;
+
+    int index2 = isStart ? 0 : line.Count - 1;
+    int step = isStart ? 1 : -1;
+
+    int segmentsConsumed = 0;
+    Vector3 boundaryPoint = isStart ? line[0][0] : line[line.Count - 1][1];
+    Vector3 lastConsumedPoint = boundaryPoint;
+    float currentNeeded = needed;
+
+    bool placedBlue = false;
+
+    // We'll store the indices of consumed segments
+    List<int> consumedIndices = new List<int>();
+
+    // Variables to store the chosen segment for blue
+    int chosenIndex = -1; 
+    Vector3 chosenSegmentStart = Vector3.zero;
+    Vector3 chosenSegmentEnd = Vector3.zero;
+
+    // First pass: try to find a place for blue
+    int currentIndex = index2;
+    while (currentIndex >= 0 && currentIndex < line.Count)
+    {
+        int segType = types[currentIndex];
+        Vector3 startP = line[currentIndex][0];
+        Vector3 endP = line[currentIndex][1];
+        float segLength = Vector3.Distance(startP, endP);
+
+        if (segType == 1)
+        {
+            // Red segment: consume it (will turn green)
+            consumedIndices.Add(currentIndex);
+            segmentsConsumed++;
+            lastConsumedPoint = isStart ? endP : startP;
+            currentIndex += step;
+        }
+        else if (segType == 0)
+        {
+            // White segment
+            if (segLength >= currentNeeded)
+            {
+                // We can place blue here
+                placedBlue = true;
+                chosenIndex = currentIndex;
+                chosenSegmentStart = startP;
+                chosenSegmentEnd = endP;
+                break;
+            }
+            else
+            {
+                // Not enough length in this white segment, consume it (green)
+                consumedIndices.Add(currentIndex);
+                segmentsConsumed++;
+                lastConsumedPoint = isStart ? endP : startP;
+                currentIndex += step;
+            }
+        }
+        else
+        {
+            // Unexpected type, treat as red
+            consumedIndices.Add(currentIndex);
+            segmentsConsumed++;
+            lastConsumedPoint = isStart ? endP : startP;
+            currentIndex += step;
+        }
+    }
+
+    // Second pass: handle results
+    if (!placedBlue)
+    {
+        // No suitable place for blue, all consumed are green
+        if (segmentsConsumed > 0)
+        {
+            ConvertToGreen(isStart, consumedIndices, boundaryPoint, lastConsumedPoint, ref types, ref line);
+        }
+        // Done, no blue placed
+        return;
+    }
+
+    // If placedBlue:
+    // First, convert consumed to green
+    if (segmentsConsumed > 0)
+    {
+        ConvertToGreen(isStart, consumedIndices, boundaryPoint, lastConsumedPoint, ref types, ref line);
+    }
+
+    // After merging, find the chosen segment again
+    int newIndex = FindSegmentIndex(line, chosenSegmentStart, chosenSegmentEnd);
+    if (newIndex == -1)
+    {
+        // If not found, something went wrong with the geometry matching.
+        // This should not happen if line segments are unique.
+        Debug.LogError("Could not find the chosen segment after merging green segments.");
+        return;
+    }
+
+    // Insert blue segment here
+    InsertBlueSegment(jointLen, isStart, newIndex, ref types, ref line);
+}
+
+private void ConvertToGreen(bool isStart, List<int> consumedIndices, Vector3 boundaryPoint, Vector3 lastConsumedPoint,
+                            ref List<int> types, ref List<Vector3[]> line)
+{
+    if (consumedIndices.Count == 0) return;
+
+    consumedIndices.Sort();
+
+    // Remove consumed segments
+    // If isStart, consumed are at the start
+    // If isEnd, consumed are at the end
+    int startIdx = isStart ? 0 : (line.Count - consumedIndices.Count);
+
+    for (int i = 0; i < consumedIndices.Count; i++)
+    {
+        types.RemoveAt(startIdx);
+        line.RemoveAt(startIdx);
+    }
+
+    // Insert one green segment
+    types.Insert(startIdx, 3);
+    line.Insert(startIdx, new Vector3[] { boundaryPoint, lastConsumedPoint });
+}
+
+/// <summary>
+/// Finds the segment index by exact matching of start and end points.
+/// </summary>
+private int FindSegmentIndex(List<Vector3[]> line, Vector3 start, Vector3 end)
+{
+    for (int i = 0; i < line.Count; i++)
+    {
+        Vector3 s = line[i][0];
+        Vector3 e = line[i][1];
+        if ((s == start && e == end) || (s == end && e == start))
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+/// <summary>
+/// Insert the blue joint segment into the found white segment.
+/// </summary>
+private void InsertBlueSegment(float jointLen, bool isStart, int currentIndex, ref List<int> types, ref List<Vector3[]> line)
+{
+    Vector3 startP = line[currentIndex][0];
+    Vector3 endP = line[currentIndex][1];
+    float segLength = Vector3.Distance(startP, endP);
+
+    // Remove the white segment
+    types.RemoveAt(currentIndex);
+    line.RemoveAt(currentIndex);
+
+    if (isStart)
+    {
+        // Blue at the start of the segment
+        float fraction = jointLen / segLength;
+        Vector3 blueEnd = Vector3.Lerp(startP, endP, fraction);
+
+        // Insert blue
+        types.Insert(currentIndex, 2);
+        line.Insert(currentIndex, new Vector3[] { startP, blueEnd });
+
+        // Leftover white
+        Vector3 leftoverStart = blueEnd;
+        Vector3 leftoverEnd = endP;
+        if (Vector3.Distance(leftoverStart, leftoverEnd) > 1e-6f)
+        {
+            types.Insert(currentIndex + 1, 0);
+            line.Insert(currentIndex + 1, new Vector3[] { leftoverStart, leftoverEnd });
+        }
+    }
+    else
+    {
+        // Blue at the end of the segment
+        float fraction = (segLength - jointLen) / segLength;
+        Vector3 blueStart = Vector3.Lerp(startP, endP, fraction);
+
+        // Leftover white
+        Vector3 leftoverStart = startP;
+        Vector3 leftoverEnd = blueStart;
+        if (Vector3.Distance(leftoverStart, leftoverEnd) > 1e-6f)
+        {
+            types.Insert(currentIndex, 0);
+            line.Insert(currentIndex, new Vector3[] { leftoverStart, leftoverEnd });
+            currentIndex++;
+        }
+
+        // Insert blue
+        types.Insert(currentIndex, 2);
+        line.Insert(currentIndex, new Vector3[] { blueStart, endP });
+    }
 }
 
 

@@ -1021,6 +1021,17 @@ public class DrawingController : MonoBehaviour
         Debug.Log($"Priority data saved to: {filePath}");
     }
 
+    public void SendPriorityData(
+    Dictionary<string, List<(List<(string pointName, bool direction, List<List<float>> intervals)>, float parameter)>> priority)
+    {
+        Dictionary<string, object> msg_dict = new Dictionary<string, object>
+        {
+            {"result", priority}
+        };
+        mqttController.message = msg_dict;
+        mqttController.Publish(mqttController.topicsPublish[4]);
+    }
+
 
 
     void OnApplicationQuit()

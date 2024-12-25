@@ -233,9 +233,11 @@ public class MeshGeneratorFromJson : MonoBehaviour
 
         BendGeometry bentGeo = element.AddComponent<BendGeometry>();
         bentGeo.types = memberData.types;
+        bentGeo.parts = memberData.parts;
         bentGeo.width = memberData.dimensions.length;
         bentGeo.height = memberData.dimensions.height;
         bentGeo.initialGeo = memberData.Vector3Parts();
+        //bentGeo.CreatConnections();
         bentGeo.InitializeValues();
         bentGeo.InitializeColors();
         bentGeo.InitializePlankMeshes();
