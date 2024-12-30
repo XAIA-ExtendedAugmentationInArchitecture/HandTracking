@@ -44,7 +44,7 @@ public class DrawingController : MonoBehaviour
     private LineRenderer lineRenderer_realtime;
     private LineRenderer lineRenderer_simplified;
     public Material ControlPointMaterial;
-    private float lineWidth = 0.002f;
+    private float lineWidth = 0.01f;
     private int DrawingIndex = -1;
     private int lineIndex = -1;
     private int linePointIndex = 0;
@@ -58,6 +58,7 @@ public class DrawingController : MonoBehaviour
     private HandsAggregatorSubsystem aggregator;
     private string timestamp;
     [HideInInspector] public bool newPeriodic = false;
+    
     public bool scaleMode = false;
     private bool delState = false;
     private bool lineChanged = true;
@@ -145,8 +146,7 @@ public class DrawingController : MonoBehaviour
                     StatefulInteractable meshInteractable = child.gameObject.GetComponent<StatefulInteractable>();
                     meshInteractable.ForceSetToggled(true);
                     meshInteractable.TryToggle();
-                }
-                
+                }  
             }
             if (drawingOn)
             {
@@ -172,16 +172,13 @@ public class DrawingController : MonoBehaviour
             }
             else
             {
-                
                 if (linePointIndex != -1 && lineIndex != -1)
                 {
                     SimplifyDrawing(false, newPeriodic);
                     //StoreDrawnLine(lineRenderer_realtime);
                     //GenerateMeshCollider();
                 }
-
                 linePointIndex = -1;
-
             }
         }
         else if (drawingMode == "pinchDrawing")
@@ -204,7 +201,7 @@ public class DrawingController : MonoBehaviour
                         previousPosition = jointPose.Pose.position;
                         linePointIndex = 0;
                         lineIndex++;
-                        // Instantiate a new line renderer for the current line index
+                        //Instantiate a new line renderer for the current line index
                         lineRenderer_realtime = InstantiateLine(lineIndex, "realtime");
                         Debug.Log("Line index is" + lineIndex + "lineRenderer" + lineRenderer_realtime);
                     }
@@ -227,8 +224,7 @@ public class DrawingController : MonoBehaviour
                     linePointIndex = -1;
                 }
             }
-        }
-        
+        }  
     }
 
     void SimplifyDrawing(bool pinch, bool periodic, bool simplify=true)
@@ -239,75 +235,17 @@ public class DrawingController : MonoBehaviour
 
         Destroy(lineObject);
         lineRenderer_simplified = lineObjectSimplified.GetComponent<LineRenderer>();
-        // if (pinch)
-        // {
-        //     lineRenderer_simplified = curveManipulator.FlattenCurve(lineRenderer_simplified);
-        // }  
          
         //then we store it
         StoreDrawnLine(lineRenderer_simplified);
 
         curveManipulator.CreateControlPoints(lineObjectSimplified, ControlPointMaterial, periodic);
 
-    }
-
-    void CreatePlanks()
-    {
-        float[] plankLengths = meshGenerator.stock.priorityLengths;
-        string[] planknames = meshGenerator.stock.priority;
-
-
-        foreach (Transform child in currentDrawingParent.transform)
-        {
-            if (child.name != "pins" && child.gameObject.name != "BoundingBox(Clone)")
-            {
-                GameObject bPlanks = child.gameObject.FindObject("bendedPlanks");
-                if (bPlanks != null)
-                {
-                    bPlanks.DestroyGameObjectAndChildren("all",true);
-                }
-                GameObject bendedPlanks = new GameObject("bendedPlanks");
-                bendedPlanks.transform.parent = child.transform;
-                // bendedPlanks.transform.localRotation = Quaternion.identity;
-                // bendedPlanks.transform.localScale = Vector3.one;
-
-                CurveManipulator lnManipulator = child.gameObject.GetComponent<CurveManipulator>();
-                LineRenderer lnR = child.gameObject.GetComponent<LineRenderer>();
-                Vector3[] points = new Vector3[lnR.positionCount];
-                lnR.GetPositions(points);
-
-
-                (List<Vector3[]> segmentedPoints, float[] updPlankLengths, List<string> usedNames) = lnManipulator.SegmentCurve(points.ToList(), plankLengths, planknames);
-               plankLengths = updPlankLengths;
-
-                int j =0;
-                foreach (Vector3[] spoints in segmentedPoints)  
-                {
-                    PlankBender plankBender = new PlankBender();
-
-                    string usedname = usedNames[j];
-                    GameObject plank = new GameObject(usedname);
-                    plank.transform.parent = bendedPlanks.transform;
-                    // plank.transform.localRotation = Quaternion.identity;
-                    // plank.transform.localScale = Vector3.one;
-                    
-                    Plank plankToUse = meshGenerator.stock.planks[usedname];
-                    // Generate the plank mesh
-                    Color elColor= new Color(plankToUse.color[0], plankToUse.color[1], plankToUse.color[2], plankToUse.color[3]);
-                    plank = plankBender.GeneratePlankMesh( lnManipulator.projectionPlane.normal, currentDrawingParent.transform.localScale.x, plankToUse.dimensions.width, plankToUse.dimensions.height, spoints, plank, elColor);
-
-                    j++;
-                }
-
-            }
-        }
+        MappingOnCurve mapper = lineObjectSimplified.AddComponent<MappingOnCurve>();
+        mapper.CreateEndPoint( ControlPointMaterial, lineRenderer_simplified.GetPosition(0), true, false);
 
     }
 
-    public void Test()
-    {
-        CreatePlanks();
-    }
 
     public void GenerateNewDrawings(Drawings data)
     {
@@ -426,7 +364,7 @@ public class DrawingController : MonoBehaviour
         }
     }
 
-    void EnableControlPoints(bool enable)
+    public void EnableControlPoints(bool enable)
     {
         // Iterate over each child of currentDrawingParent
         foreach (Transform child in currentDrawingParent.transform)
@@ -440,6 +378,25 @@ public class DrawingController : MonoBehaviour
                 {
                     grandchild.gameObject.GetComponent<Renderer>().enabled = enable;
                     grandchild.gameObject.GetComponent<ObjectManipulator>().enabled = enable;
+                }
+            }
+            }
+        }
+    }
+
+    public void EnableEndPoints(bool enable)
+    {
+        // Iterate over each child of currentDrawingParent
+        foreach (Transform child in currentDrawingParent.transform)
+        {
+            // Check if the child GameObject has the specific tag you are interested in
+            if (child.CompareTag("simplified"))
+            {
+                foreach (Transform grandchild in child.transform)
+            {
+                if (grandchild.name == "StartPoint" || grandchild.name == "EndPoint")
+                {
+                    grandchild.gameObject.GetComponent<Renderer>().enabled = enable;
                 }
             }
             }
@@ -523,7 +480,6 @@ public class DrawingController : MonoBehaviour
         }
 
     }
-
 
     public void CopySelectedLine()
     {
@@ -936,7 +892,6 @@ public class DrawingController : MonoBehaviour
     {
         Destroy(gObject);
     }
-    
     
     void UpdatePositionsInDictionary(string dkey)
     {

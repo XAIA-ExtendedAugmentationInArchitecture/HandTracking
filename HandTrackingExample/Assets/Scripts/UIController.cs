@@ -12,7 +12,6 @@ public class UIController : MonoBehaviour
     public DrawingController drawController;
     public MqttController mqttController;
     public MeshGeneratorFromJson meshGenerator;
-    public BendGeometry benGeo;
     public PressableButton Localize;
     public PressableButton NewDrawing;
     //public PressableButton Undo;
@@ -77,16 +76,34 @@ public class UIController : MonoBehaviour
     public GameObject TableMenu;
 
     public PressableButton InventoryButton;
+    public GameObject SelectGeos;
+    
+    public PressableButton DetailsButton;
     public GameObject Submenu;
-    public PressableButton nextPart;
-    public PressableButton previousPart;
-    public PressableButton DirectionToggle;
-    public Slider bendSlider;
     public PressableButton nextGeo;
     public PressableButton previousGeo;
-    public PressableButton ManipulatorToggle;
+    public PressableButton VisibTimber;
+    public PressableButton nextPair;
+    public PressableButton previousPair;
+    public PressableButton VisibInventory;
+    public PressableButton RotateClockwise;
+    public PressableButton FlipButton;
+    public Slider MoveSlider;
 
-    public PressableButton PriorityMapper;
+    public GameObject arrow;
+
+    private bool endPointsOn = false;
+    private bool detailsOn = false;
+    private List<string[]> totalpairs = new List<string[]>();
+    private  GameObject[] pairObjects = new GameObject[2];
+    private bool isFirstEl = true;
+    private int pairIndex = -1;
+
+    [HideInInspector]  public string detailElement="";
+    [HideInInspector]  public GameObject detailElementObject;
+
+    const float OVERLAP_DISTANCE = 0.30f;
+
     private int ind = 0;
 
     private float[] scales = { 0.5f, 0.2f, 0.1f, 0.05f, 0.02f, 0.01f, 0.004f, 0.002f, 0.001f };
@@ -98,14 +115,95 @@ public class UIController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {   
+        VisibInventory.OnClicked.AddListener(() => {
+            if (meshGenerator?.inventoryParent != null && drawController?.linesParent != null) {
+                ToggleVisibility(meshGenerator.inventoryParent);
+                ToggleVisibility(drawController.linesParent);
+            } else {
+                Debug.LogWarning("Required parent objects are missing");
+            }
+        });
+        VisibTimber.OnClicked.AddListener(() => ToggleVisibility(meshGenerator.inventoryParent));
+        arrow.SetActive(false);
         Submenu.SetActive(false);
-        InventoryButton.OnClicked.AddListener(() =>  ToggleVisibility(Submenu));
-        InventoryButton.OnClicked.AddListener(() => drawController.ActivateStandBy());
+        SelectGeos.SetActive(false);
+        InventoryButton.OnClicked.AddListener(() => {
+            ToggleVisibility(SelectGeos);
+            drawController.EnableControlPoints(false);
+            endPointsOn = !endPointsOn;
+            Debug.Log("Inventory Button Clicked and the end points will be " + endPointsOn);
+            drawController.EnableEndPoints(endPointsOn);
+            drawController.ActivateStandBy();
+        });
+        DetailsButton.OnClicked.AddListener(() => {
+            ToggleVisibility(Submenu);
+            drawController.ActivateStandBy();
+            detailsOn = !detailsOn;
+            if (detailsOn)
+            {
+                CalculatePairs();
+                pairIndex = -1;
+            }
+
+        });
         nextGeo.OnClicked.AddListener(ShowNextGeo);
         previousGeo.OnClicked.AddListener(ShowPreviousGeo);
-        nextPart.OnClicked.AddListener(OnNextPart);
-        previousPart.OnClicked.AddListener(OnPreviousPart);
-        ManipulatorToggle.OnClicked.AddListener(() =>  ToggleObjectManipulator(ManipulatorToggle.IsToggled));
+
+        RotateClockwise.OnClicked.AddListener(() => {
+            var timElement = detailElementObject?.GetComponent<TimberElement>();
+            if (timElement != null)
+            {
+                Debug.LogWarning($"Choco {timElement.rotated} ");
+                timElement.rotated = (timElement.rotated + 90) % 360;
+                Debug.LogWarning($"Choco2 {timElement.rotated} ");
+
+                TransformDetailElement(detailElementObject, isFirstEl);
+            }
+            else
+            {
+                Debug.LogWarning("No TimberElement component found or detail element is null");
+            }
+
+
+        });
+
+        MoveSlider.OnValueUpdated.AddListener((SliderEventData sliderEventData) => {
+            var timElement = detailElementObject?.GetComponent<TimberElement>();
+            if (timElement != null)
+            {
+                // Extract the slider value from sliderEventData
+                float value = sliderEventData.NewValue;
+
+                // Remap the slider value from 0-1 to -0.1-0.1
+                float remappedValue = (value * 0.2f) - 0.1f;
+                timElement.moveDist = remappedValue;
+
+                TransformDetailElement(detailElementObject, isFirstEl);
+            }
+            else
+            {
+                Debug.LogWarning("No TimberElement component found or detail element is null");
+            }
+        });
+
+
+        FlipButton.OnClicked.AddListener(() => {
+            var timElement = detailElementObject?.GetComponent<TimberElement>();
+            if (timElement != null)
+            {
+                Debug.Log($"Chico: {timElement.flipped}");
+                timElement.flipped = !timElement.flipped;
+                Debug.Log($"Chico2: {timElement.flipped}");
+                TransformDetailElement(detailElementObject, isFirstEl);
+            }
+            else
+            {
+                Debug.LogWarning("No TimberElement component found or detail element is null");
+            }
+        });
+
+        nextPair.OnClicked.AddListener(() => ShowPair(1));
+        previousPair.OnClicked.AddListener(() => ShowPair(-1));
 
         TableMenu.SetActive(false);
 
@@ -137,11 +235,14 @@ public class UIController : MonoBehaviour
         PeriodicButton.OnClicked.AddListener(() => TogglePeriodic());
         PeriodicInfo.text = "Open";
 
-        SelectToDelete.OnClicked.AddListener(() => drawController.EnableDeleteLineState());
-        SelectToDelete.OnClicked.AddListener(() => drawController.ActivateStandBy());
-        SelectToDelete.OnClicked.AddListener(() => ToggleVisibility(NextToDelete.gameObject.transform.parent.gameObject));
-        SelectToDelete.OnClicked.AddListener(() => ToggleVisibility(Delete.gameObject.transform.parent.gameObject));
-        SelectToDelete.OnClicked.AddListener(() => ToggleVisibility(CopyLine.gameObject.transform.parent.gameObject));
+        SelectToDelete.OnClicked.AddListener(() => {
+            drawController.EnableDeleteLineState();
+            drawController.ActivateStandBy();
+            ToggleVisibility(NextToDelete.gameObject.transform.parent.gameObject);
+            ToggleVisibility(Delete.gameObject.transform.parent.gameObject); 
+            ToggleVisibility(CopyLine.gameObject.transform.parent.gameObject);
+        });
+
         NextToDelete.OnClicked.AddListener(() => drawController.SelectLine());
         Delete.OnClicked.AddListener(() => drawController.DeleteLine());
         CopyLine.OnClicked.AddListener(() => drawController.CopySelectedLine());
@@ -209,6 +310,30 @@ public class UIController : MonoBehaviour
             else
             {
               ScaleInfo.text = "1:" + Mathf.RoundToInt(1/ scaleValue).ToString();  
+            }
+
+            foreach (Transform child in meshGenerator.locksParent.transform)
+            {
+                GameObject element = child.GetComponent<ElementStateController>().target;
+
+                // 1) Grab world-space bounds from the Renderer
+                Bounds worldBounds = element.GetComponent<Renderer>().bounds;
+                Vector3 worldCenter = worldBounds.center;
+                Vector3 worldSize   = worldBounds.size;
+
+                // 2) Convert them to element-local coordinates
+                Vector3 localCenter = element.transform.InverseTransformPoint(worldCenter);
+                Vector3 localSize   = element.transform.InverseTransformVector(worldSize);
+
+                // 3) Adjust local offset to be "above" the item
+                Vector3 localOffset = new Vector3(
+                    localCenter.x *scaleValue,
+                    (localCenter.y + (localSize.y / 2.0f) + 0.075f) * scaleValue,
+                    localCenter.z *scaleValue
+                );
+
+                // 4) Assign to the lock's Orbital LocalOffset
+                child.GetComponent<Orbital>().LocalOffset = localOffset;
             }
             // ScaleInfo.text = (scaleValue*100).ToString() + "%";
             // ScaleInfo.text = "1:" + Mathf.RoundToInt(1/ scaleValue).ToString();
@@ -340,15 +465,6 @@ public class UIController : MonoBehaviour
         mqttConnectionDialog.SetActive(true);
     }
 
-    void OnNextPart()
-    {
-        benGeo.ChangeIndex(true, bendSlider, DirectionToggle); // Forward navigation
-    }
-
-    void OnPreviousPart()
-    {
-        benGeo.ChangeIndex(false, bendSlider, DirectionToggle); // Backward navigation
-    }
 
     void ShowNextGeo()
     {
@@ -371,75 +487,26 @@ public class UIController : MonoBehaviour
 
     void SetActiveGeo(int index)
     {
-        if ( benGeo!= null)
-        {
-            benGeo.RecolorPlankMeshes();
-        }
+
         // Deactivate all children first
         for (int i = 0; i < meshGenerator.inventoryParent.transform.childCount; i++)
         {
             GameObject child = meshGenerator.inventoryParent.transform.GetChild(i).gameObject;
+            GameObject childlock = meshGenerator.locksParent.FindObject("lock_"+ child.name);
             bool isActive = (i == index);
             child.SetActive(isActive);
+            childlock.SetActive(isActive);
 
-            // Update the BendGeometry reference if this is the active child
-            if (isActive)
+            if (!isActive)
             {
-                // Get the BendGeometry component
-                benGeo = child.GetComponent<BendGeometry>();
-
-                // Ensure benGeo is not null before adding listeners
-                if (benGeo != null)
-                {
-                    // Remove existing listeners to avoid duplication
-                    DirectionToggle.OnClicked.RemoveAllListeners();
-                    bendSlider.OnValueUpdated.RemoveAllListeners();
-
-                    // Add listeners
-                    DirectionToggle.OnClicked.AddListener(() =>
-                    {
-                        bendSlider.Value=0.5f;
-                    });
-
-                    Debug.Log("ABC000 Here");
-                    bendSlider.OnValueUpdated.AddListener(eventData =>
-                    {
-                        benGeo.OnBendSliderChanged(eventData.NewValue); // Extract the NewValue and pass it
-                    });
-
-                }
-                else
-                {
-                    
-                    Debug.LogWarning("BendGeometry component not found on the active child.");
-                }
-            }
-            else
-            {
-                bool isOn = child.GetComponent<BendGeometry>().moved;
+                //Debug.LogError("The child "+ child.name + " is not active");
+                bool isOn = child.GetComponent<TimberElement>().moved;
                 child.SetActive(isOn);
+                childlock.SetActive(isOn);
             }
         }
     }
 
-    void ToggleObjectManipulator(bool enable)
-    {
-        // Iterate through all children of inventoryParent
-        foreach (Transform child in meshGenerator.inventoryParent.transform)
-        {
-            // Try to get the ObjectManipulator component
-            var objectManipulator = child.GetComponent<ObjectManipulator>();
-            var renderer = child.GetComponent<MeshRenderer>();
-            if (objectManipulator != null)
-            {
-                objectManipulator.enabled = enable;
-            }
-            if (renderer != null)
-            {
-                renderer.enabled = !enable;
-            }
-        }
-    }
 
     public void MapElements()
     {
@@ -505,4 +572,208 @@ public class UIController : MonoBehaviour
         drawController.currentDrawingParent.transform.localScale = Vector3.one * scale;
     }
 
+    void  CalculatePairs()
+    {   totalpairs.Clear();
+
+        foreach (Transform child in drawController.currentDrawingParent.transform)
+        {
+            // Check if the child GameObject has the specific tag you are interested in
+            if (child.CompareTag("simplified"))
+            {
+                List<string[]> pairs = child.GetComponent<MappingOnCurve>().GetPairs();
+                if (pairs != null && pairs.Count > 0)
+                {
+                    totalpairs.AddRange(pairs);
+                }
+            }
+        }
+
+        Debug.Log($"Total pairs: {totalpairs.Count} // [{string.Join(", ", totalpairs)}]");
+    }
+
+    public void ShowPair(int direction = 1)
+    {
+        arrow.SetActive(false);
+        meshGenerator.detailsParent.SetActive(true);
+        if (totalpairs.Count == 0) return;
+
+        pairIndex = (pairIndex + 1 * direction) % totalpairs.Count;
+
+        string[] pair = totalpairs[pairIndex];
+
+        Debug.Log($"Here the pairs are [{string.Join(", ", pair)}]");
+
+        // First deactivate all children
+        foreach (Transform child in meshGenerator.detailsParent.transform)
+        {
+            child.gameObject.SetActive(false);
+        }
+
+        pairObjects[0] = meshGenerator.detailsParent.transform.Find(pair[0]).gameObject;
+        pairObjects[1] = meshGenerator.detailsParent.transform.Find(pair[1]).gameObject;
+
+        if (pairObjects[0]==null)
+        {
+            Debug.Log("Disaster0");
+        }
+        else if ( pairObjects[1]==null)
+        {
+            Debug.Log("Disaster1");
+        }
+
+        TransformDetailElement(meshGenerator.inventoryParent.transform.Find(pair[0]).gameObject);
+        TransformDetailElement(meshGenerator.inventoryParent.transform.Find(pair[1]).gameObject, false);
+        
+        pairObjects[0].SetActive(true);
+        pairObjects[1].SetActive(true);
+        
+    }
+
+    public void SetDetailElement()
+    {
+        foreach(Transform child in meshGenerator.inventoryParent.transform)
+        {
+            if (child.name == detailElement)
+            {
+                detailElementObject = child.gameObject;
+
+                if (pairObjects[0].name == detailElement)
+                {
+                    isFirstEl = true;
+                }
+                else if (pairObjects[1].name == detailElement)
+                {
+                    isFirstEl = false;
+                }
+                MoveSlider.Value = (detailElementObject.GetComponent<TimberElement>().moveDist + 0.1f) / 0.2f;
+                Debug.Log($"The selected object is: {child.name} and it is first: {isFirstEl}");
+                return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Transforms a detail element's position and rotation based on its properties
+    /// </summary>
+    /// <param name="isFirstElement">Whether this is the first element in a pair</param>
+    private void TransformDetailElement(GameObject originalObject, bool isFirstElement = true)
+    {
+
+        if (originalObject == null)
+        {
+            Debug.LogWarning($"TransformDetailElement: Original Object is null");
+            
+            return;
+        }
+
+        GameObject targetObject = meshGenerator.detailsParent.FindObject(originalObject.name);
+        // Find corresponding timber element
+
+        if (targetObject == null)
+        {
+            Debug.LogWarning($"TransformDetailElement: Target object is null");
+            return;
+        }
+
+        // Get element properties
+        var elementProperties = originalObject.GetComponent<TimberElement>();
+        if (elementProperties == null)
+        {
+            Debug.LogError($"TransformDetailElement: Missing TimberElement component on {originalObject.name}");
+            return;
+        }
+
+        float moveDist = elementProperties.moveDist;
+        bool isFlipped = elementProperties.flipped;
+        int rotation = elementProperties.rotated;
+
+        //Debug.Log($"Choco The object is: {originalObject.name} and it is the first element: {isFirstElement} and it is flipped: {isFlipped} and rotation in Z is {targetObject.transform.rotation.eulerAngles.z} and movedist is {moveDist} ");
+
+        // Calculate bounds
+        var renderer = targetObject.GetComponent<Renderer>();
+        if (renderer == null)
+        {
+            Debug.LogError($"TransformDetailElement: Missing Renderer on {targetObject.name}");
+            return;
+        }
+
+        Bounds worldBounds = renderer.bounds;
+        float localSize = elementProperties.length;
+
+        // Calculate new position and rotation
+        Vector3 newPosition = targetObject.transform.position;
+        Vector3 newRotation = targetObject.transform.rotation.eulerAngles;
+
+        // Base position offset accounting for element size and overlap
+        float baseOffset = OVERLAP_DISTANCE / 2f;
+        float sizeOffset = isFlipped ? 0 : -localSize;
+
+        // Calculate x position based on element order and properties
+        newPosition.x = isFirstElement ?
+            sizeOffset + moveDist + baseOffset :
+            (isFlipped ? localSize : 0) + moveDist - baseOffset;
+
+        
+        Debug.LogWarning($"Choco {rotation} ");
+        newRotation.x = rotation;
+
+        if (! isFirstElement)
+        {
+            newPosition.z = 0.15f;
+        }
+        else
+        {
+            newPosition.z = 0.0f;
+        }
+
+        if (isFlipped)
+        {
+            newRotation.z = 180;
+            Debug.LogWarning($"Choco222");
+        }
+        else
+        {
+            newRotation.z = 0;
+            Debug.LogWarning($"Choco11");
+        }
+
+
+        // Apply transformation
+        targetObject.transform.position = newPosition;
+        targetObject.transform.rotation = Quaternion.Euler(rotation, 0, newRotation.z );
+
+        Debug.Log($"Choco2 The object is: {originalObject.name} and it is the first element: {isFirstElement} and it is flipped: {isFlipped}  and rotation in z is {targetObject.transform.rotation.eulerAngles.z} and the rotation in x is {targetObject.transform.rotation.eulerAngles.x} and movedist is {moveDist} ");
+        //Debug.LogWarning($"Choco2 {newRotation.x} ");
+    }
 }
+
+
+//  // Handle rotation first
+//         newRotation.x = rotation;
+
+//         if (!isFirstElement)
+//         {
+//             newPosition.z = 0.15f;
+//         }
+//         else
+//         {
+//             newPosition.z = 0.0f;
+//         }
+
+//         // Handle flip state independently of rotation
+//         if (isFlipped)
+//         {
+//             // Only apply 180 degree flip if not already rotated
+//             newRotation.z = (rotation == 0 || rotation == 180) ? 180 : rotation;
+//         }
+//         else
+//         {
+//             newRotation.z = rotation;
+//         }
+
+//         // Apply transformation
+//         targetObject.transform.position = newPosition;
+//         targetObject.transform.rotation = Quaternion.Euler(newRotation);
+
+//         Debug.Log($"Object: {originalObject.name}, First: {isFirstElement}, Flipped: {isFlipped}, Rotation Z: {newRotation.z}, MoveDist: {moveDist}");
+//         Debug.LogWarning($"Rotation X: {newRotation.x}");

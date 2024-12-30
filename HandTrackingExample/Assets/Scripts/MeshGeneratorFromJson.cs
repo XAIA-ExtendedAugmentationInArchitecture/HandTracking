@@ -32,7 +32,8 @@ public class MeshGeneratorFromJson : MonoBehaviour
     private GameObject element;
     private float alphaValue = 0.20f;
 
-    public GameObject inventoryParent;
+    [HideInInspector] public GameObject inventoryParent;
+    [HideInInspector] public GameObject detailsParent;
     public Material[] materials;
     public Inventory inventory;
     private string folderpath =""; // "C:\\Users\\eleni\\Documents\\GitHub\\IntuitiveRobotics-AugmentedTechnologies\\HandTracking\\data\\" ;
@@ -42,7 +43,7 @@ public class MeshGeneratorFromJson : MonoBehaviour
     {   
         elementsParent = new GameObject("Elements");
         locksParent = new GameObject("Locks");
-        locksParent.SetActive(false);
+        locksParent.SetActive(true);
         elementsParent.SetActive(false);
 
         string dataFolderPath =Application.dataPath; // Constructing the path dynamically 
@@ -64,6 +65,11 @@ public class MeshGeneratorFromJson : MonoBehaviour
 
         LoadInventoryFromJson(library);
 
+        detailsParent = Instantiate(inventoryParent);
+        detailsParent.name = "DetailedView";
+        CorrectDetailed();
+
+        detailsParent.SetActive(false);
     }
 
     void LoadInventoryFromJson(string path) 
@@ -86,7 +92,8 @@ public class MeshGeneratorFromJson : MonoBehaviour
                 inventory.members[match.Value] = meshReader.memberData; 
                 GenerateMember(meshReader.memberData, match.Value, inventoryParent);
             }
-        }	
+        }
+
 	}
 	
 	void LoadFromJson(string path) 
@@ -230,36 +237,112 @@ public class MeshGeneratorFromJson : MonoBehaviour
                 break; 
             }
         }
+        element.AddComponent<MeshCollider>();
 
-        BendGeometry bentGeo = element.AddComponent<BendGeometry>();
-        bentGeo.types = memberData.types;
-        bentGeo.parts = memberData.parts;
-        bentGeo.width = memberData.dimensions.length;
-        bentGeo.height = memberData.dimensions.height;
-        bentGeo.initialGeo = memberData.Vector3Parts();
-        //bentGeo.CreatConnections();
-        bentGeo.InitializeValues();
-        bentGeo.InitializeColors();
-        bentGeo.InitializePlankMeshes();
+        TimberElement timberEl = element.AddComponent<TimberElement>();
+        timberEl.types = memberData.types;
+        timberEl.width = memberData.dimensions.length;
+        timberEl.height = memberData.dimensions.height;
+        timberEl.length = memberData.dimensions.width;
+        timberEl.segments = memberData.Vector3Parts();
+        timberEl.MarkDefects();
 
-        //element.AddComponent<MeshCollider>();
-        ObjectManipulator objMan= element.AddComponent<ObjectManipulator>();
-        objMan.AllowedManipulations = TransformFlags.Move | TransformFlags.Rotate;
-        objMan.AllowedInteractionTypes = InteractionFlags.Near | InteractionFlags.Ray | InteractionFlags.Generic; 
 
-        objMan.selectEntered.AddListener((SelectEnterEventArgs args) =>
-        {
-            if (!bentGeo.moved)
-            {
-                bentGeo.moved = true;
-                Debug.Log("Object moved for the first time!");
+        var interactable =element.AddComponent<StatefulInteractable>();
+        interactable.ToggleMode = StatefulInteractable.ToggleType.Toggle;
+        interactable.OnToggled.AddListener(() => drawController.StartDrawing());
+        interactable.OnUntoggled.AddListener(() => drawController.StopDrawing());
 
-                objMan.selectEntered.RemoveAllListeners();
-            }
-        });
 
-        objMan.enabled = false;
+        GameObject lockInstance = Instantiate(padlocks);
+
+
+        //Grab world-space bounds from the Renderer
+        Bounds worldBounds = element.GetComponent<Renderer>().bounds;
+        Vector3 worldCenter = worldBounds.center;
+        Vector3 worldSize   = worldBounds.size;
+
+        // Convert them to element-local coordinates
+        Vector3 localCenter = element.transform.InverseTransformPoint(worldCenter);
+        Vector3 localSize   = element.transform.InverseTransformVector(worldSize);
+
+        // Adjust local offset to be "above" the item
+        Vector3 localOffset = new Vector3(
+            localCenter.x,
+            localCenter.y + (localSize.y / 2.0f) + 0.075f,
+            localCenter.z
+        );
+
+        // 4) Assign to the lock's Orbital LocalOffset
+        lockInstance.GetComponent<Orbital>().LocalOffset = localOffset;
+
+        lockInstance.name ="lock_" + element.name;
+        lockInstance.transform.parent = locksParent.transform;
+        SolverHandler lockSolver = lockInstance.GetComponent<SolverHandler>();
+        lockSolver.TrackedTargetType = TrackedObjectType.CustomOverride;
+        lockSolver.TransformOverride = element.transform;
+        lockInstance.GetComponent<ElementStateController>().target = element;
+
+        element.transform.localPosition = Vector3.zero;
+        element.transform.localRotation = Quaternion.identity;
+
+        lockInstance.SetActive(false);
         element.SetActive(false); 
 	}
+
+    void CorrectDetailed()
+    {
+        foreach (Transform child in detailsParent.transform)
+        {
+            var interactable =child.GetComponent<StatefulInteractable>();
+            var timberEl =child.GetComponent<TimberElement>();
+            if (interactable != null)
+            {
+                Destroy(interactable);
+            }
+            if (timberEl!= null)
+            {
+                Destroy(timberEl);
+            }
+
+            interactable =child.AddComponent<StatefulInteractable>();
+            interactable.ToggleMode = StatefulInteractable.ToggleType.Button;
+            
+            UIController uiController = GameObject.Find("UIController").GetComponent<UIController>();
+            interactable.OnClicked.AddListener(() => 
+            {
+                uiController.arrow.SetActive(true);
+                uiController.detailElement= child.name;
+                uiController.SetDetailElement();
+
+                GameObject elementToTrack = child.gameObject;
+
+                Bounds worldBounds = elementToTrack.GetComponent<Renderer>().bounds;
+                Vector3 worldCenter = worldBounds.center;
+                Vector3 worldSize   = worldBounds.size;
+
+                // Convert them to element-local coordinates
+                Vector3 localCenter = elementToTrack.transform.InverseTransformPoint(worldCenter);
+                Vector3 localSize   = elementToTrack.transform.InverseTransformVector(worldSize);
+
+                // Adjust local offset to be "above" the item
+                Vector3 localOffset = new Vector3(
+                    localCenter.x,
+                    localCenter.y + (localSize.y / 2.0f) + 0.075f,
+                    localCenter.z
+                );
+
+                // 4) Assign to the lock's Orbital LocalOffset
+                var arrowOrbital = uiController.arrow.GetComponent<Orbital>();
+                arrowOrbital.LocalOffset = localOffset;
+
+                var Arsolver = uiController.arrow.GetComponent<SolverHandler>();
+                Arsolver.TrackedTargetType = TrackedObjectType.CustomOverride;
+                Arsolver.TransformOverride = elementToTrack.transform;
+            });
+
+
+        }
+    }
 
 }

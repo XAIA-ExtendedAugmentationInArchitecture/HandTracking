@@ -21,10 +21,8 @@ public class CurveManipulator : MonoBehaviour
     
 {
     [HideInInspector] public LineRenderer lineRenderer;  // Reference to the original LineRenderer component
-    public List<float> plankLengths; // List of segment lengths
     public Material lineMaterial;      // Material for the new LineRenderers
     public float lineWidth = 0.25f;     // Width of the new line segments
-    public Plane projectionPlane ;
 
     private CurveControlPoint[] controlPoints = new CurveControlPoint[0];
     [HideInInspector] public Vector3[] controlPositions = new Vector3[0];
@@ -34,11 +32,6 @@ public class CurveManipulator : MonoBehaviour
     [HideInInspector] public float smoothSegSize = 0.2f;
     private float ctrlPtSize = 0.06f;
     private bool isPeriodic = false;
-
-    private void Start()
-    {
-
-    }
 
     public void Update () 
 	{
@@ -114,13 +107,10 @@ public class CurveManipulator : MonoBehaviour
         simplifiedCurveRenderer.Simplify(simplifyingFactor);
         }
 
-        Debug.Log("Hoiii2 " + isPeriodic );
         simplifiedCurveRenderer.loop = isPeriodic;
         return simplifiedCurve;
         
     }
-
-
 
     public (List<Vector3[]> segmentedPoints, float[] updatedSegmentLengths, List<string> usedNames) SegmentCurve(
         List<Vector3> points, float[] segmentLengths, string[] segmentNames)   
@@ -190,57 +180,6 @@ public class CurveManipulator : MonoBehaviour
     }
 
 
-    public LineRenderer FlattenCurve(LineRenderer lnRenderer)
-    {
-        Vector3[] initialPositions = new Vector3[lnRenderer.positionCount];
-        lnRenderer.GetPositions(initialPositions);
-        if (initialPositions.Length > 0)
-        {
-            Vector3[] flattenPositions = ProjectCurveOnPlane(initialPositions);
-            lnRenderer.SetPositions(flattenPositions);
-        }
-    
-        return lnRenderer;
-    }
-
-    public Vector3[] ProjectCurveOnPlane(Vector3[] points)
-    {
-        // 1. Get the first point, last point, and calculate the mean of all other points
-        Vector3 firstPoint = points[0];
-        Vector3 lastPoint = points[points.Length - 1];
-        Vector3 meanPoint = CalculateMean(points);
-
-        // 2. Define the plane using the first, last, and mean points
-        projectionPlane = new Plane(firstPoint, lastPoint, meanPoint);
-
-        // 3. Project each point onto the plane
-        Vector3[] projectedPoints = new Vector3[points.Length];
-        for (int i = 0; i < points.Length; i++)
-        {
-            projectedPoints[i] = ProjectPointOnPlane(projectionPlane, points[i]);
-        }
-
-        return projectedPoints;
-    }
-
-    private Vector3 CalculateMean(Vector3[] points)
-    {
-        Vector3 sum = Vector3.zero;
-        for (int i = 1; i < points.Length - 1; i++) // Exclude first and last point
-        {
-            sum += points[i];
-        }
-        return sum / (points.Length - 2); // Mean of the intermediate points
-    }
-
-    private Vector3 ProjectPointOnPlane(Plane plane, Vector3 point)
-    {
-        // Calculate the distance from the point to the plane
-        float distance = plane.GetDistanceToPoint(point);
-
-        // Project the point onto the plane by moving it along the normal by the distance
-        return point - plane.normal * distance;
-    }
 
     float CalculateTotalLength(Vector3[] points)
     {
@@ -339,7 +278,6 @@ public class CurveManipulator : MonoBehaviour
 		}
 	}
 
-
   
     public static Vector3[] GetInterpolatedPoints(Vector3[] controlPointsList, float resolution, bool isPeriodic)
     {
@@ -382,7 +320,6 @@ public class CurveManipulator : MonoBehaviour
                 Vector3 newPos = GetCatmullRomPosition(t, p0, p1, p2, p3);
                 if (interpolatedPoints.Count == 0 || interpolatedPoints[interpolatedPoints.Count - 1] != newPos)
                 {
-                    Debug.Log("Hoolla2 ");
                     interpolatedPoints.Add(newPos);
                 }
             }
@@ -392,25 +329,6 @@ public class CurveManipulator : MonoBehaviour
     }
 
 
-
-    // Clamp the list positions to allow looping
-    private static int ClampListPos(int pos, int max)
-    {
-        if (pos < 0)
-        {
-            pos = max - 1;
-        }
-        if (pos > max)
-		{
-			pos = 1;
-		}
-		else if (pos > max - 1)
-		{
-			pos = 0;
-		}
-
-        return pos;
-    }
 
     // Returns a position between 4 Vector3 with Catmull-Rom spline algorithm
     // http://www.iquilezles.org/www/articles/minispline/minispline.htm
