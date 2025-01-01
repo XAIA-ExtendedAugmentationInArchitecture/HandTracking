@@ -68,6 +68,8 @@ public class UIController : MonoBehaviour
     public GameObject PickTeam;
 
     public GameObject StartDialog;
+
+    public GameObject StPointDialog;
     public GameObject HandMenu;
 
     public TextMeshPro DrawingText;
@@ -90,12 +92,20 @@ public class UIController : MonoBehaviour
     public PressableButton FlipButton;
     public Slider MoveSlider;
 
+    public PressableButton AdjStPt;
+    public GameObject SliderGameObj;
+    public Slider SliderStPt;
+    public PressableButton AcceptStPoint;
+    public PressableButton PauseDrawing;
+
     public GameObject arrow;
 
     private bool endPointsOn = false;
     private bool detailsOn = false;
     private List<string[]> totalpairs = new List<string[]>();
     private  GameObject[] pairObjects = new GameObject[2];
+
+    private  List<GameObject> startingPoints = new List<GameObject>();
     private bool isFirstEl = true;
     private int pairIndex = -1;
 
@@ -106,7 +116,7 @@ public class UIController : MonoBehaviour
 
     private int ind = 0;
 
-    private float[] scales = { 0.5f, 0.2f, 0.1f, 0.05f, 0.02f, 0.01f, 0.004f, 0.002f, 0.001f };
+    private float[] scales = {0.5f, 0.2f, 0.1f, 0.05f, 0.02f, 0.01f, 0.004f, 0.002f, 0.001f };
     private int currentScaleIndex = 0;
 
     private Dictionary<string, List<(List<(string pointName, bool direction, List<List<float>> intervals)>, float parameter)>> priority;
@@ -115,6 +125,108 @@ public class UIController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {   
+        PauseDrawing.OnClicked.AddListener(() => drawController.ActivateStandBy());
+        StPointDialog.SetActive(false);
+        AcceptStPoint.gameObject.transform.parent.gameObject.SetActive(false);
+
+        AcceptStPoint.OnClicked.AddListener(()=> {
+            GameObject stPoint = drawController.GetComponent<OrderController>().selectedStPoint;
+            if (stPoint != null)
+            {
+                float value = SliderStPt.Value;
+                var mappingCurve = stPoint.transform.parent.GetComponent<MappingOnCurve>();
+                
+                mappingCurve.parameter = value;
+                mappingCurve.ShiftStPosition(value);
+
+                foreach (var pt in mappingCurve.endPts)
+                {
+                    Destroy(pt);
+                }
+
+                foreach (var pt in mappingCurve.stPts)
+                {
+                    Destroy(pt);
+                }
+
+                mappingCurve.endPts.Clear();
+                mappingCurve.stPts.Clear();
+
+                // Create new points
+                var lineRenderer = mappingCurve.GetComponent<LineRenderer>();
+                mappingCurve.CreateEndPoint(drawController.ControlPointMaterial, lineRenderer.GetPosition(0));
+                mappingCurve.UpdateEndPoints();
+                mappingCurve.SnapElements();
+
+            }
+            else
+            {
+                SetupstPointDialog();
+            }
+            
+        });
+
+        AdjStPt.OnClicked.AddListener(() => {
+
+            //drawController.ActivateStandBy();
+            ToggleVisibility(SliderGameObj);
+            ToggleVisibility(AcceptStPoint.gameObject.transform.parent.gameObject);
+
+            if (startingPoints != null)
+            {
+                foreach (GameObject point in startingPoints)
+                {
+                    if (point != null)
+                    {
+                    Destroy(point);
+                    }
+                }
+            startingPoints.Clear();
+            }
+
+            Destroy(drawController.GetComponent<OrderController>().selectedStPoint);
+
+            if ( SliderGameObj.activeSelf==false)
+            {
+                return;
+            }
+
+            foreach (Transform child in drawController.currentDrawingParent.transform)
+            {
+                // Check if the child has a LineRenderer component
+                LineRenderer lineRenderer = child.GetComponent<LineRenderer>();
+                if (lineRenderer != null && lineRenderer.loop)
+                {
+                    // Get the MappingOnCurve component
+                    MappingOnCurve mappingOnCurve = child.GetComponent<MappingOnCurve>();
+                    if (mappingOnCurve != null && mappingOnCurve.stPoint == null)
+                    {
+                        // Create the starting point using the material and the first position of the LineRenderer
+                        mappingOnCurve.CreateStPoint(drawController.ControlPointMaterial, lineRenderer.GetPosition(0));
+                        
+                        // Append the starting point to the list
+                        startingPoints.Add(mappingOnCurve.stPoint);
+                    }
+                }
+            }     
+        });
+
+        SliderGameObj.SetActive(false);
+
+        SliderStPt.OnValueUpdated.AddListener((SliderEventData sliderEventData) => {
+            GameObject stPoint = drawController.GetComponent<OrderController>().selectedStPoint;
+            if (stPoint != null)
+            {
+                float value = sliderEventData.NewValue;
+                stPoint.transform.parent.GetComponent<MappingOnCurve>().UpdateStPosition(value);
+            }
+            else
+            {
+                SetupstPointDialog();
+            }
+            
+        });
+
         VisibInventory.OnClicked.AddListener(() => {
             if (meshGenerator?.inventoryParent != null && drawController?.linesParent != null) {
                 ToggleVisibility(meshGenerator.inventoryParent);
@@ -123,6 +235,7 @@ public class UIController : MonoBehaviour
                 Debug.LogWarning("Required parent objects are missing");
             }
         });
+
         VisibTimber.OnClicked.AddListener(() => ToggleVisibility(meshGenerator.inventoryParent));
         arrow.SetActive(false);
         Submenu.SetActive(false);
@@ -133,11 +246,11 @@ public class UIController : MonoBehaviour
             endPointsOn = !endPointsOn;
             Debug.Log("Inventory Button Clicked and the end points will be " + endPointsOn);
             drawController.EnableEndPoints(endPointsOn);
-            drawController.ActivateStandBy();
+            //drawController.ActivateStandBy();
         });
         DetailsButton.OnClicked.AddListener(() => {
             ToggleVisibility(Submenu);
-            drawController.ActivateStandBy();
+            //drawController.ActivateStandBy();
             detailsOn = !detailsOn;
             if (detailsOn)
             {
@@ -227,7 +340,7 @@ public class UIController : MonoBehaviour
 
         SendPriority.OnClicked.AddListener(() =>
         {
-            mqttPriorityDialogBody.text = "Do you want to send the mapping to Rhino?";
+            mqttPriorityDialogBody.text = "Do you want to send the Mapping to Rhino?";
             SetupSendPriorityDialog();
         });  
 
@@ -237,7 +350,7 @@ public class UIController : MonoBehaviour
 
         SelectToDelete.OnClicked.AddListener(() => {
             drawController.EnableDeleteLineState();
-            drawController.ActivateStandBy();
+            //drawController.ActivateStandBy();
             ToggleVisibility(NextToDelete.gameObject.transform.parent.gameObject);
             ToggleVisibility(Delete.gameObject.transform.parent.gameObject); 
             ToggleVisibility(CopyLine.gameObject.transform.parent.gameObject);
@@ -252,7 +365,7 @@ public class UIController : MonoBehaviour
         ScaleParent.SetActive(false);
         ScaleButton.OnClicked.AddListener(() => ScaleParent.SetActive(!ScaleParent.activeSelf));
         ScaleButton.OnClicked.AddListener(() => drawController.ToggleScale());
-        ScaleButton.OnClicked.AddListener(() => drawController.ActivateStandBy());
+        //ScaleButton.OnClicked.AddListener(() => drawController.ActivateStandBy());
         RealScaleButton.OnClicked.AddListener(() => drawController.currentDrawingParent.transform.localScale = Vector3.one);
         RealScaleButton.OnClicked.AddListener(() =>  meshGenerator.inventoryParent.transform.localScale = Vector3.one);
         
@@ -362,6 +475,16 @@ public class UIController : MonoBehaviour
         dialog.SetNegative("No", args => Debug.Log("Rejected"));
 
         mqttSendDialog.SetActive(true);
+    }
+
+    void SetupstPointDialog()
+    {
+        var dialog = StPointDialog.GetComponent<Dialog>();
+        dialog.Reset();
+
+        StPointDialog.GetComponent<Dialog>().SetNeutral("OK", args =>  Debug.Log("OK"));
+
+        StPointDialog.SetActive(true);
     }
 
     void SetupSendPriorityDialog()

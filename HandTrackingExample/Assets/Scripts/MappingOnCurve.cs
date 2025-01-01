@@ -30,6 +30,9 @@ public class MappingOnCurve : MonoBehaviour
     [HideInInspector] public List<GameObject> stPts = new List<GameObject>(); //the starting points for all the timber elements that are snapped into this curve
     [HideInInspector] public List<GameObject> endPts = new List<GameObject>(); //the end points for all the timber elements that are snapped into this curve
 
+    [HideInInspector] public GameObject stPoint;
+    [HideInInspector] public float parameter = 0.0f;
+    
     private List<float> lengths = new List<float>();
     private List<string> names = new List<string>();
 
@@ -74,7 +77,6 @@ public class MappingOnCurve : MonoBehaviour
         if (index != -1) // Check if the name exists in the list
         {
             Debug.Log($"Element with name {name} found at index {index}.");
-            Debug.Log($"Bazinga8: \nNames: [{string.Join(", ", names)}]\nLengths: [{string.Join(", ", lengths)}]\nEnd Points: [{string.Join(", ", endPts.Select(p => p.name))}]\nStart Points: [{string.Join(", ", stPts.Select(p => p.name))}]");
 
             names.RemoveAt(index); 
             lengths.RemoveAt(index);
@@ -126,7 +128,6 @@ public class MappingOnCurve : MonoBehaviour
     private void AddEndPoints( List<float> lengths)
     {
         // Calculate the cumulative length
-         
 
         float cumulativeLength = 0f;
 
@@ -215,17 +216,13 @@ public class MappingOnCurve : MonoBehaviour
         }
     }
 
-    public void SnapElementOnCurve(GameObject element)
+    public void SnapElementOnCurve(GameObject element, Vector3 snapPoint)
     {
         if (stPts.Count == 0)
         {
             Debug.LogWarning("No start points available to snap the element!");
             return;
         }
-
-        // Get the last point in the stPts list
-        GameObject lastStartPoint = stPts.Last();
-        Vector3 lastStartPosition = lastStartPoint.transform.position;
 
         // Get the LineRenderer component
         LineRenderer lineRenderer = GetComponent<LineRenderer>();
@@ -236,7 +233,7 @@ public class MappingOnCurve : MonoBehaviour
         }
 
         // Calculate the tangent (direction) of the curve at the last point
-        Vector3 tangent = GetTangentAtPoint(lastStartPosition);
+        Vector3 tangent = GetTangentAtPoint(snapPoint);
         if (tangent == Vector3.zero)
         {
             Debug.LogError("Failed to calculate tangent at the last start point!");
@@ -257,15 +254,34 @@ public class MappingOnCurve : MonoBehaviour
 
         // Position the element's start point to match the last start point
         Vector3 offset = elementStart - element.transform.position;
-        element.transform.position = lastStartPosition - offset;
+        element.transform.position = snapPoint - offset;
 
         // Calculate rotation from element's direction to curve's tangent
         Quaternion fromToRotation = Quaternion.FromToRotation(elementDirection, tangent);
         element.transform.rotation = fromToRotation * element.transform.rotation;
 
-        Debug.Log($"Snapped element '{element.name}' to curve at position {lastStartPosition} with tangent {tangent} and with length {timberElement.length}.");
+        Debug.Log($"Snapped element '{element.name}' to curve at position {snapPoint} with tangent {tangent} and with length {timberElement.length}.");
     }
 
+    public void SnapElements ()
+    {
+        MeshGeneratorFromJson meshGenerator = GameObject.Find("MeshGenerator").GetComponent<MeshGeneratorFromJson>();
+        GameObject inventoryParent = meshGenerator.inventoryParent;
+        
+        int i =0;
+        foreach(string name in names)
+        {
+            GameObject element = inventoryParent.FindObject(name);
+            if (element != null)
+            {
+                Vector3 snapPoint = stPts[i].transform.position;
+                SnapElementOnCurve(element, snapPoint);
+            
+            }
+            i++;
+        }
+    }
+    
     // Helper method to calculate the tangent at a given point on the LineRenderer
     private Vector3 GetTangentAtPoint(Vector3 position)
     {
@@ -319,39 +335,92 @@ public class MappingOnCurve : MonoBehaviour
 
         return pairs;
     }
+
+    public void CreateStPoint(Material material, Vector3 position)
+    {
+        if (mat == null)
+        {
+            mat = material;
+        }
+        
+        stPoint = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        stPoint.transform.parent = this.gameObject.transform;
+        stPoint.transform.position = position + this.gameObject.transform.position;
+        stPoint.transform.localScale = new Vector3(ctrlPtSize*2, ctrlPtSize*2 , ctrlPtSize*2);
+        stPoint.GetComponent<Renderer>().material = material;
+        stPoint.name = "StartPoint0";
+        stPoint.GetComponent<Renderer>().material.color = new Color(Color.magenta.r, Color.magenta.g, Color.magenta.b, 0.3f);
+    
+
+        StatefulInteractable interactable = stPoint.AddComponent<StatefulInteractable>();
+        interactable.ToggleMode = StatefulInteractable.ToggleType.Button;
+
+        OrderController orderCon = GameObject.Find("DrawingController").GetComponent<OrderController>();
+        interactable.OnClicked.AddListener(() => 
+        {
+            stPoint.GetComponent<Renderer>().material.color = new Color(Color.blue.r, Color.blue.g, Color.blue.b, 0.3f);
+            
+            if (orderCon.selectedStPoint != null)
+            {
+                orderCon.selectedStPoint.GetComponent<Renderer>().material.color = new Color(Color.magenta.r, Color.magenta.g, Color.magenta.b, 0.3f);
+            }
+            orderCon.selectedStPoint = stPoint;
+        });
+            
+    }
+
+    public void UpdateStPosition(float value)
+    {
+        // Get the LineRenderer component
+        LineRenderer lineRenderer = GetComponent<LineRenderer>();
+
+        // Get the number of positions in the LineRenderer
+        int numPoints = lineRenderer.positionCount;
+
+        // Calculate the target position based on the slider value
+        int targetIndex = Mathf.RoundToInt(value * (numPoints - 1));
+
+        Debug.Log($"Whobooboo: {value} {numPoints} {targetIndex}");
+        Vector3 targetPosition = lineRenderer.GetPosition(targetIndex);
+
+        // Update the sphere's position to the target position
+        stPoint.transform.position = targetPosition + this.gameObject.transform.position;
+    }
+
+     public void ShiftStPosition(float value)
+    {
+        // Get the LineRenderer component
+        LineRenderer lineRenderer = GetComponent<LineRenderer>();
+
+        // Get the number of positions in the LineRenderer
+        int numPoints = lineRenderer.positionCount;
+
+        // Calculate the target position based on the slider value
+        int targetIndex = Mathf.RoundToInt(value * (numPoints - 1));
+        Vector3 targetPosition = lineRenderer.GetPosition(targetIndex);
+
+        Vector3[] positions = new Vector3[numPoints];
+
+        lineRenderer.GetPositions(positions);
+
+        // Shift the positions array to make the targetIndex position the first
+        List<Vector3> shiftedPositions = new List<Vector3>();
+
+        // Add positions starting from the targetIndex to the end
+        for (int i = targetIndex; i < numPoints; i++)
+        {
+            shiftedPositions.Add(positions[i]);
+        }
+
+        // Add positions from the start to the targetIndex
+        for (int i = 0; i < targetIndex; i++)
+        {
+            shiftedPositions.Add(positions[i]);
+        }
+
+        // Update the LineRenderer with the shifted positions
+        lineRenderer.positionCount = shiftedPositions.Count;
+        lineRenderer.SetPositions(shiftedPositions.ToArray());
+    }
 }
 
-
-// public void RemoveTimberElement (string name)
-//     {
-//         int index = names.IndexOf(name);
-
-//         if (index != -1) // Check if the name exists in the list
-//         {
-//             Debug.Log($"Element with name {name} found at index {index}.");
-//             Debug.Log($"Bazinga8 {names} // {lengths} // {endPts} // {stPts}.");
-
-//             names.RemoveAt(index); 
-//             lengths.RemoveAt(index);
-
-//             Destroy(endPts[index]);
-//             endPts.RemoveAt(index);
-
-            
-//             if (done)
-//             {
-//                 done = false;
-//             } 
-//             else
-//             {
-//                 Destroy(stPts[index+1]);
-//                 stPts.RemoveAt(index+1); // it always has an extra start point in the beginning
-//             }
-//         }
-//         else
-//         {
-//             Debug.LogWarning($"Element with name {name} not found in the names list.");
-//         }
-
-//         Debug.Log($"Bazinga9 {names} // {lengths} // {endPts} // {stPts}.");
-//     }

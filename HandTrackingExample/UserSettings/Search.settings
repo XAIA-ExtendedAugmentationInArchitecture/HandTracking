@@ -8,7 +8,7 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
-	"last_search.5A656512" = "ref=\"Assets/Scripts/DirectInputAirTapDisplayer.cs\""
+	"last_search.5A656512" = "ref=\"/StartInfoDialog\""
 	"OpenInspectorPreview.5A656512" = "0"
 	"currentGroup.5A656512" = "all"
 }

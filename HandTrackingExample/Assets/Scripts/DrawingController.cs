@@ -620,10 +620,24 @@ public class DrawingController : MonoBehaviour
         }
 
         uIController.DrawingText.text = "Drawing No: " + DrawingIndex.ToString() + "    |";
+        float scale = 1f; // Default scale
+        // Validate currentDrawingParent and its scale
+        if (currentDrawingParent != null)
+        {
+            float currentScale = currentDrawingParent.transform.localScale.x;
+
+            // Check if the scale is valid (not zero, not NaN, or invalid)
+            if (currentScale > 0f && !float.IsNaN(currentScale))
+            {
+                scale = currentScale;
+            }
+        }
         currentDrawingParent = new GameObject("drawing" + DrawingIndex);
         GameObject pinPoints = new GameObject("pins");
         pinPoints.transform.parent = currentDrawingParent.transform;
         currentDrawingParent.transform.parent = linesParent.transform;
+
+        currentDrawingParent.transform.localScale = Vector3.one *scale;
 
         string dkey = "drawing" + DrawingIndex.ToString();
 

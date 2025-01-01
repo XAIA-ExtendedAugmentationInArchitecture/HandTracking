@@ -12,6 +12,8 @@ public class OrderController : MonoBehaviour
     private DrawingController drawController;
     private const float proximityThreshold = 0.25f;
 
+    [HideInInspector] public GameObject selectedStPoint;
+
    public void CheckProximityToCurves(GameObject selectedObj)
     {
         drawController = GameObject.Find("DrawingController").GetComponent<DrawingController>();
@@ -43,7 +45,7 @@ public class OrderController : MonoBehaviour
                     {
                         Debug.Log($"Selected object {selectedObj.name} is within {proximityThreshold}m under the scale of {scale} on {curveChild.name}.");
                         
-                        mappingOnCurve.SnapElementOnCurve(selectedObj);
+                        mappingOnCurve.SnapElementOnCurve(selectedObj, snapPoint);
                         float length = selectedObj.GetComponent<TimberElement>().length;
                         mappingOnCurve.AppendTimberElement(selectedObj.name, length, scale);
                         
