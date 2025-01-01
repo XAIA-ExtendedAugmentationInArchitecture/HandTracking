@@ -991,14 +991,15 @@ public class DrawingController : MonoBehaviour
     }
 
     public void SendPriorityData(
-    Dictionary<string, List<(List<(string pointName, bool direction, List<List<float>> intervals)>, float parameter)>> priority)
+    Dictionary<string, object> priority)
     {
         Dictionary<string, object> msg_dict = new Dictionary<string, object>
         {
             {"result", priority}
         };
         mqttController.message = msg_dict;
-        mqttController.Publish(mqttController.topicsPublish[4]);
+        
+        mqttController.Publish(mqttController.topicsPublish[1]);
     }
 
 

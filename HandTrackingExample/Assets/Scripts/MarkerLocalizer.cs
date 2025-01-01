@@ -120,20 +120,20 @@ public class MarkerLocalizer: MonoBehaviour
                             // Apply movement to the object's position
                             meshGenerator.inventoryParent.transform.position += movement;
 
-                            // // Define movement amounts along local axes
-                            // movementX = 0.0f;
-                            // movementY = 0.25f;/* your desired movement along local y-axis */;
-                            // movementZ = 0.25f/* your desired movement along local z-axis */;
+                            // Define movement amounts along local axes
+                            movementX = 0.0f;
+                            movementY = 0.25f;/* your desired movement along local y-axis */;
+                            movementZ = 0.25f/* your desired movement along local z-axis */;
 
-                            // meshGenerator.detailsParent.transform.position = pos;
-                            // meshGenerator.detailsParent.transform.rotation = rot;
+                            meshGenerator.detailsParent.transform.position = pos;
+                            meshGenerator.detailsParent.transform.rotation = rot;
 
-                            // // Calculate movement vector based on local axes
-                            // movement = (movementX * meshGenerator.detailsParent.transform.right) +
-                            //                 (movementY * meshGenerator.detailsParent.transform.up) +
-                            //                 (movementZ * meshGenerator.detailsParent.transform.forward);
+                            // Calculate movement vector based on local axes
+                            movement = (movementX * meshGenerator.detailsParent.transform.right) +
+                                            (movementY * meshGenerator.detailsParent.transform.up) +
+                                            (movementZ * meshGenerator.detailsParent.transform.forward);
                             
-                            // meshGenerator.detailsParent.transform.position += movement;
+                            meshGenerator.detailsParent.transform.position += movement;
 
 
                             return; // Exit the loop once the desired marker is found

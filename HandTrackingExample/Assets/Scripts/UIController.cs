@@ -119,7 +119,7 @@ public class UIController : MonoBehaviour
     private float[] scales = {0.5f, 0.2f, 0.1f, 0.05f, 0.02f, 0.01f, 0.004f, 0.002f, 0.001f };
     private int currentScaleIndex = 0;
 
-    private Dictionary<string, List<(List<(string pointName, bool direction, List<List<float>> intervals)>, float parameter)>> priority;
+    private Dictionary<string, object> priority = new Dictionary<string, object>();
 
     
     // Start is called before the first frame update
@@ -341,7 +341,7 @@ public class UIController : MonoBehaviour
         SendPriority.OnClicked.AddListener(() =>
         {
             mqttPriorityDialogBody.text = "Do you want to send the Mapping to Rhino?";
-            SetupSendPriorityDialog();
+            OrderToDict();
         });  
 
         Periodic.SetActive(false);
@@ -631,50 +631,57 @@ public class UIController : MonoBehaviour
     }
 
 
-    public void MapElements()
+    public void OrderToDict()
     {
-        PriorityMapper priorityMapper= new PriorityMapper();
-        List<LineRenderer> lineRenderers= new List<LineRenderer>();
-        List<List<List<float>>> parts = new List<List<List<float>>> {};
+        // Create the final dictionary to hold the structure
+        var lines = new Dictionary<string, object>();
 
+        int lineIndex = 0;
+
+        // Loop through all child transforms
         foreach (Transform child in drawController.currentDrawingParent.transform)
         {
-            LineRenderer ln = child.gameObject.GetComponent<LineRenderer>();
+            MappingOnCurve ln = child.GetComponent<MappingOnCurve>();
             if (ln != null)
             {
-                lineRenderers.Add(ln);
-            }
-        }
+                // Create the "line" dictionary entry
+                List<string> names = ln.names;
+                float parameter = ln.parameter;
 
-        List<Vector3> points = new List<Vector3>();
-        List<(Vector3,Vector3)> endPoints = new List<(Vector3,Vector3)>();
-
-        List<string> pointNames = new List<string>();
-        
-        foreach(Transform child in meshGenerator.inventoryParent.transform)
-        {
-            Vector3 pt = child.GetComponent<BendGeometry>().CalculateMeanPoint();
-            (Vector3,Vector3) endpts = child.GetComponent<BendGeometry>().CalculateEndPoints();
-
-            string ptName = child.gameObject.name;
-            if (pt != null)
-            {
-                points.Add(pt);
-                endPoints.Add(endpts);
-                if (ptName != null)
+                var lineDict = new Dictionary<string, object>
                 {
-                    pointNames.Add(ptName);
+                    { "names", names },
+                    { "parameter", parameter }
+                };
+
+                // Add this line to the lines dictionary
+                lines.Add($"line{lineIndex}", lineDict);
+                lineIndex++;
+
+                // Add details for each name
+                foreach (string name in names)
+                {
+                    TimberElement element = meshGenerator.inventoryParent.transform.Find(name)?.GetComponent<TimberElement>();
+                    if (element != null)
+                    {
+                        // Add the details for the name to the order dictionary
+                        if (!priority.ContainsKey(name))
+                        {
+                            priority[name] = new Dictionary<string, object>
+                            {
+                                { "flipped", element.flipped },
+                                { "rotated", element.rotated },
+                                { "moveDist", element.moveDist}
+                            };
+                        }
+                    }
                 }
-                parts.Add(child.GetComponent<BendGeometry>().parts);
             }
         }
-
-
-        Dictionary<LineRenderer, List<string>> priorityOrder = priorityMapper.MapPointsToLineRenderers(lineRenderers, points, pointNames, 0.5f);
-        priority = priorityMapper.MergePriorityData(priorityOrder,points, parts, endPoints, pointNames, lineRenderers);
+        // Add the "lines" dictionary to the final order dictionary
+        priority["lines"] = lines;
 
         SetupSendPriorityDialog();
-        //drawController.SavePriorityData(priority);
     }
 
     void OnNextScalePressed()

@@ -69610,7 +69610,6 @@ MonoBehaviour:
   - reference: MixedReality.Toolkit.IGazeInteractor, MixedReality.Toolkit.Core
   - reference: MixedReality.Toolkit.IGazePinchInteractor, MixedReality.Toolkit.Core
   - reference: MixedReality.Toolkit.ISpeechInteractor, MixedReality.Toolkit.Core
-  - reference: MixedReality.Toolkit.IRayInteractor, MixedReality.Toolkit.Core
   <ToggleMode>k__BackingField: 0
   <SelectThreshold>k__BackingField: 0.9
   <DeselectThreshold>k__BackingField: 0.1
@@ -100283,7 +100282,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &2064211902
 MonoBehaviour:
   m_ObjectHideFlags: 0

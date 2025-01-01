@@ -34,7 +34,7 @@ public class MappingOnCurve : MonoBehaviour
     [HideInInspector] public float parameter = 0.0f;
     
     private List<float> lengths = new List<float>();
-    private List<string> names = new List<string>();
+    [HideInInspector] public List<string> names = new List<string>();
 
     public void CreateEndPoint(Material material, Vector3 position, bool isStartPt = true, bool show = true)
     {
@@ -281,7 +281,7 @@ public class MappingOnCurve : MonoBehaviour
             i++;
         }
     }
-    
+
     // Helper method to calculate the tangent at a given point on the LineRenderer
     private Vector3 GetTangentAtPoint(Vector3 position)
     {
