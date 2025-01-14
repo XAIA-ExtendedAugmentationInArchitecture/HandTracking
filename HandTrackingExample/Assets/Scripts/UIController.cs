@@ -831,8 +831,8 @@ public class UIController : MonoBehaviour
         float localSize = elementProperties.length;
 
         // Calculate new position and rotation
-        Vector3 newPosition = targetObject.transform.position;
-        Vector3 newRotation = targetObject.transform.rotation.eulerAngles;
+        Vector3 newPosition = targetObject.transform.localPosition;
+        Vector3 newRotation = targetObject.transform.localRotation.eulerAngles;
 
         // Base position offset accounting for element size and overlap
         float baseOffset = OVERLAP_DISTANCE / 2f;
@@ -869,8 +869,8 @@ public class UIController : MonoBehaviour
 
 
         // Apply transformation
-        targetObject.transform.position = newPosition;
-        targetObject.transform.rotation = Quaternion.Euler(rotation, 0, newRotation.z );
+        targetObject.transform.localPosition = newPosition;
+        targetObject.transform.localRotation = Quaternion.Euler(rotation, 0, newRotation.z);
 
         Debug.Log($"Choco2 The object is: {originalObject.name} and it is the first element: {isFirstElement} and it is flipped: {isFlipped}  and rotation in z is {targetObject.transform.rotation.eulerAngles.z} and the rotation in x is {targetObject.transform.rotation.eulerAngles.x} and movedist is {moveDist} ");
         //Debug.LogWarning($"Choco2 {newRotation.x} ");
