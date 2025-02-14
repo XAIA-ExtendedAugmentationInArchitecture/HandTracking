@@ -537,6 +537,7 @@
 "Assets/Scripts/MeshElementData.cs"
 "Assets/Scripts/MeshGeneratorFromJson.cs"
 "Assets/Scripts/MeshReader.cs"
+"Assets/Scripts/MoveAlongCurveConstraint.cs"
 "Assets/Scripts/OrderController.cs"
 "Assets/Scripts/PinManager.cs"
 "Assets/Scripts/PlankBender.cs"
@@ -544,6 +545,9 @@
 "Assets/Scripts/PriorityMapper.cs"
 "Assets/Scripts/TimberElement.cs"
 "Assets/Scripts/UIController.cs"
+"Assets/Scripts/UIControllerExtra.cs"
+"Assets/Scripts/UIPressableButton.cs"
+"Assets/Scripts/UIToggleCollection.cs"
 -langversion:9.0
 
 /deterministic

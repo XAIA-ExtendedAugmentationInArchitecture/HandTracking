@@ -107,7 +107,7 @@ public class ElementStateController : MonoBehaviour
 
             targetObjectManipulator = target.AddComponent<ObjectManipulator>();
             targetObjectManipulator.AllowedManipulations = TransformFlags.Move | TransformFlags.Rotate;
-            targetObjectManipulator.AllowedInteractionTypes = InteractionFlags.Near | InteractionFlags.Ray | InteractionFlags.Gaze | InteractionFlags.Generic; 
+            targetObjectManipulator.AllowedInteractionTypes = InteractionFlags.Near | InteractionFlags.Ray | InteractionFlags.Generic; 
             
             targetObjectManipulator.selectEntered.AddListener(OnManipulationEntered);
             targetObjectManipulator.selectExited.AddListener(OnManipulationExited);

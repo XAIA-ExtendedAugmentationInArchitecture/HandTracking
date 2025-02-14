@@ -48,7 +48,16 @@ public class OrderController : MonoBehaviour
                         mappingOnCurve.SnapElementOnCurve(selectedObj, snapPoint);
                         float length = selectedObj.GetComponent<TimberElement>().length;
                         mappingOnCurve.AppendTimberElement(selectedObj.name, length, scale);
-                        
+
+                        mappingOnCurve.AppendSegments(selectedObj.GetComponent<TimberElement>().segWithConnectionsLengths, selectedObj.GetComponent<TimberElement>().typesWithConnections);
+                        mappingOnCurve.SnapOnMiddlePoint(selectedObj);
+
+                        GameObject lockObject = GameObject.Find("MeshGenerator").GetComponent<MeshGeneratorFromJson>().locksParent.FindObject("lock_" + selectedObj.name);
+                        if (lockObject == null)
+                        {
+                            Debug.LogWarning("sssssssssssss + " + selectedObj.name);
+                        }
+                        lockObject.GetComponent<ElementStateController>().ToggleState();
                         return;
                     }
                     else

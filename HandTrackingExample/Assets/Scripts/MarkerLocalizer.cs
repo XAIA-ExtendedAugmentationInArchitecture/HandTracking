@@ -94,11 +94,11 @@ public class MarkerLocalizer: MonoBehaviour
                             uIController.TableMenu.transform.rotation = rot;
                             uIController.TableMenu.SetActive(true);
 
-                            if (drawController.pinManager.newPin)
-                            {
-                                drawController.pinManager.newPin.transform.position = pos + (rot * drawController.pinManager.initialPinPosition);
-                                drawController.pinManager.newPin.transform.rotation = rot;
-                            }
+                            // if (drawController.pinManager.newPin)
+                            // {
+                            //     drawController.pinManager.newPin.transform.position = pos + (rot * drawController.pinManager.initialPinPosition);
+                            //     drawController.pinManager.newPin.transform.rotation = rot;
+                            // }
                             
 
                             meshGenerator.locksParent.SetActive(true);
@@ -108,8 +108,8 @@ public class MarkerLocalizer: MonoBehaviour
 
 
                             // Define movement amounts along local axes
-                            float movementX = 0.7f;
-                            float movementY = 0.2f;/* your desired movement along local y-axis */;
+                            float movementX = 0.4f;
+                            float movementY = 0.1f;/* your desired movement along local y-axis */;
                             float movementZ = 0.0f/* your desired movement along local z-axis */;
 
                             // Calculate movement vector based on local axes

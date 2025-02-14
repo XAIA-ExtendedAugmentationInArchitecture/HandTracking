@@ -23,6 +23,7 @@ public class MeshGeneratorFromJson : MonoBehaviour
     [HideInInspector] public Stock stock;
     [HideInInspector] public GameObject locksParent;
     public DrawingController drawController;
+    public UIController uiController;
     public GameObject padlocks;
     private string path; 
     private string path2;
@@ -93,6 +94,30 @@ public class MeshGeneratorFromJson : MonoBehaviour
                 GenerateMember(meshReader.memberData, match.Value, inventoryParent);
             }
         }
+
+        // Arrange members in a column
+        float yOffset = 0;
+        float zoffset = 0;
+        float spacing = 0.25f; // Space between elements
+        foreach (Transform child in inventoryParent.transform)
+        {
+            Renderer renderer = child.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+            Bounds bounds = renderer.bounds;
+            float height = bounds.size.y;
+            float width = bounds.size.z;
+            
+            // Position the element
+            child.localPosition = new Vector3(0, 0, zoffset);
+            
+            // Update offset for next element
+            yOffset += height + spacing;
+            zoffset += width + spacing;
+            }
+        }
+        inventoryParent.SetActive(false);
+        locksParent.SetActive(false);
 
 	}
 	
@@ -246,6 +271,9 @@ public class MeshGeneratorFromJson : MonoBehaviour
         timberEl.length = memberData.dimensions.width;
         timberEl.segments = memberData.Vector3Parts();
         timberEl.MarkDefects();
+        timberEl.CalculateSegmentLengths();
+        timberEl.AddConnectionsAtEdges(timberEl.types, timberEl.segLengths, uiController.OVERLAP_DISTANCE );
+        Debug.Log("AAA: " + name + "Member: " +  string.Join(", ", timberEl.segWithConnectionsLengths) + " has been generated" + string.Join(", ", timberEl.typesWithConnections));
 
 
         var interactable =element.AddComponent<StatefulInteractable>();
@@ -286,8 +314,8 @@ public class MeshGeneratorFromJson : MonoBehaviour
         element.transform.localPosition = Vector3.zero;
         element.transform.localRotation = Quaternion.identity;
 
-        lockInstance.SetActive(false);
-        element.SetActive(false); 
+        //lockInstance.SetActive(false);
+        //element.SetActive(false); 
 	}
 
     void CorrectDetailed()

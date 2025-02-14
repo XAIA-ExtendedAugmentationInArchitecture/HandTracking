@@ -68,23 +68,15 @@ public class UIController : MonoBehaviour
     public GameObject PickTeam;
 
     public GameObject StartDialog;
-
-    public GameObject StPointDialog;
     public GameObject HandMenu;
 
     public TextMeshPro DrawingText;
     public TextMeshPro ModeText;
     public TextMeshPro TrackingText; 
     public GameObject TableMenu;
-
     public PressableButton InventoryButton;
-    public GameObject SelectGeos;
-    
     public PressableButton DetailsButton;
     public GameObject Submenu;
-    public PressableButton nextGeo;
-    public PressableButton previousGeo;
-    public PressableButton VisibTimber;
     public PressableButton nextPair;
     public PressableButton previousPair;
     public PressableButton VisibInventory;
@@ -93,8 +85,7 @@ public class UIController : MonoBehaviour
     public Slider MoveSlider;
 
     public PressableButton AdjStPt;
-    public GameObject SliderGameObj;
-    public Slider SliderStPt;
+
     public PressableButton AcceptStPoint;
     public PressableButton PauseDrawing;
 
@@ -104,15 +95,13 @@ public class UIController : MonoBehaviour
     private bool detailsOn = false;
     private List<string[]> totalpairs = new List<string[]>();
     private  GameObject[] pairObjects = new GameObject[2];
-
-    private  List<GameObject> startingPoints = new List<GameObject>();
     private bool isFirstEl = true;
     private int pairIndex = -1;
 
     [HideInInspector]  public string detailElement="";
     [HideInInspector]  public GameObject detailElementObject;
 
-    const float OVERLAP_DISTANCE = 0.30f;
+    public float OVERLAP_DISTANCE = 0.30f;
 
     private int ind = 0;
 
@@ -125,71 +114,46 @@ public class UIController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {   
+        ScaleParent.SetActive(false);
         PauseDrawing.OnClicked.AddListener(() => drawController.ActivateStandBy());
-        StPointDialog.SetActive(false);
-        AcceptStPoint.gameObject.transform.parent.gameObject.SetActive(false);
 
-        AcceptStPoint.OnClicked.AddListener(()=> {
-            GameObject stPoint = drawController.GetComponent<OrderController>().selectedStPoint;
-            if (stPoint != null)
-            {
-                float value = SliderStPt.Value;
-                var mappingCurve = stPoint.transform.parent.GetComponent<MappingOnCurve>();
-                
-                mappingCurve.parameter = value;
-                mappingCurve.ShiftStPosition(value);
+        // AcceptStPoint.OnClicked.AddListener(()=> {
+        //     GameObject stPoint = drawController.GetComponent<OrderController>().selectedStPoint;
+        //     if (stPoint != null)
+        //     {
+        //         var mappingCurve = stPoint.transform.parent.GetComponent<MappingOnCurve>();
 
-                foreach (var pt in mappingCurve.endPts)
-                {
-                    Destroy(pt);
-                }
+        //         foreach (var pt in mappingCurve.endPts)
+        //         {
+        //             Destroy(pt);
+        //         }
 
-                foreach (var pt in mappingCurve.stPts)
-                {
-                    Destroy(pt);
-                }
+        //         foreach (var pt in mappingCurve.stPts)
+        //         {
+        //             Destroy(pt);
+        //         }
 
-                mappingCurve.endPts.Clear();
-                mappingCurve.stPts.Clear();
+        //         mappingCurve.endPts.Clear();
+        //         mappingCurve.stPts.Clear();
 
-                // Create new points
-                var lineRenderer = mappingCurve.GetComponent<LineRenderer>();
-                mappingCurve.CreateEndPoint(drawController.ControlPointMaterial, lineRenderer.GetPosition(0));
-                mappingCurve.UpdateEndPoints();
-                mappingCurve.SnapElements();
+        //         // Create new points
+        //         var lineRenderer = mappingCurve.GetComponent<LineRenderer>();
+        //         mappingCurve.CreateEndPoint(drawController.ControlPointMaterial, lineRenderer.GetPosition(0));
+        //         mappingCurve.UpdateEndPoints();
+        //         mappingCurve.SnapElements();
 
-            }
-            else
-            {
-                SetupstPointDialog();
-            }
+        //     }
+        //     else
+        //     {
+        //         SetupstPointDialog();
+        //     }
             
-        });
+        // });
 
         AdjStPt.OnClicked.AddListener(() => {
 
-            //drawController.ActivateStandBy();
-            ToggleVisibility(SliderGameObj);
-            ToggleVisibility(AcceptStPoint.gameObject.transform.parent.gameObject);
+            drawController.ActivateStandBy();
 
-            if (startingPoints != null)
-            {
-                foreach (GameObject point in startingPoints)
-                {
-                    if (point != null)
-                    {
-                    Destroy(point);
-                    }
-                }
-            startingPoints.Clear();
-            }
-
-            Destroy(drawController.GetComponent<OrderController>().selectedStPoint);
-
-            if ( SliderGameObj.activeSelf==false)
-            {
-                return;
-            }
 
             foreach (Transform child in drawController.currentDrawingParent.transform)
             {
@@ -199,32 +163,25 @@ public class UIController : MonoBehaviour
                 {
                     // Get the MappingOnCurve component
                     MappingOnCurve mappingOnCurve = child.GetComponent<MappingOnCurve>();
-                    if (mappingOnCurve != null && mappingOnCurve.stPoint == null)
+                    if (mappingOnCurve != null && lineRenderer.loop)
                     {
-                        // Create the starting point using the material and the first position of the LineRenderer
-                        mappingOnCurve.CreateStPoint(drawController.ControlPointMaterial, lineRenderer.GetPosition(0));
+                        if (mappingOnCurve.stPoint != null)
+                        {
+                            ToggleVisibility(mappingOnCurve.stPoint);
+                            if (mappingOnCurve.stPoint.activeSelf)
+                            {
+                                // Create the starting point using the material and the first position of the LineRenderer
+                                mappingOnCurve.CreateStPoint(drawController.ControlPointMaterial, lineRenderer.GetPosition(0));
+                            }
+                        } 
+                        else
+                        {
+                            mappingOnCurve.CreateStPoint(drawController.ControlPointMaterial, lineRenderer.GetPosition(0));
+                        }                                    
                         
-                        // Append the starting point to the list
-                        startingPoints.Add(mappingOnCurve.stPoint);
-                    }
+                    }   
                 }
             }     
-        });
-
-        SliderGameObj.SetActive(false);
-
-        SliderStPt.OnValueUpdated.AddListener((SliderEventData sliderEventData) => {
-            GameObject stPoint = drawController.GetComponent<OrderController>().selectedStPoint;
-            if (stPoint != null)
-            {
-                float value = sliderEventData.NewValue;
-                stPoint.transform.parent.GetComponent<MappingOnCurve>().UpdateStPosition(value);
-            }
-            else
-            {
-                SetupstPointDialog();
-            }
-            
         });
 
         VisibInventory.OnClicked.AddListener(() => {
@@ -236,12 +193,12 @@ public class UIController : MonoBehaviour
             }
         });
 
-        VisibTimber.OnClicked.AddListener(() => ToggleVisibility(meshGenerator.inventoryParent));
+        //VisibTimber.OnClicked.AddListener(() => ToggleVisibility(meshGenerator.inventoryParent));
         arrow.SetActive(false);
         Submenu.SetActive(false);
-        SelectGeos.SetActive(false);
         InventoryButton.OnClicked.AddListener(() => {
-            ToggleVisibility(SelectGeos);
+            ToggleVisibility(meshGenerator.inventoryParent);
+            ToggleVisibility(meshGenerator.locksParent);
             drawController.EnableControlPoints(false);
             endPointsOn = !endPointsOn;
             Debug.Log("Inventory Button Clicked and the end points will be " + endPointsOn);
@@ -259,16 +216,12 @@ public class UIController : MonoBehaviour
             }
 
         });
-        nextGeo.OnClicked.AddListener(ShowNextGeo);
-        previousGeo.OnClicked.AddListener(ShowPreviousGeo);
 
         RotateClockwise.OnClicked.AddListener(() => {
             var timElement = detailElementObject?.GetComponent<TimberElement>();
             if (timElement != null)
             {
-                Debug.LogWarning($"Choco {timElement.rotated} ");
                 timElement.rotated = (timElement.rotated + 90) % 360;
-                Debug.LogWarning($"Choco2 {timElement.rotated} ");
 
                 TransformDetailElement(detailElementObject, isFirstEl);
             }
@@ -336,8 +289,7 @@ public class UIController : MonoBehaviour
             SetupSendToRhinoDialog();
         });
 
-        VisualizeDrawing.OnClicked.AddListener(() => ToggleVisibility(next));
-
+        
         SendPriority.OnClicked.AddListener(() =>
         {
             mqttPriorityDialogBody.text = "Do you want to send the Mapping to Rhino?";
@@ -362,7 +314,7 @@ public class UIController : MonoBehaviour
 
         Locks.OnClicked.AddListener(() => meshGenerator.locksParent.SetActive(!meshGenerator.locksParent.activeSelf));
 
-        ScaleParent.SetActive(false);
+        
         ScaleButton.OnClicked.AddListener(() => ScaleParent.SetActive(!ScaleParent.activeSelf));
         ScaleButton.OnClicked.AddListener(() => drawController.ToggleScale());
         //ScaleButton.OnClicked.AddListener(() => drawController.ActivateStandBy());
@@ -416,6 +368,10 @@ public class UIController : MonoBehaviour
         {
             float scaleValue = drawController.currentDrawingParent.transform.localScale.x;
             meshGenerator.inventoryParent.transform.localScale = Vector3.one * scaleValue;
+            if (scaleValue !=1.0f)
+            {
+                meshGenerator.locksParent.transform.localScale = Vector3.one * 0.75f;
+            }
             if (scaleValue > 0.1f)
             {
                 ScaleInfo.text = "1:" + (Mathf.Round((1 / scaleValue) * 10f) / 10f).ToString(); 
@@ -477,15 +433,6 @@ public class UIController : MonoBehaviour
         mqttSendDialog.SetActive(true);
     }
 
-    void SetupstPointDialog()
-    {
-        var dialog = StPointDialog.GetComponent<Dialog>();
-        dialog.Reset();
-
-        StPointDialog.GetComponent<Dialog>().SetNeutral("OK", args =>  Debug.Log("OK"));
-
-        StPointDialog.SetActive(true);
-    }
 
     void SetupSendPriorityDialog()
     {
@@ -523,7 +470,7 @@ public class UIController : MonoBehaviour
         StartDialog.SetActive(true);
     }
 
-    void ToggleVisibility(GameObject gameObject)
+    public void ToggleVisibility(GameObject gameObject)
     {
         if (gameObject != null)
         {
@@ -588,25 +535,6 @@ public class UIController : MonoBehaviour
         mqttConnectionDialog.SetActive(true);
     }
 
-
-    void ShowNextGeo()
-    {
-        if (meshGenerator.inventoryParent.transform.childCount == 0) return;
-
-        // Increment index and wrap around if necessary
-        ind = (ind + 1) % meshGenerator.inventoryParent.transform.childCount;
-        SetActiveGeo(ind);
-
-    }
-
-    void ShowPreviousGeo()
-    {
-        if (meshGenerator.inventoryParent.transform.childCount == 0) return;
-
-        // Decrement index and wrap around if necessary
-        ind = (ind - 1 + meshGenerator.inventoryParent.transform.childCount) % meshGenerator.inventoryParent.transform.childCount;
-        SetActiveGeo(ind);
-    }
 
     void SetActiveGeo(int index)
     {
@@ -817,7 +745,7 @@ public class UIController : MonoBehaviour
         bool isFlipped = elementProperties.flipped;
         int rotation = elementProperties.rotated;
 
-        //Debug.Log($"Choco The object is: {originalObject.name} and it is the first element: {isFirstElement} and it is flipped: {isFlipped} and rotation in Z is {targetObject.transform.rotation.eulerAngles.z} and movedist is {moveDist} ");
+        //Debug.Log($"The object is: {originalObject.name} and it is the first element: {isFirstElement} and it is flipped: {isFlipped} and rotation in Z is {targetObject.transform.rotation.eulerAngles.z} and movedist is {moveDist} ");
 
         // Calculate bounds
         var renderer = targetObject.GetComponent<Renderer>();
@@ -844,27 +772,24 @@ public class UIController : MonoBehaviour
             (isFlipped ? localSize : 0) + moveDist - baseOffset;
 
         
-        Debug.LogWarning($"Choco {rotation} ");
         newRotation.x = rotation;
 
-        if (! isFirstElement)
-        {
-            newPosition.z = 0.15f;
-        }
-        else
-        {
-            newPosition.z = 0.0f;
-        }
+        // if (! isFirstElement)
+        // {
+        //     newPosition.z = 0.15f;
+        // }
+        // else
+        // {
+        //     newPosition.z = 0.0f;
+        // }
 
         if (isFlipped)
         {
             newRotation.z = 180;
-            Debug.LogWarning($"Choco222");
         }
         else
         {
             newRotation.z = 0;
-            Debug.LogWarning($"Choco11");
         }
 
 
@@ -872,8 +797,7 @@ public class UIController : MonoBehaviour
         targetObject.transform.localPosition = newPosition;
         targetObject.transform.localRotation = Quaternion.Euler(rotation, 0, newRotation.z);
 
-        Debug.Log($"Choco2 The object is: {originalObject.name} and it is the first element: {isFirstElement} and it is flipped: {isFlipped}  and rotation in z is {targetObject.transform.rotation.eulerAngles.z} and the rotation in x is {targetObject.transform.rotation.eulerAngles.x} and movedist is {moveDist} ");
-        //Debug.LogWarning($"Choco2 {newRotation.x} ");
+        Debug.Log($"The object is: {originalObject.name} and it is the first element: {isFirstElement} and it is flipped: {isFlipped}  and rotation in z is {targetObject.transform.rotation.eulerAngles.z} and the rotation in x is {targetObject.transform.rotation.eulerAngles.x} and movedist is {moveDist} ");
     }
 }
 

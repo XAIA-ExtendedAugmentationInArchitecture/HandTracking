@@ -185,11 +185,11 @@ public class DrawingController : MonoBehaviour
         {
             if (aggregator != null)
             {
-                // Get a single joint (Index tip, on left hand, for example)
+                // // Get a single joint (Index tip, on left hand, for example)
                 bool jointIsValid = aggregator.TryGetJoint(TrackedHandJoint.IndexTip, XRNode.RightHand, out HandJointPose jointPose);
 
-                // Check whether the user's left hand is facing away (commonly used to check "aim" intent)
-                bool handIsValid = aggregator.TryGetPalmFacingAway(XRNode.LeftHand, out bool isLeftPalmFacingAway);
+                // // Check whether the user's left hand is facing away (commonly used to check "aim" intent)
+                // bool handIsValid = aggregator.TryGetPalmFacingAway(XRNode.LeftHand, out bool isLeftPalmFacingAway);
 
                 // Query pinch characteristics from the left hand.
                 bool handIsValidPinch = aggregator.TryGetPinchProgress(XRNode.RightHand, out bool isReadyToPinch, out bool isPinching, out float pinchAmount);
@@ -270,6 +270,122 @@ public class DrawingController : MonoBehaviour
         linePointIndex =-1;
     }
 
+    public void ActivateStandByNew(bool activate)
+    {
+        if (activate)
+        {
+            lastDrawingMode = drawingMode;
+            pointsOn = false;
+            pinPointsOn = false;
+            farDrawing = false;
+            drawingMode ="";
+            uIController.ModeText.text = "DRAW mode: Editing";
+            uIController.Periodic.SetActive(false);
+            EnableControlPoints(pointsOn);
+            ActivatePinPoints(pinPointsOn);
+            pinManager.newPin.SetActive(pinPointsOn);
+
+            foreach (Transform child in meshGenerator.elementsParent.transform)
+            {
+                child.gameObject.GetComponent<MeshCollider>().enabled=farDrawing;
+                child.gameObject.GetComponent<StatefulInteractable>().enabled=farDrawing;
+            }
+        }
+        else
+        {
+            if (lastDrawingMode == "pinchDrawing")
+            {
+                drawingMode ="farDrawing";
+            }
+            else if (lastDrawingMode == "controlPoints")
+            {
+                drawingMode ="pinchDrawing";
+            }
+            else if (lastDrawingMode == "pinPoints")
+            {
+                drawingMode ="controlPoints";
+            }
+            else if (lastDrawingMode == "farDrawing")
+            {
+                drawingMode ="pinPoints";
+            }
+            ToggleDrawingMode();
+        }
+    }
+
+    public void ActivateElementInteraction(bool activate)
+    {
+        foreach (Transform child in meshGenerator.elementsParent.transform)
+        {
+            child.gameObject.GetComponent<MeshCollider>().enabled=activate;
+            child.gameObject.GetComponent<StatefulInteractable>().enabled=activate;
+        }
+    }
+
+    public void ModeFreehand()
+    {
+        drawingMode ="pinchDrawing";
+        pointsOn = false;
+        pinPointsOn = false;
+        farDrawing = false;
+        EnableControlPoints(pointsOn);
+        ActivatePinPoints(pinPointsOn);
+        pinManager.newPin.SetActive(pinPointsOn);
+        
+        ActivateElementInteraction(farDrawing);
+    }
+
+    public void ModeDrawOnObject()
+    {
+        drawingMode ="farDrawing";
+        pointsOn = false;
+        pinPointsOn = false;
+        farDrawing = true;
+        EnableControlPoints(pointsOn);
+        ActivatePinPoints(pinPointsOn);
+        //pinManager.newPin.SetActive(pinPointsOn);
+        
+        ActivateElementInteraction(farDrawing);
+    }
+
+    public void ModeControlPoints()
+    {
+        drawingMode ="";
+        pointsOn = true;
+        pinPointsOn = false;
+        farDrawing = false;
+        EnableControlPoints(pointsOn);
+        ActivatePinPoints(pinPointsOn);
+        //pinManager.newPin.SetActive(pinPointsOn);
+        
+        ActivateElementInteraction(farDrawing);
+    }
+
+    public void ModePinPoints()
+    {
+        Debug.Log("Tequila");
+        drawingMode ="";
+        pointsOn = false;
+        pinPointsOn = true;
+        farDrawing = false;
+        EnableControlPoints(pointsOn);
+        ActivatePinPoints(pinPointsOn);
+        //pinManager.newPin.SetActive(pinPointsOn);
+        
+        ActivateElementInteraction(farDrawing);
+    }
+
+    public void ModeEditing()
+    {
+        pointsOn = false;
+        pinPointsOn = false;
+        farDrawing = false;
+        drawingMode ="";
+        EnableControlPoints(pointsOn);
+        ActivatePinPoints(pinPointsOn);
+        //pinManager.newPin.SetActive(pinPointsOn);
+        ActivateElementInteraction(farDrawing);
+    }
     public void ActivateStandBy()
     {
         activateStandBy = !activateStandBy;
@@ -392,6 +508,8 @@ public class DrawingController : MonoBehaviour
             // Check if the child GameObject has the specific tag you are interested in
             if (child.CompareTag("simplified"))
             {
+                MappingOnCurve mappingOnCurve = child.gameObject.GetComponent<MappingOnCurve>();
+                mappingOnCurve.UpdateStartPoint(enable);
                 foreach (Transform grandchild in child.transform)
             {
                 if (grandchild.name == "StartPoint" || grandchild.name == "EndPoint")
@@ -613,10 +731,10 @@ public class DrawingController : MonoBehaviour
         
         if (DrawingIndex == 0)
         {
-            Vector3 newPos = meshGenerator.elementsParent.transform.position + (meshGenerator.elementsParent.transform.rotation * pinManager.initialPinPosition);
-            Quaternion newRot = meshGenerator.elementsParent.transform.rotation;
-            pinManager.InstantiatePin(newPos, newRot);
-            pinManager.newPin.SetActive(false); 
+            // Vector3 newPos = meshGenerator.elementsParent.transform.position + (meshGenerator.elementsParent.transform.rotation * pinManager.initialPinPosition);
+            // Quaternion newRot = meshGenerator.elementsParent.transform.rotation;
+            // pinManager.InstantiatePin(newPos, newRot);
+            // pinManager.newPin.SetActive(false); 
         }
 
         uIController.DrawingText.text = "Drawing No: " + DrawingIndex.ToString() + "    |";
@@ -776,7 +894,7 @@ public class DrawingController : MonoBehaviour
         newLine.material = lineMaterial;
         newLine.startWidth = lineWidth;
         newLine.endWidth = lineWidth;
-        newLine.alignment = LineAlignment.TransformZ;
+        newLine.alignment = LineAlignment.View;
         //newLine.positionCount = 0;
 
         //newLine.loop = true; 
@@ -993,6 +1111,13 @@ public class DrawingController : MonoBehaviour
     public void SendPriorityData(
     Dictionary<string, object> priority)
     {
+        Debug.Log(priority);
+        // Print all elements in the priority dictionary
+        foreach (var entry in priority)
+        {
+            Debug.Log($"Key: {entry.Key}");
+            Debug.Log($"Value: {entry.Value}");
+        }
         Dictionary<string, object> msg_dict = new Dictionary<string, object>
         {
             {"result", priority}

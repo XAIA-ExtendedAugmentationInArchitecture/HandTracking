@@ -435,6 +435,29 @@ public static class ColorExtensions
     }
 }
 
+public static class MaterialExtensions
+{
+    public static Material Create(this Material material, float renderingMode = 0, Color? color = null)
+    {
+        if (material == null)
+        {
+            material = new Material(Shader.Find("Standard")); // Create a new material if null
+        }
+
+        material.SetFloat("_Mode", renderingMode); // Set the rendering mode
+        material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+        material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+        material.SetInt("_ZWrite", 0);
+        material.DisableKeyword("_ALPHATEST_ON");
+        material.EnableKeyword("_ALPHABLEND_ON");
+        material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+        material.renderQueue = 3000;
+        material.color = color ?? Color.white; // Use default color if null
+
+        return material;
+    }
+}
+
 public static class QuaternionExtensions
 {
     public static Quaternion SetRotationfromXZAxis(Vector3 xaxis, Vector3 zaxis)
