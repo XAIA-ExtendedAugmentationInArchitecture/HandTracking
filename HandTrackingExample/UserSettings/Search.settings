@@ -16,7 +16,7 @@ scopes = {
 	"picker_item_size.075BCD15" = "96"
 	"picker_inspector.075BCD15" = "0"
 	"picker_current_group.075BCD15" = "all"
-	"last_search.8DF93126" = "console"
+	"last_search.8DF93126" = "t"
 	"OpenInspectorPreview.8DF93126" = "0"
 	"currentGroup.8DF93126" = null
 }
@@ -75,6 +75,7 @@ providers = {
 objectSelectors = {
 }
 recentSearches = [
+	"t"
 ]
 searchItemFavorites = [
 ]

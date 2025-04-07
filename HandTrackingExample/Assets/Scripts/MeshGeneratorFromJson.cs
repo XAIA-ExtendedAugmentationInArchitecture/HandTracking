@@ -109,7 +109,7 @@ public class MeshGeneratorFromJson : MonoBehaviour
             float width = bounds.size.z;
             
             // Position the element
-            child.localPosition = new Vector3(0, 0, zoffset);
+            child.localPosition = new Vector3(0, yOffset, 0);
             
             // Update offset for next element
             yOffset += height + spacing;
@@ -205,7 +205,7 @@ public class MeshGeneratorFromJson : MonoBehaviour
         Vector3 center = bounds.center;
         Vector3 size = bounds.size;
 
-        lockInstance.GetComponent<Orbital>().LocalOffset = new Vector3(center[0], center[1]+ size[1]/2 + 0.075f , center[2]);
+        lockInstance.GetComponent<Orbital>().LocalOffset = new Vector3(center[0], center[1]+ size[1]/2 + 0.05f , center[2]);
         
         lockInstance.name ="lock_" + element.name;
         lockInstance.transform.parent = locksParent.transform;

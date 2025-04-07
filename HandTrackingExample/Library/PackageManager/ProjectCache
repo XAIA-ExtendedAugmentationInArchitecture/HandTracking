@@ -5,16 +5,16 @@ m_ProjectFiles:
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 638567620049844280
-    m_Hash: 2249968619
+      ticks: 638786986439319649
+    m_Hash: 4239468579
   m_LockFileStatus:
     m_FilePath: C:/Users/eleni/Documents/GitHub/IntuitiveRobotics-AugmentedTechnologies/HandTracking/HandTrackingExample/Packages/packages-lock.json
     m_PathExists: 1
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 638567620108572382
-    m_Hash: 1615509037
+      ticks: 638786986439377976
+    m_Hash: 3945230036
 m_EmbeddedPackageManifests:
   m_ManifestsStatus: {}
 m_LocalPackages:
@@ -268,9 +268,13 @@ m_ResolvedPackages:
     all:
     - 1.10.0
     - 1.10.1
+    - 1.11.1
+    - 1.11.2
     compatible:
     - 1.10.0
     - 1.10.1
+    - 1.11.1
+    - 1.11.2
     recommended: 
     deprecated: []
   dependencies:
@@ -285,20 +289,22 @@ m_ResolvedPackages:
   resolvedDependencies:
   - name: com.unity.xr.arfoundation
     version: 5.1.3
-  - name: com.unity.editorcoroutines
+  - name: com.unity.ugui
+    version: 2.0.0
+  - name: com.unity.modules.ui
+    version: 1.0.0
+  - name: com.unity.modules.imgui
     version: 1.0.0
   - name: com.unity.inputsystem
     version: 1.7.0
   - name: com.unity.modules.uielements
     version: 1.0.0
-  - name: com.unity.modules.ui
-    version: 1.0.0
-  - name: com.unity.modules.imgui
-    version: 1.0.0
   - name: com.unity.modules.jsonserialize
     version: 1.0.0
   - name: com.unity.modules.hierarchycore
     version: 1.0.0
+  - name: com.unity.mathematics
+    version: 1.2.6
   - name: com.unity.xr.core-utils
     version: 2.3.0
   - name: com.unity.modules.xr
@@ -313,10 +319,8 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.xr.legacyinputhelpers
     version: 2.1.10
-  - name: com.unity.ugui
-    version: 2.0.0
-  - name: com.unity.mathematics
-    version: 1.2.6
+  - name: com.unity.editorcoroutines
+    version: 1.0.0
   - name: com.unity.modules.particlesystem
     version: 1.0.0
   - name: com.unity.modules.unityanalytics
@@ -388,9 +392,11 @@ m_ResolvedPackages:
     all:
     - 0.6.7
     - 0.7.1
+    - 0.8.0
     compatible:
     - 0.6.7
     - 0.7.1
+    - 0.8.0
     recommended: 
     deprecated: []
   dependencies: []
@@ -540,16 +546,16 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.addressables
     version: 1.21.20
-  - name: com.unity.scriptablebuildpipeline
-    version: 1.21.22
   - name: com.unity.modules.assetbundle
-    version: 1.0.0
-  - name: com.unity.modules.imageconversion
     version: 1.0.0
   - name: com.unity.modules.jsonserialize
     version: 1.0.0
+  - name: com.unity.modules.imageconversion
+    version: 1.0.0
   - name: com.unity.modules.unitywebrequest
     version: 1.0.0
+  - name: com.unity.scriptablebuildpipeline
+    version: 1.21.22
   - name: com.unity.modules.unitywebrequestassetbundle
     version: 1.0.0
   - name: com.unity.ugui
@@ -755,9 +761,19 @@ m_ResolvedPackages:
     - 2.2.0
     - 2.3.1
     - 2.4.3
+    - 2.4.4
+    - 2.5.1
+    - 2.5.2
+    - 2.6.0
+    - 2.7.1
     compatible:
     - 2.3.1
     - 2.4.3
+    - 2.4.4
+    - 2.5.1
+    - 2.5.2
+    - 2.6.0
+    - 2.7.1
     recommended: 2.3.1
     deprecated: []
   dependencies: []
@@ -1012,6 +1028,139 @@ m_ResolvedPackages:
     2.0."}'
   assetStore:
     productId: 
+- packageId: com.unity.recorder@5.0.0
+  testable: 0
+  isDirectDependency: 1
+  version: 5.0.0
+  source: 1
+  resolvedPath: C:\Users\eleni\Documents\GitHub\IntuitiveRobotics-AugmentedTechnologies\HandTracking\HandTrackingExample\Library\PackageCache\com.unity.recorder@5.0.0
+  assetPath: Packages/com.unity.recorder
+  name: com.unity.recorder
+  displayName: Recorder
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: assets
+  description: 'The Recorder allows you to capture and save data from the Unity Editor
+    during Play mode: animations, videos, images, audio, and more.'
+  errors: []
+  versions:
+    all:
+    - 2.0.0-preview.6
+    - 2.0.1-preview.1
+    - 2.0.2-preview.3
+    - 2.0.3-preview.1
+    - 2.1.0-preview.1
+    - 2.2.0-preview.4
+    - 2.3.0-preview.3
+    - 2.4.0-preview.1
+    - 2.5.0-pre.1
+    - 2.5.2
+    - 2.5.4
+    - 2.5.5
+    - 2.5.7
+    - 2.6.0-exp.3
+    - 2.6.0-exp.4
+    - 3.0.0-pre.1
+    - 3.0.0-pre.2
+    - 3.0.0
+    - 3.0.1
+    - 3.0.2
+    - 3.0.3
+    - 3.0.4
+    - 4.0.0-pre.1
+    - 4.0.0-pre.2
+    - 4.0.0-pre.3
+    - 4.0.0-pre.4
+    - 4.0.0-pre.5
+    - 4.0.0
+    - 4.0.1
+    - 4.0.2
+    - 4.0.3
+    - 5.0.0-pre.1
+    - 5.0.0
+    - 5.1.0-pre.1
+    - 5.1.0
+    - 5.1.1
+    - 5.1.2
+    compatible:
+    - 5.0.0
+    - 5.1.0-pre.1
+    - 5.1.0
+    - 5.1.1
+    - 5.1.2
+    recommended: 5.0.0
+    deprecated: []
+  dependencies:
+  - name: com.unity.timeline
+    version: 1.0.0
+  resolvedDependencies:
+  - name: com.unity.timeline
+    version: 1.8.6
+  - name: com.unity.modules.audio
+    version: 1.0.0
+  - name: com.unity.modules.director
+    version: 1.0.0
+  - name: com.unity.modules.animation
+    version: 1.0.0
+  - name: com.unity.modules.particlesystem
+    version: 1.0.0
+  keywords:
+  - unity
+  - recorder
+  - recording
+  - capture
+  - video
+  - animation
+  - clip
+  - images
+  - render
+  - pass
+  - layer
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 1
+  isAssetStorePackage: 0
+  datePublishedTicks: 638320170720000000
+  documentationUrl: https://docs.unity3d.com/Packages/com.unity.recorder@5.0/manual/index.html
+  hasRepository: 1
+  repository:
+    type: git
+    url: https://github.cds.internal.unity3d.com/unity/com.unity.recorder.git
+    revision: cd750a66bf75ef56d93106b65f5ff599a8eb0016
+    path: 
+  unityLifecycle:
+    version: 5.0.0
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: '{"changelog":"### Added\n- Tutorial in documentation to set up a
+    Unity project with API scripting for starting recordings via a command line. 
+    \n\n### Changed\n- Removed resolution automatic rounding to the nearest even
+    number when Movie Recorder uses MP4 codec and \"Match Window Size\" output resolution.\n\n###
+    Fixed\n- Prevent video output from being corrupted when generated via a Recorder
+    Clip run through a Scene loaded in Play mode.\n- Ensure the project uses the
+    right RenderPipeline settings at all time: quality RenderPipeline settings or
+    default RenderPipeline settings.\n- Ensure that the status messages at the bottom
+    of the Recorder window are always readable even if the window is small."}'
+  assetStore:
+    productId: 
 - packageId: com.unity.timeline@1.8.6
   testable: 0
   isDirectDependency: 1
@@ -1110,6 +1259,7 @@ m_ResolvedPackages:
     - 1.7.4
     - 1.7.5
     - 1.7.6
+    - 1.7.7
     - 1.8.0
     - 1.8.1
     - 1.8.2
@@ -1118,24 +1268,26 @@ m_ResolvedPackages:
     - 1.8.5
     - 1.8.6
     - 1.8.7
+    - 1.8.8
     compatible:
     - 1.8.6
     - 1.8.7
-    recommended: 1.8.7
+    - 1.8.8
+    recommended: 1.8.8
     deprecated: []
   dependencies:
+  - name: com.unity.modules.audio
+    version: 1.0.0
   - name: com.unity.modules.director
     version: 1.0.0
   - name: com.unity.modules.animation
     version: 1.0.0
-  - name: com.unity.modules.audio
-    version: 1.0.0
   - name: com.unity.modules.particlesystem
     version: 1.0.0
   resolvedDependencies:
-  - name: com.unity.modules.director
-    version: 1.0.0
   - name: com.unity.modules.audio
+    version: 1.0.0
+  - name: com.unity.modules.director
     version: 1.0.0
   - name: com.unity.modules.animation
     version: 1.0.0
@@ -1325,12 +1477,16 @@ m_ResolvedPackages:
     - 1.9.1
     - 1.9.2
     - 1.9.4
+    - 1.9.5
+    - 1.9.6
     compatible:
     - 1.8.0
     - 1.9.0
     - 1.9.1
     - 1.9.2
     - 1.9.4
+    - 1.9.5
+    - 1.9.6
     recommended: 1.8.0
     deprecated:
     - 1.8.0-pre.1
@@ -1522,6 +1678,8 @@ m_ResolvedPackages:
     - 5.1.3
     - 5.1.4
     - 5.1.5
+    - 5.1.6
+    - 5.2.0
     - 6.0.0-pre.3
     - 6.0.0-pre.4
     - 6.0.0-pre.5
@@ -1530,51 +1688,64 @@ m_ResolvedPackages:
     - 6.0.0-pre.8
     - 6.0.1
     - 6.0.2
+    - 6.0.3
+    - 6.0.4
+    - 6.0.5
+    - 6.1.0-pre.1
+    - 6.1.0-pre.2
+    - 6.1.0-pre.3
+    - 6.1.0-pre.4
+    - 6.1.0-pre.5
+    - 6.1.0
     compatible:
     - 5.1.3
     - 5.1.4
     - 5.1.5
+    - 5.1.6
+    - 5.2.0
     - 6.0.0-pre.3
     - 6.0.0-pre.4
     - 6.0.0-pre.5
-    recommended: 5.1.5
+    recommended: 5.1.6
     deprecated: []
   dependencies:
-  - name: com.unity.editorcoroutines
+  - name: com.unity.ugui
+    version: 1.0.0
+  - name: com.unity.modules.ui
     version: 1.0.0
   - name: com.unity.inputsystem
     version: 1.3.0
+  - name: com.unity.mathematics
+    version: 1.2.5
   - name: com.unity.xr.core-utils
     version: 2.2.1
   - name: com.unity.xr.management
     version: 4.0.1
-  - name: com.unity.ugui
+  - name: com.unity.editorcoroutines
     version: 1.0.0
-  - name: com.unity.mathematics
-    version: 1.2.5
   - name: com.unity.modules.particlesystem
-    version: 1.0.0
-  - name: com.unity.modules.ui
     version: 1.0.0
   - name: com.unity.modules.unityanalytics
     version: 1.0.0
   - name: com.unity.modules.unitywebrequest
     version: 1.0.0
   resolvedDependencies:
-  - name: com.unity.editorcoroutines
+  - name: com.unity.ugui
+    version: 2.0.0
+  - name: com.unity.modules.ui
+    version: 1.0.0
+  - name: com.unity.modules.imgui
     version: 1.0.0
   - name: com.unity.inputsystem
     version: 1.7.0
   - name: com.unity.modules.uielements
     version: 1.0.0
-  - name: com.unity.modules.ui
-    version: 1.0.0
-  - name: com.unity.modules.imgui
-    version: 1.0.0
   - name: com.unity.modules.jsonserialize
     version: 1.0.0
   - name: com.unity.modules.hierarchycore
     version: 1.0.0
+  - name: com.unity.mathematics
+    version: 1.2.6
   - name: com.unity.xr.core-utils
     version: 2.3.0
   - name: com.unity.modules.xr
@@ -1589,10 +1760,8 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.xr.legacyinputhelpers
     version: 2.1.10
-  - name: com.unity.ugui
-    version: 2.0.0
-  - name: com.unity.mathematics
-    version: 1.2.6
+  - name: com.unity.editorcoroutines
+    version: 1.0.0
   - name: com.unity.modules.particlesystem
     version: 1.0.0
   - name: com.unity.modules.unityanalytics
@@ -1679,29 +1848,43 @@ m_ResolvedPackages:
     - 1.4.0-pre.1
     - 1.4.0
     - 1.4.1
+    - 1.4.3
     - 1.5.0-pre.1
     - 1.5.0-pre.3
+    - 1.5.0-pre.4
+    - 1.5.0
     compatible:
     - 1.3.0
     - 1.4.0-pre.1
     - 1.4.0
     - 1.4.1
+    - 1.4.3
     - 1.5.0-pre.1
     - 1.5.0-pre.3
+    - 1.5.0-pre.4
+    - 1.5.0
     recommended: 1.3.0
     deprecated: []
   dependencies:
-  - name: com.unity.inputsystem
-    version: 1.3.0
   - name: com.unity.modules.xr
     version: 1.0.0
+  - name: com.unity.inputsystem
+    version: 1.3.0
+  - name: com.unity.mathematics
+    version: 1.2.6
   - name: com.unity.xr.core-utils
     version: 2.2.0
   - name: com.unity.xr.management
     version: 4.0.1
-  - name: com.unity.mathematics
-    version: 1.2.6
   resolvedDependencies:
+  - name: com.unity.modules.xr
+    version: 1.0.0
+  - name: com.unity.modules.physics
+    version: 1.0.0
+  - name: com.unity.modules.jsonserialize
+    version: 1.0.0
+  - name: com.unity.modules.subsystems
+    version: 1.0.0
   - name: com.unity.inputsystem
     version: 1.7.0
   - name: com.unity.modules.uielements
@@ -1710,16 +1893,10 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.modules.imgui
     version: 1.0.0
-  - name: com.unity.modules.jsonserialize
-    version: 1.0.0
   - name: com.unity.modules.hierarchycore
     version: 1.0.0
-  - name: com.unity.modules.xr
-    version: 1.0.0
-  - name: com.unity.modules.physics
-    version: 1.0.0
-  - name: com.unity.modules.subsystems
-    version: 1.0.0
+  - name: com.unity.mathematics
+    version: 1.2.6
   - name: com.unity.xr.core-utils
     version: 2.3.0
   - name: com.unity.xr.management
@@ -1728,8 +1905,6 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.xr.legacyinputhelpers
     version: 2.1.10
-  - name: com.unity.mathematics
-    version: 1.2.6
   keywords:
   - xr
   - vr
@@ -1830,38 +2005,40 @@ m_ResolvedPackages:
     - 1.11.0
     - 1.11.1-exp.1
     - 1.12.0-exp.1
+    - 1.12.0
+    - 1.12.1
+    - 1.13.0
+    - 1.13.1
+    - 1.13.2
+    - 1.14.0
+    - 1.14.1
+    - 1.14.2
     compatible:
     - 1.10.0
     - 1.11.0-exp.1
     - 1.11.0
     - 1.11.1-exp.1
     - 1.12.0-exp.1
+    - 1.12.0
+    - 1.12.1
+    - 1.13.0
+    - 1.13.1
+    - 1.13.2
+    - 1.14.0
+    - 1.14.1
+    - 1.14.2
     recommended: 1.10.0
     deprecated: []
   dependencies:
-  - name: com.unity.xr.management
-    version: 4.4.0
-  - name: com.unity.xr.legacyinputhelpers
-    version: 2.1.2
   - name: com.unity.inputsystem
     version: 1.6.3
   - name: com.unity.xr.core-utils
     version: 2.1.1
-  resolvedDependencies:
   - name: com.unity.xr.management
     version: 4.4.0
-  - name: com.unity.modules.subsystems
-    version: 1.0.0
-  - name: com.unity.modules.jsonserialize
-    version: 1.0.0
-  - name: com.unity.modules.vr
-    version: 1.0.0
-  - name: com.unity.modules.physics
-    version: 1.0.0
-  - name: com.unity.modules.xr
-    version: 1.0.0
   - name: com.unity.xr.legacyinputhelpers
-    version: 2.1.10
+    version: 2.1.2
+  resolvedDependencies:
   - name: com.unity.inputsystem
     version: 1.7.0
   - name: com.unity.modules.uielements
@@ -1870,10 +2047,24 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.modules.imgui
     version: 1.0.0
+  - name: com.unity.modules.jsonserialize
+    version: 1.0.0
   - name: com.unity.modules.hierarchycore
     version: 1.0.0
   - name: com.unity.xr.core-utils
     version: 2.3.0
+  - name: com.unity.modules.xr
+    version: 1.0.0
+  - name: com.unity.modules.physics
+    version: 1.0.0
+  - name: com.unity.modules.subsystems
+    version: 1.0.0
+  - name: com.unity.xr.management
+    version: 4.4.0
+  - name: com.unity.modules.vr
+    version: 1.0.0
+  - name: com.unity.xr.legacyinputhelpers
+    version: 2.1.10
   keywords:
   - openxr
   - xr
@@ -1977,13 +2168,15 @@ m_ResolvedPackages:
     version: 3.2.0
   - name: com.unity.xr.interaction.toolkit
     version: 2.5.2
-  - name: com.unity.inputsystem
-    version: 1.7.0
-  - name: com.unity.modules.uielements
-    version: 1.0.0
+  - name: com.unity.ugui
+    version: 2.0.0
   - name: com.unity.modules.ui
     version: 1.0.0
   - name: com.unity.modules.imgui
+    version: 1.0.0
+  - name: com.unity.inputsystem
+    version: 1.7.0
+  - name: com.unity.modules.uielements
     version: 1.0.0
   - name: com.unity.modules.jsonserialize
     version: 1.0.0
@@ -1991,8 +2184,8 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.mathematics
     version: 1.2.6
-  - name: com.unity.ugui
-    version: 2.0.0
+  - name: com.unity.modules.audio
+    version: 1.0.0
   - name: com.unity.xr.core-utils
     version: 2.3.0
   - name: com.unity.modules.xr
@@ -2004,8 +2197,6 @@ m_ResolvedPackages:
   - name: com.unity.xr.legacyinputhelpers
     version: 2.1.10
   - name: com.unity.modules.vr
-    version: 1.0.0
-  - name: com.unity.modules.audio
     version: 1.0.0
   - name: com.unity.xr.management
     version: 4.4.0
@@ -2073,8 +2264,12 @@ m_ResolvedPackages:
     note that audio spatializer plugins may be platform specific.'
   errors: []
   versions:
-    all: []
-    compatible: []
+    all:
+    - 3.0.3
+    - 3.0.4
+    compatible:
+    - 3.0.3
+    - 3.0.4
     recommended: 
     deprecated: []
   dependencies:
@@ -2085,13 +2280,15 @@ m_ResolvedPackages:
     version: 3.2.0
   - name: com.unity.xr.interaction.toolkit
     version: 2.5.2
-  - name: com.unity.inputsystem
-    version: 1.7.0
-  - name: com.unity.modules.uielements
-    version: 1.0.0
+  - name: com.unity.ugui
+    version: 2.0.0
   - name: com.unity.modules.ui
     version: 1.0.0
   - name: com.unity.modules.imgui
+    version: 1.0.0
+  - name: com.unity.inputsystem
+    version: 1.7.0
+  - name: com.unity.modules.uielements
     version: 1.0.0
   - name: com.unity.modules.jsonserialize
     version: 1.0.0
@@ -2099,8 +2296,8 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.mathematics
     version: 1.2.6
-  - name: com.unity.ugui
-    version: 2.0.0
+  - name: com.unity.modules.audio
+    version: 1.0.0
   - name: com.unity.xr.core-utils
     version: 2.3.0
   - name: com.unity.modules.xr
@@ -2112,8 +2309,6 @@ m_ResolvedPackages:
   - name: com.unity.xr.legacyinputhelpers
     version: 2.1.10
   - name: com.unity.modules.vr
-    version: 1.0.0
-  - name: com.unity.modules.audio
     version: 1.0.0
   - name: com.unity.xr.management
     version: 4.4.0
@@ -2172,8 +2367,10 @@ m_ResolvedPackages:
     other packages in the MRTK ecosystem.
   errors: []
   versions:
-    all: []
-    compatible: []
+    all:
+    - 3.2.2
+    compatible:
+    - 3.2.2
     recommended: 
     deprecated: []
   dependencies:
@@ -2186,13 +2383,15 @@ m_ResolvedPackages:
   resolvedDependencies:
   - name: com.unity.xr.interaction.toolkit
     version: 2.5.2
-  - name: com.unity.inputsystem
-    version: 1.7.0
-  - name: com.unity.modules.uielements
-    version: 1.0.0
+  - name: com.unity.ugui
+    version: 2.0.0
   - name: com.unity.modules.ui
     version: 1.0.0
   - name: com.unity.modules.imgui
+    version: 1.0.0
+  - name: com.unity.inputsystem
+    version: 1.7.0
+  - name: com.unity.modules.uielements
     version: 1.0.0
   - name: com.unity.modules.jsonserialize
     version: 1.0.0
@@ -2200,8 +2399,8 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.mathematics
     version: 1.2.6
-  - name: com.unity.ugui
-    version: 2.0.0
+  - name: com.unity.modules.audio
+    version: 1.0.0
   - name: com.unity.xr.core-utils
     version: 2.3.0
   - name: com.unity.modules.xr
@@ -2213,8 +2412,6 @@ m_ResolvedPackages:
   - name: com.unity.xr.legacyinputhelpers
     version: 2.1.10
   - name: com.unity.modules.vr
-    version: 1.0.0
-  - name: com.unity.modules.audio
     version: 1.0.0
   - name: com.unity.xr.management
     version: 4.4.0
@@ -2288,13 +2485,15 @@ m_ResolvedPackages:
     version: 3.2.0
   - name: com.unity.xr.interaction.toolkit
     version: 2.5.2
-  - name: com.unity.inputsystem
-    version: 1.7.0
-  - name: com.unity.modules.uielements
-    version: 1.0.0
+  - name: com.unity.ugui
+    version: 2.0.0
   - name: com.unity.modules.ui
     version: 1.0.0
   - name: com.unity.modules.imgui
+    version: 1.0.0
+  - name: com.unity.inputsystem
+    version: 1.7.0
+  - name: com.unity.modules.uielements
     version: 1.0.0
   - name: com.unity.modules.jsonserialize
     version: 1.0.0
@@ -2302,8 +2501,8 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.mathematics
     version: 1.2.6
-  - name: com.unity.ugui
-    version: 2.0.0
+  - name: com.unity.modules.audio
+    version: 1.0.0
   - name: com.unity.xr.core-utils
     version: 2.3.0
   - name: com.unity.modules.xr
@@ -2315,8 +2514,6 @@ m_ResolvedPackages:
   - name: com.unity.xr.legacyinputhelpers
     version: 2.1.10
   - name: com.unity.modules.vr
-    version: 1.0.0
-  - name: com.unity.modules.audio
     version: 1.0.0
   - name: com.unity.xr.management
     version: 4.4.0
@@ -2375,8 +2572,10 @@ m_ResolvedPackages:
     located in StandardAssets.
   errors: []
   versions:
-    all: []
-    compatible: []
+    all:
+    - 3.0.3
+    compatible:
+    - 3.0.3
     recommended: 
     deprecated: []
   dependencies:
@@ -2450,8 +2649,10 @@ m_ResolvedPackages:
     interactions that other XRI interactors will."
   errors: []
   versions:
-    all: []
-    compatible: []
+    all:
+    - 3.2.2
+    compatible:
+    - 3.2.2
     recommended: 
     deprecated: []
   dependencies:
@@ -2486,8 +2687,10 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.xr.arfoundation
     version: 5.1.3
-  - name: com.unity.editorcoroutines
-    version: 1.0.0
+  - name: com.unity.ugui
+    version: 2.0.0
+  - name: com.unity.mathematics
+    version: 1.2.6
   - name: com.unity.xr.core-utils
     version: 2.3.0
   - name: com.unity.modules.xr
@@ -2502,10 +2705,8 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.xr.legacyinputhelpers
     version: 2.1.10
-  - name: com.unity.ugui
-    version: 2.0.0
-  - name: com.unity.mathematics
-    version: 1.2.6
+  - name: com.unity.editorcoroutines
+    version: 1.0.0
   - name: com.unity.modules.particlesystem
     version: 1.0.0
   - name: com.unity.modules.unityanalytics
@@ -2576,8 +2777,10 @@ m_ResolvedPackages:
   versions:
     all:
     - 3.3.0
+    - 3.3.1
     compatible:
     - 3.3.0
+    - 3.3.1
     recommended: 
     deprecated: []
   dependencies:
@@ -2594,13 +2797,15 @@ m_ResolvedPackages:
     version: 3.2.0
   - name: com.unity.xr.interaction.toolkit
     version: 2.5.2
-  - name: com.unity.inputsystem
-    version: 1.7.0
-  - name: com.unity.modules.uielements
-    version: 1.0.0
+  - name: com.unity.ugui
+    version: 2.0.0
   - name: com.unity.modules.ui
     version: 1.0.0
   - name: com.unity.modules.imgui
+    version: 1.0.0
+  - name: com.unity.inputsystem
+    version: 1.7.0
+  - name: com.unity.modules.uielements
     version: 1.0.0
   - name: com.unity.modules.jsonserialize
     version: 1.0.0
@@ -2608,8 +2813,8 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.mathematics
     version: 1.2.6
-  - name: com.unity.ugui
-    version: 2.0.0
+  - name: com.unity.modules.audio
+    version: 1.0.0
   - name: com.unity.xr.core-utils
     version: 2.3.0
   - name: com.unity.modules.xr
@@ -2621,8 +2826,6 @@ m_ResolvedPackages:
   - name: com.unity.xr.legacyinputhelpers
     version: 2.1.10
   - name: com.unity.modules.vr
-    version: 1.0.0
-  - name: com.unity.modules.audio
     version: 1.0.0
   - name: com.unity.xr.management
     version: 4.4.0
@@ -2752,8 +2955,10 @@ m_ResolvedPackages:
     create and analyze components for use with MRTK3.
   errors: []
   versions:
-    all: []
-    compatible: []
+    all:
+    - 3.0.4
+    compatible:
+    - 3.0.4
     recommended: 
     deprecated: []
   dependencies:
@@ -2764,13 +2969,15 @@ m_ResolvedPackages:
     version: 3.2.0
   - name: com.unity.xr.interaction.toolkit
     version: 2.5.2
-  - name: com.unity.inputsystem
-    version: 1.7.0
-  - name: com.unity.modules.uielements
-    version: 1.0.0
+  - name: com.unity.ugui
+    version: 2.0.0
   - name: com.unity.modules.ui
     version: 1.0.0
   - name: com.unity.modules.imgui
+    version: 1.0.0
+  - name: com.unity.inputsystem
+    version: 1.7.0
+  - name: com.unity.modules.uielements
     version: 1.0.0
   - name: com.unity.modules.jsonserialize
     version: 1.0.0
@@ -2778,8 +2985,8 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.mathematics
     version: 1.2.6
-  - name: com.unity.ugui
-    version: 2.0.0
+  - name: com.unity.modules.audio
+    version: 1.0.0
   - name: com.unity.xr.core-utils
     version: 2.3.0
   - name: com.unity.modules.xr
@@ -2791,8 +2998,6 @@ m_ResolvedPackages:
   - name: com.unity.xr.legacyinputhelpers
     version: 2.1.10
   - name: com.unity.modules.vr
-    version: 1.0.0
-  - name: com.unity.modules.audio
     version: 1.0.0
   - name: com.unity.xr.management
     version: 4.4.0
@@ -2877,13 +3082,15 @@ m_ResolvedPackages:
     version: 3.2.0
   - name: com.unity.xr.interaction.toolkit
     version: 2.5.2
-  - name: com.unity.inputsystem
-    version: 1.7.0
-  - name: com.unity.modules.uielements
-    version: 1.0.0
+  - name: com.unity.ugui
+    version: 2.0.0
   - name: com.unity.modules.ui
     version: 1.0.0
   - name: com.unity.modules.imgui
+    version: 1.0.0
+  - name: com.unity.inputsystem
+    version: 1.7.0
+  - name: com.unity.modules.uielements
     version: 1.0.0
   - name: com.unity.modules.jsonserialize
     version: 1.0.0
@@ -2891,8 +3098,8 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.mathematics
     version: 1.2.6
-  - name: com.unity.ugui
-    version: 2.0.0
+  - name: com.unity.modules.audio
+    version: 1.0.0
   - name: com.unity.xr.core-utils
     version: 2.3.0
   - name: com.unity.modules.xr
@@ -2904,8 +3111,6 @@ m_ResolvedPackages:
   - name: com.unity.xr.legacyinputhelpers
     version: 2.1.10
   - name: com.unity.modules.vr
-    version: 1.0.0
-  - name: com.unity.modules.audio
     version: 1.0.0
   - name: com.unity.xr.management
     version: 4.4.0
@@ -2972,8 +3177,10 @@ m_ResolvedPackages:
     and may be desirable in resource-constrained scenarios.
   errors: []
   versions:
-    all: []
-    compatible: []
+    all:
+    - 3.1.4
+    compatible:
+    - 3.1.4
     recommended: 
     deprecated: []
   dependencies:
@@ -2992,13 +3199,15 @@ m_ResolvedPackages:
     version: 3.2.0
   - name: com.unity.xr.interaction.toolkit
     version: 2.5.2
-  - name: com.unity.inputsystem
-    version: 1.7.0
-  - name: com.unity.modules.uielements
-    version: 1.0.0
+  - name: com.unity.ugui
+    version: 2.0.0
   - name: com.unity.modules.ui
     version: 1.0.0
   - name: com.unity.modules.imgui
+    version: 1.0.0
+  - name: com.unity.inputsystem
+    version: 1.7.0
+  - name: com.unity.modules.uielements
     version: 1.0.0
   - name: com.unity.modules.jsonserialize
     version: 1.0.0
@@ -3006,8 +3215,8 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.mathematics
     version: 1.2.6
-  - name: com.unity.ugui
-    version: 2.0.0
+  - name: com.unity.modules.audio
+    version: 1.0.0
   - name: com.unity.xr.core-utils
     version: 2.3.0
   - name: com.unity.modules.xr
@@ -3019,8 +3228,6 @@ m_ResolvedPackages:
   - name: com.unity.xr.legacyinputhelpers
     version: 2.1.10
   - name: com.unity.modules.vr
-    version: 1.0.0
-  - name: com.unity.modules.audio
     version: 1.0.0
   - name: com.unity.xr.management
     version: 4.4.0
@@ -3089,8 +3296,10 @@ m_ResolvedPackages:
     see org.mixedrealitytoolkit.uxcomponents.'
   errors: []
   versions:
-    all: []
-    compatible: []
+    all:
+    - 3.2.2
+    compatible:
+    - 3.2.2
     recommended: 
     deprecated: []
   dependencies:
@@ -3111,13 +3320,15 @@ m_ResolvedPackages:
     version: 3.2.0
   - name: com.unity.xr.interaction.toolkit
     version: 2.5.2
-  - name: com.unity.inputsystem
-    version: 1.7.0
-  - name: com.unity.modules.uielements
-    version: 1.0.0
+  - name: com.unity.ugui
+    version: 2.0.0
   - name: com.unity.modules.ui
     version: 1.0.0
   - name: com.unity.modules.imgui
+    version: 1.0.0
+  - name: com.unity.inputsystem
+    version: 1.7.0
+  - name: com.unity.modules.uielements
     version: 1.0.0
   - name: com.unity.modules.jsonserialize
     version: 1.0.0
@@ -3125,8 +3336,8 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.mathematics
     version: 1.2.6
-  - name: com.unity.ugui
-    version: 2.0.0
+  - name: com.unity.modules.audio
+    version: 1.0.0
   - name: com.unity.xr.core-utils
     version: 2.3.0
   - name: com.unity.modules.xr
@@ -3138,8 +3349,6 @@ m_ResolvedPackages:
   - name: com.unity.xr.legacyinputhelpers
     version: 2.1.10
   - name: com.unity.modules.vr
-    version: 1.0.0
-  - name: com.unity.modules.audio
     version: 1.0.0
   - name: com.unity.xr.management
     version: 4.4.0
@@ -3218,13 +3427,15 @@ m_ResolvedPackages:
     version: 3.2.0
   - name: com.unity.xr.interaction.toolkit
     version: 2.5.2
-  - name: com.unity.inputsystem
-    version: 1.7.0
-  - name: com.unity.modules.uielements
-    version: 1.0.0
+  - name: com.unity.ugui
+    version: 2.0.0
   - name: com.unity.modules.ui
     version: 1.0.0
   - name: com.unity.modules.imgui
+    version: 1.0.0
+  - name: com.unity.inputsystem
+    version: 1.7.0
+  - name: com.unity.modules.uielements
     version: 1.0.0
   - name: com.unity.modules.jsonserialize
     version: 1.0.0
@@ -3232,8 +3443,8 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.mathematics
     version: 1.2.6
-  - name: com.unity.ugui
-    version: 2.0.0
+  - name: com.unity.modules.audio
+    version: 1.0.0
   - name: com.unity.xr.core-utils
     version: 2.3.0
   - name: com.unity.modules.xr
@@ -3245,8 +3456,6 @@ m_ResolvedPackages:
   - name: com.unity.xr.legacyinputhelpers
     version: 2.1.10
   - name: com.unity.modules.vr
-    version: 1.0.0
-  - name: com.unity.modules.audio
     version: 1.0.0
   - name: com.unity.xr.management
     version: 4.4.0
@@ -5604,6 +5813,14 @@ m_ResolvedPackages:
     - 1.8.1
     - 1.8.2
     - 1.9.0
+    - 1.10.0
+    - 1.11.0
+    - 1.11.1
+    - 1.11.2
+    - 1.12.0
+    - 1.13.0
+    - 1.13.1
+    - 1.14.0
     compatible:
     - 1.7.0
     - 1.8.0-pre.1
@@ -5612,6 +5829,14 @@ m_ResolvedPackages:
     - 1.8.1
     - 1.8.2
     - 1.9.0
+    - 1.10.0
+    - 1.11.0
+    - 1.11.1
+    - 1.11.2
+    - 1.12.0
+    - 1.13.0
+    - 1.13.1
+    - 1.14.0
     recommended: 1.7.0
     deprecated: []
   dependencies:
@@ -5806,6 +6031,8 @@ m_ResolvedPackages:
     - 3.2.0-pre.8
     - 3.2.0-pre.9
     - 3.2.0-pre.10
+    - 3.2.0-pre.11
+    - 3.2.0-pre.12
     - 4.0.0-pre.1
     - 4.0.0-pre.2
     - 5.0.0
@@ -5922,49 +6149,69 @@ m_ResolvedPackages:
     - 2.5.2
     - 2.5.3
     - 2.5.4
+    - 2.6.3
+    - 2.6.4
     - 3.0.0-pre.1
     - 3.0.0-pre.2
     - 3.0.0
     - 3.0.1
     - 3.0.3
     - 3.0.4
+    - 3.0.5
+    - 3.0.6
+    - 3.0.7
+    - 3.0.8
+    - 3.1.0-pre.1
+    - 3.1.0
+    - 3.1.1
     compatible:
     - 2.5.2
     - 2.5.3
     - 2.5.4
+    - 2.6.3
+    - 2.6.4
     - 3.0.0-pre.1
     - 3.0.0-pre.2
     - 3.0.0
     - 3.0.1
     - 3.0.3
     - 3.0.4
+    - 3.0.5
+    - 3.0.6
+    - 3.0.7
+    - 3.0.8
+    - 3.1.0-pre.1
+    - 3.1.0
+    - 3.1.1
     recommended: 2.5.4
     deprecated: []
   dependencies:
+  - name: com.unity.ugui
+    version: 1.0.0
   - name: com.unity.inputsystem
     version: 1.7.0
   - name: com.unity.mathematics
     version: 1.2.6
-  - name: com.unity.ugui
-    version: 1.0.0
-  - name: com.unity.xr.core-utils
-    version: 2.2.3
-  - name: com.unity.xr.legacyinputhelpers
-    version: 2.1.10
   - name: com.unity.modules.audio
     version: 1.0.0
   - name: com.unity.modules.imgui
     version: 1.0.0
+  - name: com.unity.xr.core-utils
+    version: 2.2.3
   - name: com.unity.modules.physics
     version: 1.0.0
+  - name: com.unity.xr.legacyinputhelpers
+    version: 2.1.10
   resolvedDependencies:
-  - name: com.unity.inputsystem
-    version: 1.7.0
-  - name: com.unity.modules.uielements
-    version: 1.0.0
+  - name: com.unity.ugui
+    version: 2.0.0
   - name: com.unity.modules.ui
     version: 1.0.0
   - name: com.unity.modules.imgui
+    version: 1.0.0
+  - name: com.unity.inputsystem
+    version: 1.7.0
+  - name: com.unity.modules.uielements
     version: 1.0.0
   - name: com.unity.modules.jsonserialize
     version: 1.0.0
@@ -5972,8 +6219,8 @@ m_ResolvedPackages:
     version: 1.0.0
   - name: com.unity.mathematics
     version: 1.2.6
-  - name: com.unity.ugui
-    version: 2.0.0
+  - name: com.unity.modules.audio
+    version: 1.0.0
   - name: com.unity.xr.core-utils
     version: 2.3.0
   - name: com.unity.modules.xr
@@ -5985,8 +6232,6 @@ m_ResolvedPackages:
   - name: com.unity.xr.legacyinputhelpers
     version: 2.1.10
   - name: com.unity.modules.vr
-    version: 1.0.0
-  - name: com.unity.modules.audio
     version: 1.0.0
   keywords:
   - XR
@@ -6086,11 +6331,19 @@ m_ResolvedPackages:
     - 2.4.0-exp.1
     - 2.4.0-exp.2
     - 2.4.0-exp.3
+    - 2.4.0
+    - 2.5.0
+    - 2.5.1
+    - 2.5.2
     compatible:
     - 2.3.0
     - 2.4.0-exp.1
     - 2.4.0-exp.2
     - 2.4.0-exp.3
+    - 2.4.0
+    - 2.5.0
+    - 2.5.1
+    - 2.5.2
     recommended: 2.3.0
     deprecated: []
   dependencies:
@@ -6225,31 +6478,33 @@ m_ResolvedPackages:
     - 4.4.0
     - 4.4.1
     - 4.5.0
+    - 4.5.1
     compatible:
     - 4.4.0
     - 4.4.1
     - 4.5.0
+    - 4.5.1
     recommended: 4.4.1
     deprecated: []
   dependencies:
-  - name: com.unity.modules.subsystems
-    version: 1.0.0
   - name: com.unity.modules.vr
     version: 1.0.0
   - name: com.unity.modules.xr
+    version: 1.0.0
+  - name: com.unity.modules.subsystems
     version: 1.0.0
   - name: com.unity.xr.legacyinputhelpers
     version: 2.1.7
   resolvedDependencies:
-  - name: com.unity.modules.subsystems
+  - name: com.unity.modules.vr
     version: 1.0.0
   - name: com.unity.modules.jsonserialize
-    version: 1.0.0
-  - name: com.unity.modules.vr
     version: 1.0.0
   - name: com.unity.modules.physics
     version: 1.0.0
   - name: com.unity.modules.xr
+    version: 1.0.0
+  - name: com.unity.modules.subsystems
     version: 1.0.0
   - name: com.unity.xr.legacyinputhelpers
     version: 2.1.10
@@ -6347,9 +6602,13 @@ m_ResolvedPackages:
     - 2.1.8
     - 2.1.9
     - 2.1.10
+    - 2.1.11
+    - 2.1.12
     compatible:
     - 2.1.10
-    recommended: 2.1.10
+    - 2.1.11
+    - 2.1.12
+    recommended: 2.1.12
     deprecated: []
   dependencies:
   - name: com.unity.modules.vr
@@ -6541,7 +6800,7 @@ m_ResolvedPackages:
     configSource: 0
   hideInEditor: 1
   entitlements:
-    licensingModel: 0
+    licensingModel: 1
   isAssetStorePackage: 0
   datePublishedTicks: 637232611380000000
   documentationUrl: 
@@ -6610,9 +6869,11 @@ m_ResolvedPackages:
     - 2.0.20
     - 2.0.21
     - 2.0.22
+    - 2.0.23
     compatible:
     - 2.0.22
-    recommended: 2.0.22
+    - 2.0.23
+    recommended: 2.0.23
     deprecated: []
   dependencies:
   - name: com.unity.test-framework
@@ -6730,10 +6991,14 @@ m_ResolvedPackages:
     - 3.0.27
     - 3.0.28
     - 3.0.31
+    - 3.0.34
+    - 3.0.35
     compatible:
     - 3.0.28
     - 3.0.31
-    recommended: 3.0.31
+    - 3.0.34
+    - 3.0.35
+    recommended: 3.0.35
     deprecated: []
   dependencies:
   - name: com.unity.ext.nunit
@@ -6815,9 +7080,11 @@ m_ResolvedPackages:
     - 1.1.0
     - 1.1.1
     - 1.2.2
+    - 1.2.3
     compatible:
     - 1.2.2
-    recommended: 1.2.2
+    - 1.2.3
+    recommended: 1.2.3
     deprecated: []
   dependencies: []
   resolvedDependencies: []
@@ -6924,6 +7191,8 @@ m_ResolvedPackages:
     - 1.4.2
     - 1.4.3
     - 1.4.4
+    - 1.4.5
+    - 1.4.6
     - 2.0.1-exp.1
     - 2.0.1-exp.2
     - 2.0.1-pre.12
@@ -6935,6 +7204,8 @@ m_ResolvedPackages:
     - 1.4.2
     - 1.4.3
     - 1.4.4
+    - 1.4.5
+    - 1.4.6
     - 2.0.1-exp.1
     - 2.0.1-exp.2
     - 2.0.1-pre.12
@@ -7051,9 +7322,11 @@ m_ResolvedPackages:
     - 1.2.3
     - 1.2.4
     - 1.2.5
+    - 1.2.6
     compatible:
     - 1.2.5
-    recommended: 1.2.5
+    - 1.2.6
+    recommended: 1.2.6
     deprecated: []
   dependencies:
   - name: com.unity.test-framework
@@ -7255,48 +7528,62 @@ m_ResolvedPackages:
     - 1.21.20
     - 1.21.21
     - 1.22.2
+    - 1.22.3
+    - 1.23.1
     - 2.0.3
     - 2.0.4
     - 2.0.6
     - 2.0.8
     - 2.1.0
     - 2.2.2
+    - 2.3.0
+    - 2.3.1
+    - 2.3.7
+    - 2.3.16
+    - 2.4.1
     compatible:
     - 1.21.20
     - 1.21.21
     - 1.22.2
+    - 1.22.3
+    - 1.23.1
     - 2.0.3
     - 2.0.4
     - 2.0.6
     - 2.0.8
     - 2.1.0
     - 2.2.2
+    - 2.3.0
+    - 2.3.1
+    - 2.3.7
+    - 2.3.16
+    - 2.4.1
     recommended: 1.21.21
     deprecated: []
   dependencies:
-  - name: com.unity.scriptablebuildpipeline
-    version: 1.21.22
   - name: com.unity.modules.assetbundle
-    version: 1.0.0
-  - name: com.unity.modules.imageconversion
     version: 1.0.0
   - name: com.unity.modules.jsonserialize
     version: 1.0.0
+  - name: com.unity.modules.imageconversion
+    version: 1.0.0
   - name: com.unity.modules.unitywebrequest
     version: 1.0.0
+  - name: com.unity.scriptablebuildpipeline
+    version: 1.21.22
   - name: com.unity.modules.unitywebrequestassetbundle
     version: 1.0.0
   resolvedDependencies:
-  - name: com.unity.scriptablebuildpipeline
-    version: 1.21.22
   - name: com.unity.modules.assetbundle
-    version: 1.0.0
-  - name: com.unity.modules.imageconversion
     version: 1.0.0
   - name: com.unity.modules.jsonserialize
     version: 1.0.0
+  - name: com.unity.modules.imageconversion
+    version: 1.0.0
   - name: com.unity.modules.unitywebrequest
     version: 1.0.0
+  - name: com.unity.scriptablebuildpipeline
+    version: 1.21.22
   - name: com.unity.modules.unitywebrequestassetbundle
     version: 1.0.0
   keywords:
@@ -7585,23 +7872,35 @@ m_ResolvedPackages:
     - 1.21.22
     - 1.21.23
     - 1.21.24
+    - 1.21.25
+    - 1.22.1
     - 2.0.1
     - 2.0.2
     - 2.1.0
     - 2.1.2
     - 2.1.3
     - 2.1.4
+    - 2.1.5
+    - 2.2.4
+    - 2.2.11
+    - 2.3.0
     compatible:
     - 1.21.22
     - 1.21.23
     - 1.21.24
+    - 1.21.25
+    - 1.22.1
     - 2.0.1
     - 2.0.2
     - 2.1.0
     - 2.1.2
     - 2.1.3
     - 2.1.4
-    recommended: 1.21.24
+    - 2.1.5
+    - 2.2.4
+    - 2.2.11
+    - 2.3.0
+    recommended: 1.21.25
     deprecated: []
   dependencies: []
   resolvedDependencies: []
