@@ -70,10 +70,6 @@ public class UIToggleCollection : ToggleCollection
         if (toggle == null) { return; }
         if (toggle.Action == UIPressableButton.ActionType.None) { return; }
 
-        // if (toggle.Action == UIPressableButton.ActionType.Drawing_Freehand)
-
-        // Debug.Log("Action executed for toggle {toggle.gameObject.name}");
-        // Add custom logic here
     }
 
 

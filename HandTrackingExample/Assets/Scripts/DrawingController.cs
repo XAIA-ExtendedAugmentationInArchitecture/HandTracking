@@ -57,7 +57,7 @@ public class DrawingController : MonoBehaviour
     [HideInInspector] public GameObject currentDrawingParent;
     private HandsAggregatorSubsystem aggregator;
     private string timestamp;
-    [HideInInspector] public bool newPeriodic = false;
+    public bool newPeriodic = false;
     
     public bool scaleMode = false;
     private bool delState = false;
@@ -71,20 +71,21 @@ public class DrawingController : MonoBehaviour
     [HideInInspector] public string team;
 
 
-    public void ToggleScale()
+    public void ActivateFreehandScale(bool activate)
     {
-        scaleMode =!scaleMode;
 
         if (currentDrawingParent==null)
         {
             return;
         }
 
-        currentDrawingParent.MakeInteractableBoundBox(BoundsBox, false);
-
-        if (scaleMode)
+        if (activate)
         {
             currentDrawingParent.MakeInteractableBoundBox(BoundsBox, true, true); 
+        }
+        else
+        {
+            currentDrawingParent.MakeInteractableBoundBox(BoundsBox, false); 
         }
     }
 
@@ -132,7 +133,6 @@ public class DrawingController : MonoBehaviour
             // If the aggregator is available, enable functionality
             StartCoroutine(EnableWhenSubsystemAvailable());
         }
-        uIController.ModeText.text = "DRAW mode: Hand Ray";
     }
 
     void Update()
@@ -241,14 +241,12 @@ public class DrawingController : MonoBehaviour
 
         curveManipulator.CreateControlPoints(lineObjectSimplified, ControlPointMaterial, periodic);
 
-        MappingOnCurve mapper = lineObjectSimplified.AddComponent<MappingOnCurve>();
-        mapper.CreateEndPoint( ControlPointMaterial, lineRenderer_simplified.GetPosition(0), true, false);
-
     }
 
 
     public void GenerateNewDrawings(Drawings data)
     {
+        Debug.Log("Hoiiilaaaa" );
         foreach(KeyValuePair<string, Drawing> drawEntry in data.drawings)
         {
             Drawing drawing = drawEntry.Value;
@@ -263,6 +261,7 @@ public class DrawingController : MonoBehaviour
                 lineRenderer_realtime = InstantiateLine(lineIndex, "realtime");
                 lineRenderer_realtime.positionCount = line.positions.Length;
                 lineRenderer_realtime.SetPositions(line.positions);
+                lineRenderer_realtime.material.color = new Color(line.color[0], line.color[1], line.color[2], line.color[3]);
 
                 SimplifyDrawing(false, line.periodic ,false);
             }
@@ -270,48 +269,6 @@ public class DrawingController : MonoBehaviour
         linePointIndex =-1;
     }
 
-    public void ActivateStandByNew(bool activate)
-    {
-        if (activate)
-        {
-            lastDrawingMode = drawingMode;
-            pointsOn = false;
-            pinPointsOn = false;
-            farDrawing = false;
-            drawingMode ="";
-            uIController.ModeText.text = "DRAW mode: Editing";
-            uIController.Periodic.SetActive(false);
-            EnableControlPoints(pointsOn);
-            ActivatePinPoints(pinPointsOn);
-            pinManager.newPin.SetActive(pinPointsOn);
-
-            foreach (Transform child in meshGenerator.elementsParent.transform)
-            {
-                child.gameObject.GetComponent<MeshCollider>().enabled=farDrawing;
-                child.gameObject.GetComponent<StatefulInteractable>().enabled=farDrawing;
-            }
-        }
-        else
-        {
-            if (lastDrawingMode == "pinchDrawing")
-            {
-                drawingMode ="farDrawing";
-            }
-            else if (lastDrawingMode == "controlPoints")
-            {
-                drawingMode ="pinchDrawing";
-            }
-            else if (lastDrawingMode == "pinPoints")
-            {
-                drawingMode ="controlPoints";
-            }
-            else if (lastDrawingMode == "farDrawing")
-            {
-                drawingMode ="pinPoints";
-            }
-            ToggleDrawingMode();
-        }
-    }
 
     public void ActivateElementInteraction(bool activate)
     {
@@ -363,7 +320,6 @@ public class DrawingController : MonoBehaviour
 
     public void ModePinPoints()
     {
-        Debug.Log("Tequila");
         drawingMode ="";
         pointsOn = false;
         pinPointsOn = true;
@@ -386,99 +342,7 @@ public class DrawingController : MonoBehaviour
         //pinManager.newPin.SetActive(pinPointsOn);
         ActivateElementInteraction(farDrawing);
     }
-    public void ActivateStandBy()
-    {
-        activateStandBy = !activateStandBy;
-        if (activateStandBy)
-        {
-            lastDrawingMode = drawingMode;
-            pointsOn = false;
-            pinPointsOn = false;
-            farDrawing = false;
-            drawingMode ="";
-            uIController.ModeText.text = "DRAW mode: Editing";
-            uIController.Periodic.SetActive(false);
-            EnableControlPoints(pointsOn);
-            ActivatePinPoints(pinPointsOn);
-            pinManager.newPin.SetActive(pinPointsOn);
 
-            foreach (Transform child in meshGenerator.elementsParent.transform)
-            {
-                child.gameObject.GetComponent<MeshCollider>().enabled=farDrawing;
-                child.gameObject.GetComponent<StatefulInteractable>().enabled=farDrawing;
-            }
-        }
-        else
-        {
-            if (lastDrawingMode == "pinchDrawing")
-            {
-                drawingMode ="farDrawing";
-            }
-            else if (lastDrawingMode == "controlPoints")
-            {
-                drawingMode ="pinchDrawing";
-            }
-            else if (lastDrawingMode == "pinPoints")
-            {
-                drawingMode ="controlPoints";
-            }
-            else if (lastDrawingMode == "farDrawing")
-            {
-                drawingMode ="pinPoints";
-            }
-            ToggleDrawingMode();
-        }
-    }
-    public void ToggleDrawingMode()
-    {
-
-        if (drawingMode =="farDrawing")
-        {
-            drawingMode ="pinchDrawing";
-            pointsOn = false;
-            farDrawing = false;
-            uIController.ModeText.text = "DRAW mode: Pinch Gesture";
-            uIController.Periodic.SetActive(true);
-        }
-        else if (drawingMode =="pinchDrawing")
-        {
-            drawingMode ="controlPoints";
-            pointsOn = true;
-            farDrawing = false;
-            uIController.ModeText.text = "DRAW mode: Control Points";
-            uIController.Periodic.SetActive(false);
-
-            EnableControlPoints(pointsOn);
-        }
-        else if (drawingMode =="controlPoints")
-        {
-            drawingMode ="pinPoints";
-            pointsOn = false;
-            pinPointsOn = true;
-            farDrawing = false;
-            uIController.ModeText.text = "DRAW mode: Pin Points";
-            ActivatePinPoints(pinPointsOn);
-            pinManager.newPin.SetActive(pinPointsOn);
-            EnableControlPoints(pointsOn);
-            uIController.Periodic.SetActive(false);
-        }
-        else
-        {
-            drawingMode ="farDrawing";
-            farDrawing = true;
-            pinPointsOn = false;
-            ActivatePinPoints(pinPointsOn);
-            pinManager.newPin.SetActive(pinPointsOn);
-            uIController.ModeText.text = "DRAW mode: Hand Ray";
-            uIController.Periodic.SetActive(true);
-        }
-
-        foreach (Transform child in meshGenerator.elementsParent.transform)
-        {
-            child.gameObject.GetComponent<MeshCollider>().enabled=farDrawing;
-            child.gameObject.GetComponent<StatefulInteractable>().enabled=farDrawing;
-        }
-    }
 
     public void EnableControlPoints(bool enable)
     {
@@ -500,26 +364,6 @@ public class DrawingController : MonoBehaviour
         }
     }
 
-    public void EnableEndPoints(bool enable)
-    {
-        // Iterate over each child of currentDrawingParent
-        foreach (Transform child in currentDrawingParent.transform)
-        {
-            // Check if the child GameObject has the specific tag you are interested in
-            if (child.CompareTag("simplified"))
-            {
-                MappingOnCurve mappingOnCurve = child.gameObject.GetComponent<MappingOnCurve>();
-                mappingOnCurve.UpdateStartPoint(enable);
-                foreach (Transform grandchild in child.transform)
-            {
-                if (grandchild.name == "StartPoint" || grandchild.name == "EndPoint")
-                {
-                    grandchild.gameObject.GetComponent<Renderer>().enabled = enable;
-                }
-            }
-            }
-        }
-    }
 
     void ActivatePinPoints(bool activate)
     {
@@ -599,132 +443,6 @@ public class DrawingController : MonoBehaviour
 
     }
 
-    public void CopySelectedLine()
-    {
-       if (selectedLine != null)
-        {
-
-            GameObject clonedLine = Instantiate(selectedLine, currentDrawingParent.transform);
-
-            LineRenderer lineR = clonedLine.GetComponent<LineRenderer>();
-
-            // Adjust each point's position in the LineRenderer
-            int positionCount = lineR.positionCount;
-            Vector3[] positions = new Vector3[positionCount];
-            lineR.GetPositions(positions);
-
-            for (int i = 0; i < positionCount; i++)
-            {
-                positions[i] += new Vector3(0, 0.2f, 0);
-            }
-
-            lineR.SetPositions(positions);
-            clonedLine.GetComponent<CurveManipulator>().lineRenderer = lineR;
-
-            clonedLine.transform.position += new Vector3(0, 0.2f, 0);
-
-            int originalIndex = selectedLine.transform.GetSiblingIndex();
-            clonedLine.transform.SetSiblingIndex(originalIndex + 1);
-
-            int lineCounter = 0;
-            foreach (Transform child in currentDrawingParent.transform)
-            {
-                if (child.name != "pins" && child.name != "BoundingBox(Clone)")
-                {
-                    child.name = "line" + lineCounter.ToString();
-                    lineCounter++;
-                }
-            }
-            SelectLine();
-        } 
-    }
-    public void EnableDeleteLineState()
-    {
-        delState = ! delState;
-        if (delState)
-        {
-            indexToChange = lineIndex;
-            SelectLine();
-        }
-        else
-        {
-            prevSelLine.GetComponent<LineRenderer>().material.color = prevColor;
-
-            selectedLine.MakeInteractableBoundBox(BoundsBox, false);
-
-            if (lineChanged)
-            {
-                int lineCounter = 0;
-                foreach (Transform child in currentDrawingParent.transform)
-                {
-                    if (child.name != "pins" && child.name != "BoundingBox(Clone)")
-                    {
-                        child.name = "line" + lineCounter.ToString();
-                        child.gameObject.MakeInteractableBoundBox(BoundsBox, false);
-                        lineCounter++;
-                    }
-                }
-            }
-            lineChanged = false;
-        }
-    }
-
-    public void DeleteLine()
-    {
-        if (selectedLine != null)
-        {
-            
-            selectedLine.DestroyGameObjectAndChildren("all",true);
-            
-            prevSelLine = null;
-            
-            lineChanged = true;
-
-            SelectLine();
-        }
-    }
-
-    public void SelectLine()
-    {
-
-        if (indexToChange == currentDrawingParent.transform.childCount -1)
-        {
-            indexToChange = 0;
-        }
-        selectedLine = currentDrawingParent.FindObject("line"+ indexToChange.ToString());
-        indexToChange++;
-
-        if (selectedLine != null)
-        {
-            LineRenderer lineR = selectedLine.GetComponent<LineRenderer>();
-            if (lineR.positionCount < 2)
-            {
-                Destroy(selectedLine);
-                SelectLine();
-                return;
-            }
-            
-            selectedLine.MakeInteractableBoundBox(BoundsBox, true);
-            
-            if (prevSelLine!=null)
-            {
-                prevSelLine.GetComponent<LineRenderer>().material.color = prevColor;
-
-                prevSelLine.MakeInteractableBoundBox(BoundsBox, false);
-            }
-            
-            prevSelLine = selectedLine;
-            prevColor = lineR.material.color;
-            
-            lineR.material.color = Color.blue;
-        }
-        else
-        {
-            SelectLine();
-        }
-
-    }
-
     public void CreateDrawingParent()
     {
         DrawingIndex++;
@@ -737,7 +455,6 @@ public class DrawingController : MonoBehaviour
             // pinManager.newPin.SetActive(false); 
         }
 
-        uIController.DrawingText.text = "Drawing No: " + DrawingIndex.ToString() + "    |";
         float scale = 1f; // Default scale
         // Validate currentDrawingParent and its scale
         if (currentDrawingParent != null)
@@ -811,43 +528,6 @@ public class DrawingController : MonoBehaviour
     {
         drawingOn = false;
         //Debug.Log("Drawing on a mesh is OFF");
-    }
-
-    public void DeleteLines()
-    {
-        foreach (Transform child in currentDrawingParent.transform)
-        {
-            // Destroy the child game object
-            Destroy(child.gameObject);
-        }
-
-        lineIndex = -1;
-        linePointIndex = 0;
-    }
-
-    public void UndoLine()
-    {
-        if (lineIndex >=0)
-        {
-            Debug.Log (currentDrawingParent.name + " ! Line" + lineIndex.ToString());
-            currentDrawingParent.DestroyGameObjectAndChildren("line" + lineIndex.ToString(), false);
-            
-
-            // Remove the line from the dictionary
-            string dkey = "drawing" + EnabledDrawingIndex.ToString();
-            if (storedDrawings.drawings.ContainsKey(dkey))
-            {
-                string lkey = "line"+ lineIndex.ToString();
-                if (storedDrawings.drawings[dkey].lines.ContainsKey(lkey))
-                {
-                    storedDrawings.drawings[dkey].lines.Remove(lkey);
-                }
-            }
-
-            // Decrement line index and reset line point index
-            lineIndex--;
-            linePointIndex = -1;
-        }
     }
 
     void AddPointsToLine(LineRenderer lineRenderer, Vector3 position)
@@ -1016,15 +696,8 @@ public class DrawingController : MonoBehaviour
 
         collider.sharedMesh = mesh;
 
-        PressableButton lineButton = lineObject.AddComponent<PressableButton>();
-        lineButton.OnClicked.AddListener(() => DestroyLine(lineButton.gameObject));
     }
 
-    public void DestroyLine(GameObject gObject) 
-    {
-        Destroy(gObject);
-    }
-    
     void UpdatePositionsInDictionary(string dkey)
     {
         GameObject drawing = linesParent.FindObject(dkey);
@@ -1087,50 +760,11 @@ public class DrawingController : MonoBehaviour
         }
     }
 
-    public void SavePriorityData(
-    Dictionary<string, List<(string pointName, bool direction)>> priority)
-    {
-        // Step 1: Generate a timestamp
-        string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
-
-        // Step 2: Create a unique filename using the timestamp, the word "priority", and the team name
-        string fileName = $"{timestamp}_priority_{team}.json";
-
-        // Step 3: Define the file path to save the JSON data
-        string filePath = Path.Combine(Application.persistentDataPath, fileName);
-
-        // Step 4: Serialize the priority dictionary to JSON
-        string json = JsonConvert.SerializeObject(priority, Formatting.Indented);
-
-        // Step 5: Save the JSON data to a file
-        File.WriteAllText(filePath, json);
-
-        Debug.Log($"Priority data saved to: {filePath}");
-    }
-
-    public void SendPriorityData(
-    Dictionary<string, object> priority)
-    {
-        Debug.Log(priority);
-        // Print all elements in the priority dictionary
-        foreach (var entry in priority)
-        {
-            Debug.Log($"Key: {entry.Key}");
-            Debug.Log($"Value: {entry.Value}");
-        }
-        Dictionary<string, object> msg_dict = new Dictionary<string, object>
-        {
-            {"result", priority}
-        };
-        mqttController.message = msg_dict;
-        
-        mqttController.Publish(mqttController.topicsPublish[1]);
-    }
-
 
 
     void OnApplicationQuit()
     {   
+        lineMaterial.color = Color.red;
         if (storedDrawings.drawings.ContainsKey("drawing0")) //storedDrawings.drawings["drawing0"].lines.Count !=0)
         {
             foreach (var dKey in storedDrawings.drawings.Keys)

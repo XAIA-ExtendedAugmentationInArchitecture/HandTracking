@@ -8,6 +8,8 @@ public class UIPressableButton : PressableButton
     {
          None,
 
+        // Basic Menu
+        Session_Space, Actions, CADLink, Inventory,
         // Drawing Actions
         Drawing_Freehand, Drawing_OnObject, ControlPoints,
 
@@ -21,13 +23,13 @@ public class UIPressableButton : PressableButton
         Color_Red, Color_Blue, Color_Green,
 
         //CADLinks
-        SaveDrawing, SendDrawing, RequestDrawing,
+        SaveDrawing, SendDrawing,
 
         //FileSettings
         NewDrawing, PreviousDrawing,
 
         //Scale
-        FreehandScale, NextScale, PreviousScale
+        ScaleParent, FreehandScale, NextScale, PreviousScale
 
   
     }

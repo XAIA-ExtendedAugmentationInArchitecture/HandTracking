@@ -20,16 +20,15 @@ public class MarkerLocalizer: MonoBehaviour
     {
         Trackables = XR_Rig.transform.Find("Trackables").gameObject;
         Trackables.SetActive(false);
-        uIController.TrackingText.text = "Tracking: OFF";
 
         Geometry = meshGenerator.elementsParent;
     }
     
     public void EnableLocalization()
     {
+        Debug.Log("Bazinga");
         TrackingOn = true;   
         Trackables.SetActive(true);
-        uIController.TrackingText.text = "Tracking: ON";
         
         if (trackingCoroutine != null)
         {
@@ -40,7 +39,7 @@ public class MarkerLocalizer: MonoBehaviour
 
     private IEnumerator TrackingTimer()
     {
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(4);
         if (TrackingOn)
         {
             DisableLocalization();
@@ -52,13 +51,18 @@ public class MarkerLocalizer: MonoBehaviour
     {
         TrackingOn = false;
         Trackables.SetActive(false);
-        uIController.TrackingText.text = "Tracking: OFF";
 
         if (trackingCoroutine != null)
         {
             StopCoroutine(trackingCoroutine);
             trackingCoroutine = null;
         }
+         //untoggle uIController.Localize
+        if (uIController.Localize.IsToggled)
+        {
+            uIController.Localize.ForceSetToggled(false);
+        }
+        
     }
     
 
@@ -90,10 +94,6 @@ public class MarkerLocalizer: MonoBehaviour
                             Geometry.transform.rotation = rot;
                             Geometry.SetActive(true);
 
-                            uIController.TableMenu.transform.position = pos;
-                            uIController.TableMenu.transform.rotation = rot;
-                            uIController.TableMenu.SetActive(true);
-
                             // if (drawController.pinManager.newPin)
                             // {
                             //     drawController.pinManager.newPin.transform.position = pos + (rot * drawController.pinManager.initialPinPosition);
@@ -119,22 +119,6 @@ public class MarkerLocalizer: MonoBehaviour
 
                             // Apply movement to the object's position
                             meshGenerator.inventoryParent.transform.position += movement;
-
-                            // Define movement amounts along local axes
-                            movementX = 0.0f;
-                            movementY = 0.25f;/* your desired movement along local y-axis */;
-                            movementZ = 0.25f/* your desired movement along local z-axis */;
-
-                            meshGenerator.detailsParent.transform.position = pos;
-                            meshGenerator.detailsParent.transform.rotation = rot;
-
-                            // Calculate movement vector based on local axes
-                            movement = (movementX * meshGenerator.detailsParent.transform.right) +
-                                            (movementY * meshGenerator.detailsParent.transform.up) +
-                                            (movementZ * meshGenerator.detailsParent.transform.forward);
-                            
-                            meshGenerator.detailsParent.transform.position += movement;
-
 
                             return; // Exit the loop once the desired marker is found
                         }

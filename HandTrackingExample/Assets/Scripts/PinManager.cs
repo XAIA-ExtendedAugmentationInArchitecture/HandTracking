@@ -10,7 +10,7 @@ public class PinManager : MonoBehaviour
     public DrawingController drawingController; 
     public GameObject PinPrefab;
 
-    [HideInInspector] public GameObject newPin;
+    public GameObject newPin;
 
     [HideInInspector] public GameObject pinParent;
     [HideInInspector] public int pinIndex=0;
@@ -23,9 +23,11 @@ public class PinManager : MonoBehaviour
         }
         // Instantiate the current GameObject at the given position
         newPin = Instantiate(PinPrefab);
+        // newPin.transform.localScale = new Vector3(0.75f, 0.75f, 0.75f);
         newPin.transform.parent = parent.transform;
         newPin.transform.localPosition = position;
         newPin.transform.localRotation = rotation;
+        
         newPin.name = "pin"+ pinIndex.ToString();
         pinIndex++;
         

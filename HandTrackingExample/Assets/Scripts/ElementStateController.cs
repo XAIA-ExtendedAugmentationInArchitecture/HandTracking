@@ -11,7 +11,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 public class ElementStateController : MonoBehaviour
 {
     private DrawingController drawController;
-    private OrderController orderController;
+
     public GameObject target;
     private ObjectManipulator targetObjectManipulator;
     private StatefulInteractable targetStatefulInteractable;
@@ -26,7 +26,6 @@ public class ElementStateController : MonoBehaviour
     void Start()
     {
         drawController = GameObject.Find("DrawingController").GetComponent<DrawingController>();
-        orderController = GameObject.Find("DrawingController").GetComponent<OrderController>();
 
         pressableButton = GetComponent<PressableButton>();
         if (pressableButton != null)
@@ -122,11 +121,9 @@ public class ElementStateController : MonoBehaviour
     
     private void OnManipulationEntered(SelectEnterEventArgs args)
     {
-        target.GetComponent<TimberElement>().moved = true;
     }
 
     private void OnManipulationExited(SelectExitEventArgs args)
     {
-        orderController.CheckProximityToCurves(target);
     }
 }

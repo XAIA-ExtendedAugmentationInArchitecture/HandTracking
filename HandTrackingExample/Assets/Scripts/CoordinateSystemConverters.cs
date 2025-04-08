@@ -1,9 +1,9 @@
 /*
-    Author: MESH AG - Eleni Vasiliki Alexi
+    Author: blinded
     License: MIT
     Created on: 14/02/2024 12:00
     Updated on: 04/06/2024 12:00
-    Author: Huma Lab - Eleni Vasiliki Alexi
+    Author: blinded
 
     This Unity file contains custom JSON converters for int[], Vector3, Vector3[], and Dictionary<string, Vector3[]>.
     These converters are designed to facilitate serialization and deserialization of Vector3 data and int[] data  from JSON format.

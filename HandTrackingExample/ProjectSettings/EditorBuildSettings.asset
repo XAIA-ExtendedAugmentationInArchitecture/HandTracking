@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/hand_tracking_test.unity
-    guid: 9ae4a22a3cfe87441aa6b4cd5997d726
+    path: Assets/Scenes/Far_Interaction_Drawing.unity
+    guid: 4cc03cf363a15e5428dcad8349ee5f54
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 9ad56510223fe8e4e821d2c7120c5b13, type: 2}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: ecbcbc914f115f048a9d566c45ed92f8, type: 2}
