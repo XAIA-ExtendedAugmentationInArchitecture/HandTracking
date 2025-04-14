@@ -85,6 +85,10 @@ public class UIControllerExtra : MonoBehaviour
                 ExtraSettings.SetActive(false);
                 drawingController.ModePinPoints();
                 pinParent.SetActive(true);
+                foreach (Transform child in pinParent.transform)
+                {
+                    child.gameObject.SetActive(true);
+                }
                 break;
             case UIPressableButton.ActionType.Session_Space:
                 //untoggle all other buttons

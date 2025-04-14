@@ -44,7 +44,7 @@ public class DrawingController : MonoBehaviour
     private LineRenderer lineRenderer_realtime;
     private LineRenderer lineRenderer_simplified;
     public Material ControlPointMaterial;
-    private float lineWidth = 0.01f;
+    private float lineWidth = 0.0025f;
     private int DrawingIndex = -1;
     private int lineIndex = -1;
     private int linePointIndex = 0;
