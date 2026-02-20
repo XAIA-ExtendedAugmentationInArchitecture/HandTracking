@@ -96,7 +96,7 @@ public class CurveManipulator : MonoBehaviour
         float totalLength = CalculateTotalLength(initialPositions);
         if (simplify)
         {
-            float simplifyingFactor = 0.02f;
+            float simplifyingFactor = 0.008f;
 
         if (totalLength <= 0.5f)
         {

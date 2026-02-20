@@ -451,6 +451,7 @@ public class MeshGeneratorFromJson : MonoBehaviour
     {
         element = data.GenerateMesh();
         element.transform.parent = elParent.transform;
+        element.transform.localScale = Vector3.one; // Ensure scale is (1,1,1)
 
         Material uniqueMaterial = new Material(material);
         uniqueMaterial.name = element.name;
@@ -473,7 +474,7 @@ public class MeshGeneratorFromJson : MonoBehaviour
         Vector3 center = bounds.center;
         Vector3 size = bounds.size;
 
-        lockInstance.GetComponent<Orbital>().LocalOffset = new Vector3(center.x, center.y + size.y / 2 + 0.05f, center.z);
+        lockInstance.GetComponent<Orbital>().LocalOffset = new Vector3(center.x, center.y + size.y / 2 + 0.015f, center.z);
         
         lockInstance.name = "lock_" + element.name;
         lockInstance.transform.parent = locksParent.transform;

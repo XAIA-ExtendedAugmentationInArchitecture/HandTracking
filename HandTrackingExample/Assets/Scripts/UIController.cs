@@ -41,7 +41,7 @@ public class UIController : MonoBehaviour
     public PressableButton InventoryButton;
 
 
-    private float[] scales = {1.0f, 0.5f, 0.2f, 0.1f, 0.05f, 0.02f, 0.01f, 0.004f, 0.002f, 0.001f };
+    private float[] scales = { 1.0f, 0.5f, 0.2f, 0.1f, 0.05f }; // 0.02f, 0.01f, 0.004f, 0.002f, 0.001f };
     private int currentScaleIndex = 0;
 
     
@@ -114,7 +114,8 @@ public class UIController : MonoBehaviour
 
             float scaleValue = drawController.currentDrawingParent.transform.localScale.x;
             meshGenerator.inventoryParent.transform.localScale = Vector3.one * scaleValue;
-            if (scaleValue !=1.0f)
+            meshGenerator.elementsParent.transform.localScale = Vector3.one * scaleValue;
+            if (scaleValue != 1.0f)
             {
                 meshGenerator.locksParent.transform.localScale = Vector3.one * 0.75f;
             }
@@ -124,7 +125,7 @@ public class UIController : MonoBehaviour
             }
             else
             {
-              ScaleInfo.text = "1:" + Mathf.RoundToInt(1/ scaleValue).ToString();  
+                ScaleInfo.text = "1:" + Mathf.RoundToInt(1 / scaleValue).ToString();
             }
 
             foreach (Transform child in meshGenerator.locksParent.transform)

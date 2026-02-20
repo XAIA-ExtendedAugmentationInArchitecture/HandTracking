@@ -25,7 +25,7 @@ public class DrawingController : MonoBehaviour
     [HideInInspector] public bool pinPointsOn = false;
     private bool farDrawing = false;
 
-    [HideInInspector] public string drawingMode = "farDrawing";
+    [HideInInspector] public string drawingMode = "";
     [HideInInspector] public string lastDrawingMode = "";
 
     public GameObject BoundsBox;
@@ -246,7 +246,6 @@ public class DrawingController : MonoBehaviour
 
     public void GenerateNewDrawings(Drawings data)
     {
-        Debug.Log("Hoiiilaaaa" );
         foreach(KeyValuePair<string, Drawing> drawEntry in data.drawings)
         {
             Drawing drawing = drawEntry.Value;
@@ -414,32 +413,38 @@ public class DrawingController : MonoBehaviour
 
     public void VisualizeDrawing()
     {
+        UpdatePositionsInDictionary("drawing" + EnabledDrawingIndex.ToString());
         HideChildren(linesParent.transform);
-        EnabledDrawingIndex ++;
+        EnabledDrawingIndex++;
         if (EnabledDrawingIndex == linesParent.transform.childCount)
         {
-            EnabledDrawingIndex=0;
+            EnabledDrawingIndex = 0;
         }
         currentDrawingParent = linesParent.transform.GetChild(EnabledDrawingIndex).gameObject;
-        lineIndex = currentDrawingParent.transform.childCount -1;
+        lineIndex = currentDrawingParent.transform.childCount - 1;
         currentDrawingParent.SetActive(true);
 
         int existingPins = currentDrawingParent.FindObject("pins").transform.childCount;
-        pinManager.newPin.name ="pin" + existingPins;
+        pinManager.newPin.name = "pin" + existingPins;
         pinManager.pinIndex = existingPins + 1;
 
 
         EnableControlPoints(pointsOn);
         ActivatePinPoints(pinPointsOn);
 
-        foreach (var kvp in storedDrawings.drawings["drawing"+ EnabledDrawingIndex.ToString()].objectFrames)
+        foreach (var kvp in storedDrawings.drawings["drawing" + EnabledDrawingIndex.ToString()].objectFrames)
         {
             string object_name = kvp.Key;
             Frame object_frame = kvp.Value;
 
-            GameObject gobject = meshGenerator.elementsParent.FindObject(object_name);
+            GameObject gobject = meshGenerator.elementsParent.FindObject(object_name); 
+            if (gobject == null)
+            {
+                gobject = meshGenerator.inventoryParent.FindObject(object_name);
+            }
             gobject.Orient(object_frame);
         }
+    
 
     }
 
@@ -588,14 +593,14 @@ public class DrawingController : MonoBehaviour
 
         Vector3[] positions = new Vector3[name.positionCount];
         name.GetPositions(positions);
-        
+
         string dkey = "drawing" + DrawingIndex.ToString();
 
         if (!storedDrawings.drawings.ContainsKey(dkey))
         {
             Transform parent = meshGenerator.elementsParent.transform;
             storedDrawings.drawings["drawing" + DrawingIndex.ToString()] = new Drawing
-            {   
+            {
                 MCF = new Frame
                 {
                     point = parent.position,
@@ -606,8 +611,8 @@ public class DrawingController : MonoBehaviour
             };
         }
 
-        string lkey =  "line"+ lineIndex.ToString();
-        
+        string lkey = "line" + lineIndex.ToString();
+
         if (!storedDrawings.drawings[dkey].lines.ContainsKey(dkey))
         {
             storedDrawings.drawings[dkey].lines[lkey] = new DrawingLine
@@ -620,13 +625,25 @@ public class DrawingController : MonoBehaviour
                     lineMaterial.color.a
                 },
                 positions = new Vector3[positions.Length]
+                
             };
         }
         storedDrawings.drawings[dkey].lines[lkey].positions = positions;
+        storedDrawings.drawings[dkey].lines[lkey].periodic = name.loop;
 
         storedDrawings.drawings[dkey].objectFrames = new Dictionary<string, Frame>();
 
         foreach (Transform child in meshGenerator.elementsParent.transform)
+        {
+            storedDrawings.drawings[dkey].objectFrames[child.name] = new Frame
+            {
+                point = child.position,
+                xaxis = child.right,
+                zaxis = child.forward
+            };
+        }
+        
+        foreach (Transform child in meshGenerator.inventoryParent.transform)
         {
             storedDrawings.drawings[dkey].objectFrames[child.name] = new Frame
             {
@@ -704,13 +721,13 @@ public class DrawingController : MonoBehaviour
 
         foreach (Transform child in drawing.transform)
         {
-            
+
             if (child.CompareTag("simplified"))
             {
                 string lKey = child.gameObject.name;
 
                 CurveManipulator crvManipulator = child.gameObject.GetComponent<CurveManipulator>();
-                
+
                 if (crvManipulator == null)
                 {
                     Debug.LogError("CurveManipulator component not found on: " + lKey);
@@ -732,9 +749,46 @@ public class DrawingController : MonoBehaviour
                 for (int i = 0; i < crvManipulator.controlPositions.Length; i++)
                 {
                     lineData.positions[i] = crvManipulator.controlPositions[i];
-                } 
+                }
 
-                crvManipulator.saved = true;  
+
+
+                crvManipulator.saved = true;
+            }
+        }
+
+
+        storedDrawings.drawings[dkey].scale = currentDrawingParent.transform.localScale.x;
+
+
+        // Only add new frames if they don't already exist in the dictionary
+        if (storedDrawings.drawings[dkey].objectFrames == null)
+        {
+            storedDrawings.drawings[dkey].objectFrames = new Dictionary<string, Frame>();
+        }
+
+        // Combine meshGenerator.elementsParent and meshGenerator.inventoryParent for updating objectFrames
+        IEnumerable<Transform> allChildren = meshGenerator.elementsParent.transform.Cast<Transform>()
+            .Concat(meshGenerator.inventoryParent.transform.Cast<Transform>());
+
+        foreach (Transform child in allChildren)
+        {
+            if (!storedDrawings.drawings[dkey].objectFrames.ContainsKey(child.name))
+            {
+            // If it doesn't exist, add it
+            storedDrawings.drawings[dkey].objectFrames[child.name] = new Frame
+            {
+                point = child.position,
+                xaxis = child.right,
+                zaxis = child.forward
+            };
+            }
+            else
+            {
+            // Otherwise, update it
+            storedDrawings.drawings[dkey].objectFrames[child.name].point = child.position;
+            storedDrawings.drawings[dkey].objectFrames[child.name].xaxis = child.right;
+            storedDrawings.drawings[dkey].objectFrames[child.name].zaxis = child.forward;
             }
         }
     }

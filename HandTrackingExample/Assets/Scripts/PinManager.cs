@@ -26,7 +26,11 @@ public class PinManager : MonoBehaviour
         // newPin.transform.localScale = new Vector3(0.75f, 0.75f, 0.75f);
         newPin.transform.parent = parent.transform;
         newPin.transform.localPosition = position;
+        Vector3 adjustedPosition = newPin.transform.localPosition;
+        adjustedPosition.y += 74.2f; // slight offset to avoid z-fighting
+        newPin.transform.localPosition = adjustedPosition;
         newPin.transform.localRotation = rotation;
+        newPin.transform.localScale= 700f * Vector3.one;
         
         newPin.name = "pin"+ pinIndex.ToString();
         pinIndex++;

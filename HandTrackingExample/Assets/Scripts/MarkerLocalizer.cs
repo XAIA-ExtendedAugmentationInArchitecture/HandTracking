@@ -101,7 +101,7 @@ public class MarkerLocalizer: MonoBehaviour
                             // }
                             
 
-                            meshGenerator.locksParent.SetActive(true);
+                            //meshGenerator.locksParent.SetActive(true);
 
                             meshGenerator.inventoryParent.transform.position = pos;
                             meshGenerator.inventoryParent.transform.rotation = rot;
